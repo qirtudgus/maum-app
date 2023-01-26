@@ -33,7 +33,7 @@ footer, header, hgroup, menu, nav, section {
 body {
 	line-height: 1;
 }
-ol, ul {
+ol, ul, li {
 	list-style: none;
 }
 blockquote, q {
@@ -49,6 +49,23 @@ table {
 	border-spacing: 0;
 }
   
+*::-webkit-scrollbar {
+  width: 8px;
+
+
+}
+*::-webkit-scrollbar-track {
+	background-color: #b8b8b8;
+}
+ 
+*::-webkit-scrollbar-thumb {   
+	border-radius: 2px;
+  background-color: #525252;
+}
+*::-webkit-scrollbar-thumb:hover {   
+  background-color: #252525;
+}
+
 `;
 
 export default GlobalStyle;
