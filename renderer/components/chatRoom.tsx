@@ -20,12 +20,14 @@ const MessageWrap = styled.div<MessageSendData>`
   margin: 0 auto;
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  align-items: flex-start;
+  /* justify-content: flex-start; */
+  flex-direction: column;
+
   margin-bottom: 30px;
   /* flex-direction: column; */
   &.myMessage {
-    justify-content: flex-end;
+    align-items: flex-end;
   }
 
   &.myMessage > li {
@@ -52,6 +54,10 @@ const MessageWrap = styled.div<MessageSendData>`
     position: absolute;
     left: -140px;
     font-size: 12px;
+  }
+
+  & .messageWrite {
+    margin-bottom: 5px;
   }
 `;
 
@@ -158,6 +164,7 @@ const ChatRoom = ({
                 'myMessage'
               }
             >
+              <span className='messageWrite'>{i.displayName}</span>
               <Message
 
               //본인 메시지일 경우에 대한 스타일링용 className
