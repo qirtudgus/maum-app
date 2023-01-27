@@ -181,6 +181,7 @@ const GroupChatList = ({
       setGroupChatUserList(userList);
     });
   };
+
   const enterGroupChatRoom = (item: groupChatList) => {
     setIsStartChat(false);
     setIsStartGroupChat(true);
@@ -189,7 +190,6 @@ const GroupChatList = ({
       chatRoomUid: item.chatUid,
     });
   };
-
   //uid배열과 chatRoomUid를 받아와 uid들의 그룹채팅리스트에 그룹채팅uid를 추가해준다.
   const updateUsersChatRoomUid = async (uid: string, chatRoomUid: string) => {
     let myGroupChatListPath = ref(
@@ -218,43 +218,32 @@ const GroupChatList = ({
   };
 
   const createGroupChatRoom = () => {
-    console.log(addUserList);
-    //한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
+    //1.한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
     let chatRoomUid = createChatUid();
-    // setChatRoomTitleDefaultValue(고유번호);
-
-    //1. 선택된 uid들을 순회하며 각 db경로에 uid 추가해주기
-    // uid를 받아 순회하기만하면돼서 모듈화 해도 될듯
+    //2.초대된 유저를 순회하며, 각 유저들의 채팅리스트를 업데이트해준다.
     addUserList.forEach(async (i) => {
       updateUsersChatRoomUid(i.uid, chatRoomUid);
     });
-    //2. 고유 그룹채팅방 생성하기
-    // 인원 정보 쭉 넣고
-    // chat 추가하고...
-    let 고유채팅방경로 = ref(
-      realtimeDbService,
-      `groupChatRooms/${chatRoomUid}`,
-    );
-    let 고유채팅방채팅 = ref(
+    //2. 고유 그룹채팅방 생성하고, 시작메시지 push하기
+    let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
+    let groupChatMessagePath = ref(
       realtimeDbService,
       `groupChatRooms/${chatRoomUid}/chat`,
     );
-    //인원 정보 추가
-
-    let 제목은 =
+    //3.채팅방제목을 적으면 그걸로 사용, 안적었을 시 고유번호로 사용
+    let chatRoomTitle =
       chatRoomsTitleInputRef.current.value !== ''
         ? chatRoomsTitleInputRef.current.value
         : chatRoomUid;
 
-    set(고유채팅방경로, {
-      chatRoomsTitle: 제목은,
+    set(groupChatPath, {
+      chatRoomsTitle: chatRoomTitle,
       connectedUser: addUserList,
     });
-    push(고유채팅방채팅, {
+    push(groupChatMessagePath, {
       displayName: authService.currentUser.displayName,
       uid: authService.currentUser.uid,
       message: `그룹채팅이 시작되었습니다.`,
-      // message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
       createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
     });
     setShowAddGroupChat(false);
