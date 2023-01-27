@@ -1,5 +1,6 @@
 import { get, onValue, push, ref, set, update } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
+import Head from 'next/head';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import {
@@ -9,6 +10,8 @@ import {
   UserList,
 } from '../firebaseConfig';
 import { convertDate } from './chatRoom';
+import LoadingSpinner from './LoadingSpinner';
+import MessageContainerFront from './messageContainer';
 
 const Message = styled.li`
   &.myMessage {
@@ -99,6 +102,8 @@ const GroupChatRoom = ({
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
 
+  const [isChatLoading, setIsChatLoading] = useState(false);
+
   const messageInputRef = useRef<HTMLInputElement>();
 
   const showUserList = () => {
@@ -166,6 +171,8 @@ const GroupChatRoom = ({
       setConnectedUserList(갱신배열);
     });
 
+    setIsChatLoading(true);
+
     return () => {
       //로그아웃시에도 채팅창이 닫히도록..
       //지금은 채팅창 컴포넌트를 띄운채로 로그아웃 시
@@ -198,6 +205,9 @@ const GroupChatRoom = ({
 
   return (
     <>
+      <Head>
+        <title>maumTalk - {chatRoomInfo.displayName} 그룹채팅</title>
+      </Head>
       <div>{chatRoomInfo.displayName} 채팅방</div>
       <div>
         참여자:{' '}
@@ -205,22 +215,11 @@ const GroupChatRoom = ({
           return <li key={index}>{i.displayName}</li>;
         })}
       </div>
-      {chatList.map((i, index) => {
-        return (
-          <Message
-            key={index}
-            //본인 메시지일 경우에 대한 스타일링용 className
-            className={
-              i.displayName === authService.currentUser.displayName &&
-              'myMessage'
-            }
-          >
-            {i.createdAt}
-            {i.message}
-          </Message>
-        );
-      })}
-
+      {isChatLoading ? (
+        <MessageContainerFront chatList={chatList} />
+      ) : (
+        <LoadingSpinner />
+      )}
       <input
         ref={messageInputRef}
         placeholder='메시지를 입력해주세요'
