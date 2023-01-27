@@ -1,6 +1,6 @@
-import { get, off, onValue, push, ref } from 'firebase/database';
+import { off, onValue, push, ref } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
-import { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { authService, realtimeDbService } from '../firebaseConfig';
@@ -134,7 +134,7 @@ const ChatRoom = ({
     };
   }, [chatRoomInfo.chatRoomUid]);
 
-  //언마운트 시 현재 활성화된 액티브돔을 찾아서 제거한다.
+  //언마운트 시 현재 활성화된 메뉴의 액티브돔을 찾아서 제거한다.
   useLayoutEffect(() => {
     return () => {
       if (document.getElementById('chatUserActive')) {
@@ -145,16 +145,15 @@ const ChatRoom = ({
 
   return (
     <>
+      <Head>
+        <title>maumTalk - {chatRoomInfo.displayName}와의 대화</title>
+      </Head>
       <ChatTitle>
         {chatRoomInfo.displayName}와의 대화
         <span
           title='닫기'
           className='closeBtn'
           onClick={() => {
-            //현재 활성화된 액티브돔을 찾아서 제거한다.
-            if (document.getElementById('chatUserActive')) {
-              document.getElementById('chatUserActive').removeAttribute('id');
-            }
             setIsStartChat(false);
           }}
         >
