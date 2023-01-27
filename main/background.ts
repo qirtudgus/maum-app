@@ -17,13 +17,20 @@ if (isProd) {
     width: 1000,
     height: 600,
   });
+  const mainWindow2 = createWindow('main2', {
+    width: 1000,
+    height: 600,
+  });
 
   if (isProd) {
     await mainWindow.loadURL('app://./home.html');
+    await mainWindow2.loadURL('app://./home.html');
   } else {
     const port = process.argv[2];
     await mainWindow.loadURL(`http://localhost:${port}/home`);
+    await mainWindow2.loadURL(`http://localhost:${port}/home`);
     mainWindow.webContents.openDevTools();
+    mainWindow2.webContents.openDevTools();
   }
 })();
 
