@@ -1,4 +1,5 @@
 import { push, ref, set, onDisconnect, get } from '@firebase/database';
+import { onValue } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import React from 'react';
 import { useEffect, useState } from 'react';
@@ -80,42 +81,41 @@ const OnUserList = ({
   //로그아웃 시 db에서 uid 제거
   const [userList, setUserList] = useState<UserListUserInfoInterface[]>([]);
   useEffect(() => {
-    const getUserList = async () => {
-      const list = await get(userListRef);
-      console.log('유즈이펙트로 가져온 유저 리스트');
-      console.log(list.val());
-      const value: UserListUserInfoInterface[] = Object.values(list.val());
-      console.log(value);
-      return value;
-    };
-    getUserList().then((res) => {
-      //클라이언트 접속 종료 시 종료상태를 false로 바꿔주는 onDisconnect 설정
-      if (authService.currentUser) {
-        const myConnectionsRef = ref(
-          realtimeDbService,
-          `userList/${authService.currentUser.uid}`,
-        );
-        onDisconnect(myConnectionsRef).update({ isOn: false });
-      }
-      setUserList(res);
-    });
-
-    //
-    // onValue(userListRef, (snapshot: DataSnapshot) => {
-    //   console.log('온밸류 호출');
-    //   //   console.log(snapshot.val());
-    //   const userList = snapshot.val();
-    //   //회원이 한명도 없는 경우에 대한 타입가드
-    //   if (userList !== null) {
-    //     const userListObj = Object.values(
-    //       userList,
-    //     ) as UserListUserInfoInterface[];
-    //     setUserList(userListObj);
-
-    //     //이건 연결이끊겼을때 해당 데이터를 삭제하는것...
-    //     // onDisconnect(userListRef).remove();
+    //실시간으로 접속유저를 볼 수가 없어서 잠시 주석처리..
+    // const getUserList = async () => {
+    //   const list = await get(userListRef);
+    //   console.log('유즈이펙트로 가져온 유저 리스트');
+    //   console.log(list.val());
+    //   const value: UserListUserInfoInterface[] = Object.values(list.val());
+    //   console.log(value);
+    //   return value;
+    // };
+    // getUserList().then((res) => {
+    //   //클라이언트 접속 종료 시 종료상태를 false로 바꿔주는 onDisconnect 설정
+    //   if (authService.currentUser) {
+    //     const myConnectionsRef = ref(
+    //       realtimeDbService,
+    //       `userList/${authService.currentUser.uid}`,
+    //     );
+    //     onDisconnect(myConnectionsRef).update({ isOn: false });
     //   }
+    //   setUserList(res);
     // });
+
+    // 온밸류를 안쓰니 접속중인 유저를 실시간표시할수가 없다...
+    onValue(userListRef, (snapshot) => {
+      console.log('온밸류 호출');
+      //   console.log(snapshot.val());
+      const userList = snapshot.val();
+      //회원이 한명도 없는 경우에 대한 타입가드
+      if (userList !== null) {
+        const userListObj = Object.values(
+          userList,
+        ) as UserListUserInfoInterface[];
+
+        setUserList(userListObj);
+      }
+    });
   }, []);
 
   return (
