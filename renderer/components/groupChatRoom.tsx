@@ -1,4 +1,4 @@
-import { get, onValue, push, ref, set, update } from 'firebase/database';
+import { get, off, onValue, push, ref, set, update } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import Head from 'next/head';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -13,6 +13,7 @@ import { convertDate } from './chatRoom';
 import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerFront from './messageContainer';
+import SendMessageInput from './SendMessageInput';
 
 const GroupChatModalUserList = styled.li`
   width: 90%;
@@ -48,8 +49,6 @@ const AddGroupChatModal = styled.div`
   width: 300px;
   height: 300px;
   background: #eee;
-  /* display: flex; */
-  /* flex-direction: column; */
 `;
 
 const AddUserListWrap = styled.div`
@@ -95,10 +94,7 @@ const GroupChatRoom = ({
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
-
   const [isChatLoading, setIsChatLoading] = useState(false);
-
-  const messageInputRef = useRef<HTMLInputElement>();
 
   const showUserList = () => {
     getUserList().then((userList) => {
@@ -113,27 +109,6 @@ const GroupChatRoom = ({
       setGroupChatUserList(duplicateDeleteArr);
     });
   };
-
-  const SendMessage = async () => {
-    //저장할 경로
-    const 채팅저장경로 = ref(
-      realtimeDbService,
-      `groupChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
-    );
-    let message = messageInputRef.current.value;
-
-    await push(채팅저장경로, {
-      displayName: authService.currentUser.displayName,
-      uid: authService.currentUser.uid,
-      message: message,
-      createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-    });
-    messageInputRef.current.focus();
-    messageInputRef.current.value = '';
-
-    //메시지 작성 후 비워주기
-  };
-
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     console.log(`현재 채팅방 : ${chatRoomInfo.chatRoomUid}`);
@@ -144,16 +119,13 @@ const GroupChatRoom = ({
     );
     onValue(채팅경로, (snapshot) => {
       console.log('채팅이 갱신되었습니다');
-      //   console.log(snapshot.val());
-      //   let a = snapshot.val();
-      let a = snapshot.val();
-
-      console.log(a);
-      let messageList = Object.values(a);
+      const chatData = snapshot.val();
+      console.log(chatData);
+      const messageList = Object.values(chatData);
       setChatList(messageList);
     });
     //현재채팅방 사용유저 onValue
-    let 고유채팅인원경로 = ref(
+    const 고유채팅인원경로 = ref(
       realtimeDbService,
       `groupChatRooms/${chatRoomInfo.chatRoomUid}/connectedUser`,
     );
@@ -168,34 +140,11 @@ const GroupChatRoom = ({
     setIsChatLoading(true);
 
     return () => {
-      //로그아웃시에도 채팅창이 닫히도록..
-      //지금은 채팅창 컴포넌트를 띄운채로 로그아웃 시
-      //계정데이터를 못읽어와서 오류가 난다.
-
-      // 해당코드를 넣으면 로그아웃시 오류는 없지만 채팅방을 옮길 때 두번 눌러줘야한다.
-      //   setIsStartChat(false);
+      off(채팅경로);
+      off(고유채팅인원경로);
       console.log('채팅방을 나갔습니다.');
     };
   }, [chatRoomInfo.chatRoomUid]);
-
-  useEffect(() => {
-    //참여자 불러오기
-    const 고유인원배열리턴 = async () => {
-      let 고유채팅인원경로 = ref(
-        realtimeDbService,
-        `groupChatRooms/${chatRoomInfo.chatRoomUid}/connectedUser`,
-      );
-      let 고유채팅인원리스트 = await (await get(고유채팅인원경로)).val();
-      return 고유채팅인원리스트;
-    };
-
-    console.log('유즈이펙트로 불러온 리스트');
-
-    고유인원배열리턴().then((res) => {
-      console.log(res);
-      setConnectedUserList(res);
-    });
-  }, []);
 
   useLayoutEffect(() => {
     return () => {
@@ -225,14 +174,8 @@ const GroupChatRoom = ({
       ) : (
         <LoadingSpinner />
       )}
-      <input
-        ref={messageInputRef}
-        placeholder='메시지를 입력해주세요'
-        onKeyDown={(e: React.KeyboardEvent) => {
-          if (e.key === 'Enter') SendMessage();
-        }}
-      ></input>
-      <button onClick={SendMessage}>메시지 전송</button>
+
+      <SendMessageInput chatRoomInfo={chatRoomInfo} isOneToOneOrGroup='group' />
       <button
         onClick={() => {
           console.log(chatList);
@@ -240,13 +183,6 @@ const GroupChatRoom = ({
         }}
       >
         채팅 로그 확인
-      </button>
-      <button
-        onClick={() => {
-          setIsStartGroupChat(false);
-        }}
-      >
-        나가기
       </button>
       <button
         onClick={async () => {
