@@ -153,8 +153,8 @@ const GroupChatList = ({
         realtimeDbService,
         `userList/${authService.currentUser.uid}/myGroupChatList`,
       );
+      console.log('그룹채팅 온밸류 호출');
       onValue(myGroupChatListPath, async (snapshot) => {
-        console.log('그룹채팅 온밸류 호출');
         //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
         if (snapshot.val()) {
           let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
@@ -165,8 +165,8 @@ const GroupChatList = ({
               let mergeGroupChatList = groupChatUidList.map((item, index) => {
                 return { chatUid: item, chatTitle: groupChatTitleList[index] };
               });
-              console.log('그룹채팅배열');
-              console.log(mergeGroupChatList);
+              //   console.log('그룹채팅배열');
+              //   console.log(mergeGroupChatList);
               setGroupChatAllList(mergeGroupChatList);
             },
           );
@@ -188,6 +188,76 @@ const GroupChatList = ({
       displayName: item.chatTitle,
       chatRoomUid: item.chatUid,
     });
+  };
+
+  //uid배열과 chatRoomUid를 받아와 uid들의 그룹채팅리스트에 그룹채팅uid를 추가해준다.
+  const updateUsersChatRoomUid = async (uid: string, chatRoomUid: string) => {
+    let myGroupChatListPath = ref(
+      realtimeDbService,
+      `userList/${uid}/myGroupChatList`,
+    );
+    const checkCurrentGroupChatRoomsArr: string[] | null = await (
+      await get(myGroupChatListPath)
+    ).val()?.groupChatUid;
+    //checkCurrentGroupChatRooms이 true일때 false일때(참여한 채팅방이 없는상태)로 분기된다.
+    if (checkCurrentGroupChatRoomsArr) {
+      //기존에 가지고있던 채팅리스트에 새로 생성된 채팅방을 추가하여 set해준다.
+      const updateCurrentGroupChatRoomsArr = [
+        ...checkCurrentGroupChatRoomsArr,
+        chatRoomUid,
+      ];
+      set(myGroupChatListPath, {
+        groupChatUid: updateCurrentGroupChatRoomsArr,
+      });
+    } else {
+      //그룹채팅이 아예 처음 초대됐기때문에 바로 채팅방을 set해준다.
+      set(myGroupChatListPath, {
+        groupChatUid: [chatRoomUid],
+      });
+    }
+  };
+
+  const createGroupChatRoom = () => {
+    console.log(addUserList);
+    //한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
+    let chatRoomUid = createChatUid();
+    // setChatRoomTitleDefaultValue(고유번호);
+
+    //1. 선택된 uid들을 순회하며 각 db경로에 uid 추가해주기
+    // uid를 받아 순회하기만하면돼서 모듈화 해도 될듯
+    addUserList.forEach(async (i) => {
+      updateUsersChatRoomUid(i.uid, chatRoomUid);
+    });
+    //2. 고유 그룹채팅방 생성하기
+    // 인원 정보 쭉 넣고
+    // chat 추가하고...
+    let 고유채팅방경로 = ref(
+      realtimeDbService,
+      `groupChatRooms/${chatRoomUid}`,
+    );
+    let 고유채팅방채팅 = ref(
+      realtimeDbService,
+      `groupChatRooms/${chatRoomUid}/chat`,
+    );
+    //인원 정보 추가
+
+    let 제목은 =
+      chatRoomsTitleInputRef.current.value !== ''
+        ? chatRoomsTitleInputRef.current.value
+        : chatRoomUid;
+
+    set(고유채팅방경로, {
+      chatRoomsTitle: 제목은,
+      connectedUser: addUserList,
+    });
+    push(고유채팅방채팅, {
+      displayName: authService.currentUser.displayName,
+      uid: authService.currentUser.uid,
+      message: `그룹채팅이 시작되었습니다.`,
+      // message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
+      createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+    });
+    setShowAddGroupChat(false);
   };
 
   return (
@@ -279,90 +349,7 @@ const GroupChatList = ({
                 </GroupChatModalUserList>
               );
             })}
-            <button
-              onClick={() => {
-                console.log(addUserList);
-
-                //1.완료 시 추가된 사람들의 식별자를 이용하여 uid와,닉네임과,채팅uid 그룹 채팅방을 만든다.
-                //2. 그룹 채팅리스트에 넣어준다.
-                //새로 초대된 사람들도 그룹 채팅 리스트에 들어가있다면 화면에 렌더링해준다.
-                //그룹 채팅 리스트는...채팅식별번호와 유저리스트로 이루어져있게?
-                //그러면 그룹채팅리스트를 db에서 필터링해서 가져오거나,
-                //클라이언트에서 가져와 순회하면서 내 uid가 들어있는 채팅식별번호만
-
-                //필요한 자료구조
-
-                //고유 그룹채팅방
-                //그룹채팅방의 인원정보
-                //그룹채팅을 저장할 공간
-
-                //내 정보에 고유그룹채팅 리스트를 추가해서 렌더링 or 고유그룹채팅방의 인원정보를 순회해서 내가 있으면 렌더링
-
-                //한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
-                let 고유번호 = createChatUid();
-                // setChatRoomTitleDefaultValue(고유번호);
-
-                //1. 선택된 uid들을 순회하며 각 db경로에 uid 추가해주기
-                addUserList.forEach(async (i, index) => {
-                  let uid = i.uid;
-                  let 그룹채팅 = ref(
-                    realtimeDbService,
-                    `userList/${uid}/myGroupChatList`,
-                  );
-                  let 현재그룹채팅배열: any[] = await (
-                    await get(그룹채팅)
-                  ).val()?.groupChatUid;
-                  console.log(현재그룹채팅배열);
-
-                  //현재그룹채팅배열이 true일때 false일때(참여한 채팅방이 없는상태)로 분기된다.
-                  if (현재그룹채팅배열) {
-                    let 갱신채팅배열 = [...현재그룹채팅배열, 고유번호];
-                    console.log(갱신채팅배열);
-                    set(그룹채팅, {
-                      groupChatUid: 갱신채팅배열,
-                    });
-                  } else {
-                    set(그룹채팅, {
-                      groupChatUid: [고유번호],
-                    });
-                  }
-                });
-                //2. 고유 그룹채팅방 생성하기
-                // 인원 정보 쭉 넣고
-                // chat 추가하고...
-                let 고유채팅방경로 = ref(
-                  realtimeDbService,
-                  `groupChatRooms/${고유번호}`,
-                );
-                let 고유채팅방채팅 = ref(
-                  realtimeDbService,
-                  `groupChatRooms/${고유번호}/chat`,
-                );
-                //인원 정보 추가
-
-                let 제목은 =
-                  chatRoomsTitleInputRef.current.value !== ''
-                    ? chatRoomsTitleInputRef.current.value
-                    : 고유번호;
-
-                set(고유채팅방경로, {
-                  chatRoomsTitle: 제목은,
-                  connectedUser: addUserList,
-                });
-                push(고유채팅방채팅, {
-                  displayName: authService.currentUser.displayName,
-                  uid: authService.currentUser.uid,
-                  message: `그룹채팅이 시작되었습니다.`,
-                  // message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
-                  createdAt: convertDate(
-                    Timestamp.fromDate(new Date()).seconds,
-                  ),
-                });
-                setShowAddGroupChat(false);
-              }}
-            >
-              완료
-            </button>
+            <button onClick={createGroupChatRoom}>완료</button>
             <button
               onClick={() => {
                 setShowAddGroupChat(false);
@@ -378,4 +365,4 @@ const GroupChatList = ({
   );
 };
 
-export default GroupChatList;
+export default React.memo(GroupChatList);
