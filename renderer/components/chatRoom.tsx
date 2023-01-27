@@ -125,6 +125,12 @@ const MessageInput = styled.div`
   }
 `;
 
+const Footer = styled.div`
+  width: 100%;
+  height: 100px;
+  background-color: #fff;
+`;
+
 export function convertDate(time) {
   //time should be server timestamp seconds only
   let dateInMillis = time * 1000;
@@ -239,6 +245,7 @@ const ChatRoom = ({
         ></input>
         <button onClick={SendMessage}>전송</button>
       </MessageInput>
+      <Footer />
       {/* <button onClick={SendMessage}>메시지 전송</button> */}
       {/* <button
         onClick={() => {
@@ -248,13 +255,13 @@ const ChatRoom = ({
       >
         채팅 로그 확인
       </button> */}
-      <button
+      {/* <button
         onClick={() => {
           setIsStartChat(false);
         }}
       >
         나가기
-      </button>
+      </button> */}
     </>
   );
 };
