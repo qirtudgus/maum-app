@@ -1,4 +1,4 @@
-import { push, ref, set, onDisconnect, get } from '@firebase/database';
+import { push, ref, set, get } from '@firebase/database';
 import { onValue } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import React from 'react';
@@ -24,12 +24,10 @@ const UserListWrap = styled.div`
 
 interface UserIsOnInterface {
   isOn: boolean;
-  currentChatUser?: boolean;
 }
 
 const UserListli = styled.li<UserIsOnInterface>`
   cursor: pointer;
-
   width: 95%;
   margin: 0 auto;
   /* max-width: 300px; */
@@ -37,7 +35,6 @@ const UserListli = styled.li<UserIsOnInterface>`
   height: 30px;
   line-height: 30px;
   margin-bottom: 5px;
-  list-style: none;
   user-select: none;
   /* border: 1px solid#eee; */
   &:hover {
@@ -55,19 +52,7 @@ const UserListli = styled.li<UserIsOnInterface>`
         color: green;
       }
     `}
-
-  /* ${(props) =>
-    props.currentChatUser &&
-    css`
-      & {
-        background: ${({ theme }) => theme.colors.main};
-      }
-      &:hover {
-        background: ${({ theme }) => theme.colors.main};
-      }
-    `} */
-
-    &#chatUserActive {
+  &#chatUserActive {
     & {
       background: ${({ theme }) => theme.colors.main};
     }
@@ -201,7 +186,6 @@ const OnUserList = ({
             isOn={i.isOn}
             key={index}
             id={i.uid === currentChatUser.uid ? 'chatUserActive' : ''}
-            // currentChatUser={i.uid === currentChatUser.uid ? true : false}
             onDoubleClick={() => {
               setCurrentChatUser(i);
               enterOneToOneChatRooms(i);
