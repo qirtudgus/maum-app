@@ -129,18 +129,32 @@ const ChatRoom = ({
       //언마운트시 해당 경로에 대한 관찰자를 off해주면 왔다갔다해도 onValue가 한번씩만 호출됨 (onValue가 쌓이는걸 방지)
       off(채팅경로);
       setIsChatLoading(false);
+
       console.log('채팅방을 나갔습니다.');
     };
   }, [chatRoomInfo.chatRoomUid]);
 
+  //언마운트 시 현재 활성화된 액티브돔을 찾아서 제거한다.
+  useLayoutEffect(() => {
+    return () => {
+      if (document.getElementById('chatUserActive')) {
+        document.getElementById('chatUserActive').removeAttribute('id');
+      }
+    };
+  }, []);
+
   return (
     <>
       <ChatTitle>
-        {chatRoomInfo.displayName}와의 대화{' '}
+        {chatRoomInfo.displayName}와의 대화
         <span
           title='닫기'
           className='closeBtn'
           onClick={() => {
+            //현재 활성화된 액티브돔을 찾아서 제거한다.
+            if (document.getElementById('chatUserActive')) {
+              document.getElementById('chatUserActive').removeAttribute('id');
+            }
             setIsStartChat(false);
           }}
         >
