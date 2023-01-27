@@ -4,25 +4,9 @@ import Head from 'next/head';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { authService, realtimeDbService } from '../firebaseConfig';
+import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerFront from './messageContainer';
-
-const ChatTitle = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  border-bottom: 1px solid#eee;
-  position: relative;
-  & .closeBtn {
-    cursor: pointer;
-    position: absolute;
-    right: 10px;
-  }
-`;
 
 const MessageInput = styled.div`
   width: 100%;
@@ -148,18 +132,10 @@ const ChatRoom = ({
       <Head>
         <title>maumTalk - {chatRoomInfo.displayName}와의 대화</title>
       </Head>
-      <ChatTitle>
-        {chatRoomInfo.displayName}와의 대화
-        <span
-          title='닫기'
-          className='closeBtn'
-          onClick={() => {
-            setIsStartChat(false);
-          }}
-        >
-          X
-        </span>
-      </ChatTitle>
+      <ChatRoomHeaderTitle
+        title={chatRoomInfo.displayName}
+        ChatStatesetState={setIsStartChat}
+      />
       {isChatLoading ? (
         <MessageContainerFront chatList={chatList} />
       ) : (
