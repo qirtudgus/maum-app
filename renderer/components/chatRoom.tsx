@@ -7,7 +7,10 @@ import { authService, realtimeDbService } from '../firebaseConfig';
 const MessageContainer = styled.div`
   position: relative;
   width: 100%;
-  overflow-y: scroll;
+  height: 100%;
+  overflow-y: auto;
+  background: #f1f1f1;
+  padding-top: 25px;
   /* overflow-x: hidden; */
 `;
 
@@ -78,14 +81,48 @@ const Message = styled.li`
 `;
 
 const ChatTitle = styled.div`
-  width: 90%;
-  margin: 0px auto 20px auto;
+  width: 100%;
+  margin: 0 auto;
   height: 40px;
   line-height: 40px;
   text-align: center;
   font-size: 20px;
   font-weight: bold;
   border-bottom: 1px solid#eee;
+  position: relative;
+  & .closeBtn {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+  }
+`;
+
+const MessageInput = styled.div`
+  width: 100%;
+  border: 1px solid#eee;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  & > input {
+    padding: 10px 10px;
+    width: 100%;
+    border: none;
+  }
+
+  & > input:focus {
+    outline: none;
+  }
+  & > button {
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    flex-shrink: 0;
+    padding: 10px;
+    background: #79d82b;
+  }
+  & > button:hover {
+    background: #64b91e;
+  }
 `;
 
 export function convertDate(time) {
@@ -109,6 +146,7 @@ const ChatRoom = ({
 }) => {
   const [chatList, setChatList] = useState([]);
   const messageInputRef = useRef<HTMLInputElement>();
+  const messageContainerScrollHandler = useRef<HTMLDivElement>();
 
   const SendMessage = async () => {
     //저장할 경로
@@ -125,10 +163,13 @@ const ChatRoom = ({
 
       createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
     });
-    messageInputRef.current.focus();
-    messageInputRef.current.value = '';
 
     //메시지 작성 후 비워주기
+    messageInputRef.current.focus();
+    messageInputRef.current.value = '';
+    //메시지 작성 후 스크롤 맨 아래로
+    messageContainerScrollHandler.current.scrollTop =
+      messageContainerScrollHandler.current.scrollHeight;
   };
 
   //useEffect onValue로 채팅을 계속 가져와야함
@@ -152,8 +193,19 @@ const ChatRoom = ({
 
   return (
     <>
-      <ChatTitle>{chatRoomInfo.displayName}와의 대화</ChatTitle>
-      <MessageContainer>
+      <ChatTitle>
+        {chatRoomInfo.displayName}와의 대화{' '}
+        <span
+          title='닫기'
+          className='closeBtn'
+          onClick={() => {
+            setIsStartChat(false);
+          }}
+        >
+          X
+        </span>
+      </ChatTitle>
+      <MessageContainer ref={messageContainerScrollHandler}>
         {chatList.map((i, index) => {
           return (
             <MessageWrap
@@ -177,22 +229,25 @@ const ChatRoom = ({
         })}
       </MessageContainer>
 
-      <input
-        ref={messageInputRef}
-        placeholder='메시지를 입력해주세요'
-        onKeyDown={(e: React.KeyboardEvent) => {
-          if (e.key === 'Enter') SendMessage();
-        }}
-      ></input>
-      <button onClick={SendMessage}>메시지 전송</button>
-      <button
+      <MessageInput>
+        <input
+          ref={messageInputRef}
+          placeholder='메시지를 입력해주세요'
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Enter') SendMessage();
+          }}
+        ></input>
+        <button onClick={SendMessage}>전송</button>
+      </MessageInput>
+      {/* <button onClick={SendMessage}>메시지 전송</button> */}
+      {/* <button
         onClick={() => {
           console.log(chatList);
           console.log(convertDate(chatList[0].createdAt.seconds));
         }}
       >
         채팅 로그 확인
-      </button>
+      </button> */}
       <button
         onClick={() => {
           setIsStartChat(false);
