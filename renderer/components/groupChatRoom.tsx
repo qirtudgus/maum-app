@@ -1,7 +1,7 @@
 import { get, onValue, push, ref, set, update } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import Head from 'next/head';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import {
   authService,
@@ -195,6 +195,14 @@ const GroupChatRoom = ({
       console.log(res);
       setConnectedUserList(res);
     });
+  }, []);
+
+  useLayoutEffect(() => {
+    return () => {
+      if (document.getElementById('groupChatActive')) {
+        document.getElementById('groupChatActive').removeAttribute('id');
+      }
+    };
   }, []);
 
   return (
