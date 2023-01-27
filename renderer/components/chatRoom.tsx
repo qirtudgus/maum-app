@@ -4,11 +4,82 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { authService, realtimeDbService } from '../firebaseConfig';
 
-const Message = styled.li`
+const MessageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  overflow-y: scroll;
+  /* overflow-x: hidden; */
+`;
+
+interface MessageSendData {
+  createdAt: string;
+}
+
+const MessageWrap = styled.div<MessageSendData>`
+  width: 95%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 30px;
+  /* flex-direction: column; */
   &.myMessage {
-    color: red;
-    text-align: right;
+    justify-content: flex-end;
   }
+
+  &.myMessage > li {
+    background: #79d82b;
+  }
+
+  & .sendDate {
+    font-size: 12px;
+    color: #494949;
+  }
+
+  & > li::after {
+    content: '${(props) => props.createdAt}';
+    position: absolute;
+    right: -140px;
+    font-size: 12px;
+  }
+  &.myMessage > li::after {
+    content: '';
+  }
+
+  &.myMessage > li::before {
+    content: '${(props) => props.createdAt}';
+    position: absolute;
+    left: -140px;
+    font-size: 12px;
+  }
+`;
+
+const Message = styled.li`
+  width: fit-content;
+  position: relative;
+  max-width: 60%;
+  /* height: 30px; */
+  min-height: 30px;
+  max-height: fit-content;
+  padding: 13px 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 7px;
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2);
+  background: #fff;
+  color: #000;
+`;
+
+const ChatTitle = styled.div`
+  width: 90%;
+  margin: 0px auto 20px auto;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid#eee;
 `;
 
 export function convertDate(time) {
@@ -75,22 +146,29 @@ const ChatRoom = ({
 
   return (
     <>
-      <div>{chatRoomInfo.displayName}와의 대화</div>
-      {chatList.map((i, index) => {
-        return (
-          <Message
-            key={index}
-            //본인 메시지일 경우에 대한 스타일링용 className
-            className={
-              i.displayName === authService.currentUser.displayName &&
-              'myMessage'
-            }
-          >
-            {i.createdAt}
-            {i.message}
-          </Message>
-        );
-      })}
+      <ChatTitle>{chatRoomInfo.displayName}와의 대화</ChatTitle>
+      <MessageContainer>
+        {chatList.map((i, index) => {
+          return (
+            <MessageWrap
+              createdAt={i.createdAt}
+              key={index}
+              className={
+                i.displayName === authService.currentUser.displayName &&
+                'myMessage'
+              }
+            >
+              <Message
+
+              //본인 메시지일 경우에 대한 스타일링용 className
+              >
+                {i.message}
+              </Message>
+              {/* <span className='sendDate'>{i.createdAt}</span> */}
+            </MessageWrap>
+          );
+        })}
+      </MessageContainer>
 
       <input
         ref={messageInputRef}
