@@ -104,30 +104,14 @@ const GroupChatRoom = ({
   const showUserList = () => {
     getUserList().then((userList) => {
       setShowAddGroupChat(true);
-
-      //초대 시
-      //받아온 유저목록중에 connectedUserList에 중복되는값은 삭제해야한다!
-
-      // console.log(connectedUserList);
-      //길이는 얘가 항상 더 길다 (전체유저)
-      // console.log(userList);
-
-      const 연결유저복사 = [...connectedUserList];
-
-      // let 중복유저제거 = userList.map((i,index) => {
-      //   // if()
-      // })
-      // let arr2 = userList.filter((x1) =>
-      //   연결유저복사.some((x2) => x1.uid !== x2.uid),
-      // );
-      // console.log(arr2);
-      const result = userList.filter((dataItem) => {
-        return !연결유저복사.some(
+      //이미 방에 연결된 유저는 제외한 리스트를 보여준다.
+      const duplicateDeleteArr = userList.filter((dataItem) => {
+        return !connectedUserList.some(
           (paramsItem) => paramsItem.uid === dataItem.uid,
         );
       });
-      console.log(result);
-      setGroupChatUserList(result);
+      console.log(duplicateDeleteArr);
+      setGroupChatUserList(duplicateDeleteArr);
     });
   };
 
@@ -436,7 +420,7 @@ const GroupChatRoom = ({
                 setShowAddGroupChat(false);
               }}
             >
-              완료
+              초대
             </button>
             <button
               onClick={() => {
