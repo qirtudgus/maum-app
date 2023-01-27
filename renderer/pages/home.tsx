@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import BasicInput from '../components/BasicInput';
 import { SolidButton } from '../components/ButtonGroup';
@@ -65,6 +65,8 @@ const Login = () => {
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [isPasswordText, setIsPasswordText] = useState('');
 
+  const 방금가입한메일 = router.query.email as string;
+
   const signInWithEmail = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(authService, email, password);
@@ -72,6 +74,16 @@ const Login = () => {
       return error;
     }
   };
+
+  useLayoutEffect(() => {
+    if (방금가입한메일) {
+      const emailInput = emailRef.current.firstChild as HTMLInputElement;
+      emailInput.focus();
+    } else {
+      const emailInput = emailRef.current.firstChild as HTMLInputElement;
+      emailInput.focus();
+    }
+  }, []);
 
   const login = () => {
     const emailInput = emailRef.current.firstChild as HTMLInputElement;
@@ -149,6 +161,7 @@ const Login = () => {
           <BasicInput
             ref={emailRef}
             placeholderValue='이메일'
+            defaultValue={방금가입한메일}
             isError={isLoginError}
             statusText={isLoginText}
           ></BasicInput>
@@ -162,7 +175,7 @@ const Login = () => {
           <RegisterLink>
             아직 회원이 아니시라면?...
             <span>
-              <Link href={'/register'}> 회원가입</Link>
+              <Link href={'/__register'}> 회원가입</Link>
             </span>
           </RegisterLink>
           <SolidButton
