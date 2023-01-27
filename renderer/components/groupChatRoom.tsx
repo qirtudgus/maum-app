@@ -10,15 +10,9 @@ import {
   UserList,
 } from '../firebaseConfig';
 import { convertDate } from './chatRoom';
+import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerFront from './messageContainer';
-
-const Message = styled.li`
-  &.myMessage {
-    color: red;
-    text-align: right;
-  }
-`;
 
 const GroupChatModalUserList = styled.li`
   width: 90%;
@@ -208,7 +202,10 @@ const GroupChatRoom = ({
       <Head>
         <title>maumTalk - {chatRoomInfo.displayName} 그룹채팅</title>
       </Head>
-      <div>{chatRoomInfo.displayName} 채팅방</div>
+      <ChatRoomHeaderTitle
+        title={chatRoomInfo.displayName}
+        ChatStatesetState={setIsStartGroupChat}
+      />
       <div>
         참여자:{' '}
         {connectedUserList.map((i, index) => {
