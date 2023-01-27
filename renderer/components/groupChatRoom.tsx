@@ -299,12 +299,20 @@ const GroupChatRoom = ({
             );
 
             //같은 uid를 가진 인덱스요소를 제거
+            //삭제 후 채팅방의 남은인원이 0명이 될 경우 채팅방도 삭제하면 좋을듯..
+            //고유채팅에서 유저정보를 삭제하기전에 사이즈가 1이라면 삭제하면 되겠다.
+            //해당값이 1일때 분기하자, 1명 남았으면 그냥 채팅방을 삭제하면됨
+            //그럼 채팅 db가 남질않는다. 그냥 채팅방을 남겨두는게 좋을것같다.
+            // let 삭제전인원 = (await get(고유채팅인원세팅경로)).size;
+
             고유채팅인원리스트.forEach((i, index) => {
               if (i.uid === authService.currentUser.uid) {
                 고유채팅인원리스트.splice(index, 1);
               }
             });
+
             set(고유채팅인원세팅경로, 고유채팅인원리스트);
+
             //삭제 후 퇴장
             setIsStartGroupChat(false);
           }
@@ -312,6 +320,16 @@ const GroupChatRoom = ({
       >
         채팅방 나가기
       </button>
+
+      <button
+        onClick={() => {
+          console.log('누굴 초대하시겠습니까');
+          showUserList();
+        }}
+      >
+        초대하기
+      </button>
+
       {showAddGroupChat && (
         <AddGroupChatModal>
           <>
@@ -433,14 +451,6 @@ const GroupChatRoom = ({
           </>
         </AddGroupChatModal>
       )}
-      <button
-        onClick={() => {
-          console.log('누굴 초대하시겠습니까');
-          showUserList();
-        }}
-      >
-        초대하기
-      </button>
     </>
   );
 };
