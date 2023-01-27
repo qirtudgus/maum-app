@@ -5,9 +5,10 @@ import styled from 'styled-components';
 import {
   authService,
   createChatUid,
-  getConnectionUserList2,
+  getUserList,
   getGroupChatRoomsUidToTitle2,
   realtimeDbService,
+  UserList,
 } from '../firebaseConfig';
 import { convertDate } from './chatRoom';
 
@@ -128,16 +129,14 @@ const GroupChatList = ({
   >;
 }) => {
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
-  const [groupChatUserList, setGroupChatUserList] = useState<any[]>([]);
+  const [groupChatUserList, setGroupChatUserList] = useState<[] | UserList[]>(
+    [],
+  );
   const [addUserList, setAddUserList] = useState<any[]>([]);
   const [groupChatTitleList, setGroupChatTitleList] = useState([]);
   const [groupChatUidList, setGroupChatUidList] = useState([]);
 
   const chatRoomsTitleInputRef = useRef<HTMLInputElement>();
-
-  const getGroupChatRoomsUidToTitle = (roomUid: string) => {
-    return ref(realtimeDbService, `groupChatRooms/${roomUid}/chatRoomsTitle`);
-  };
 
   useEffect(() => {
     //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
@@ -148,39 +147,17 @@ const GroupChatList = ({
       );
       onValue(그룹채팅경로, async (snapshot) => {
         let 그룹채팅스냅샷: any[] = snapshot.val();
-
+        //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 에러 처리를 했다.
         if (그룹채팅스냅샷) {
           let 그룹채팅스냅샷배열: string[] = [...그룹채팅스냅샷.groupChatUid];
           console.log('그룹채팅 온밸류 호출');
-          console.log(그룹채팅스냅샷);
           console.log(그룹채팅스냅샷배열);
-
-          //# 제목은 나오는데...오류!!!!!!!!! 그룹채팅스냅샷 is Not function...
-          //배열을 복사해서 해결완료
-
-          //   const 제목배열만들기 = async () => {
-          //     let c = Promise.all(
-          //       그룹채팅스냅샷배열.map(async (i, index) => {
-          //         let a = (await get(getGroupChatRoomsUidToTitle(i))).val();
-          //         return a;
-          //       }),
-          //     );
-
-          //     return c;
-          //   };
           getGroupChatRoomsUidToTitle2(그룹채팅스냅샷배열).then((res) => {
             console.log('테스트');
             console.log(res);
             setGroupChatUidList(그룹채팅스냅샷배열);
             setGroupChatTitleList(res);
           });
-
-          //   제목배열만들기().then((res) => {
-          //     setGroupChatUidList(그룹채팅스냅샷);
-          //     setGroupChatTitleList(res);
-          //   });
-
-          //   setGroupChatList(그룹채팅스냅샷);
         }
       });
     }
@@ -192,10 +169,11 @@ const GroupChatList = ({
         <span>그룹 채팅 목록</span>
         <span
           className='addGroupChatButton'
-          onClick={async () => {
-            setShowAddGroupChat(true);
-            const userList = await getConnectionUserList2();
-            setGroupChatUserList(userList);
+          onClick={() => {
+            getUserList().then((userList) => {
+              setShowAddGroupChat(true);
+              setGroupChatUserList(userList);
+            });
           }}
         >
           +
@@ -258,7 +236,7 @@ const GroupChatList = ({
                 );
               })}
             </AddUserListWrap>
-            {groupChatUserList.map((i, index) => {
+            {groupChatUserList.map((i: UserList, index: number) => {
               return (
                 <GroupChatModalUserList
                   key={index}
@@ -285,7 +263,7 @@ const GroupChatList = ({
                   }}
                 >
                   {i.displayName}
-                  {/* 추가와 빼기버튼은 버튼을 active 시키면서, 함수도 같이 토글하자, 카카오 참고 */}
+                  {/* 버튼을 active 시킬 때 가상선택자로 추가 해제를 알려준다 */}
                   <div className='isActive'></div>
                 </GroupChatModalUserList>
               );
@@ -369,6 +347,7 @@ const GroupChatList = ({
                     Timestamp.fromDate(new Date()).seconds,
                   ),
                 });
+                setShowAddGroupChat(false);
               }}
             >
               완료
