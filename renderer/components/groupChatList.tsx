@@ -6,9 +6,9 @@ import {
   authService,
   createChatUid,
   getUserList,
-  getGroupChatRoomsUidToTitle2,
   realtimeDbService,
   UserList,
+  getGroupChatRoomsUidToTitleFunc,
 } from '../firebaseConfig';
 import { convertDate } from './chatRoom';
 
@@ -129,9 +129,7 @@ const GroupChatList = ({
   >;
 }) => {
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
-  const [groupChatUserList, setGroupChatUserList] = useState<[] | UserList[]>(
-    [],
-  );
+  const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
 
   interface groupChatList {
@@ -159,7 +157,7 @@ const GroupChatList = ({
         if (snapshot.val()) {
           let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
           let groupChatUidList = groupChatListSnapshot.groupChatUid;
-          getGroupChatRoomsUidToTitle2(groupChatUidList).then(
+          getGroupChatRoomsUidToTitleFunc(groupChatUidList).then(
             (groupChatTitleList) => {
               console.log(groupChatTitleList);
               let mergeGroupChatList = groupChatUidList.map((item, index) => {
@@ -293,7 +291,6 @@ const GroupChatList = ({
                           prev.filter((todo) => todo.uid !== i.uid),
                         );
                         //className이 i.displayName인 아이를 찾아서 active 제거
-
                         const removeDom = document.querySelector(`.${i.uid}`);
                         removeDom.classList.remove('active');
                         console.log(document.querySelector(`.${i.uid}`));
@@ -313,8 +310,6 @@ const GroupChatList = ({
                   className={i.uid}
                   //   선택 시 클래스를 넣고, 다시 눌렀을 때 클래스가 있는지 확인 후 있으면 삭제, 없으면 추가
                   onClick={(e: React.MouseEvent) => {
-                    // console.log(e.currentTarget.classList.add('active'));
-
                     //액티브가 있는 경우에는 state에서 삭제 후, active 제거
                     if (e.currentTarget.classList.contains('active')) {
                       setAddUserList((prev) =>
