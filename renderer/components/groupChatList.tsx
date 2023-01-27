@@ -37,13 +37,17 @@ const GroupListLi = styled.li`
   margin: 0 auto;
   /* max-width: 300px; */
   flex-shrink: 0;
-  height: 50px;
+  height: 30px;
+  line-height: 30px;
   margin-bottom: 5px;
-  list-style: none;
   user-select: none;
   border: 1px solid#eee;
   &:hover {
     background: #eee;
+  }
+
+  &#groupChatActive {
+    background: ${({ theme }) => theme.colors.main};
   }
 `;
 
@@ -131,6 +135,10 @@ const GroupChatList = ({
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
+  const [currentGroupChat, setCurrentGroupChat] = useState({
+    chatUid: '',
+    chatTitle: '',
+  });
 
   interface groupChatList {
     chatUid: string;
@@ -269,7 +277,16 @@ const GroupChatList = ({
           return (
             <GroupListLi
               key={index}
-              onDoubleClick={() => enterGroupChatRoom(item)}
+              id={
+                item.chatUid === currentGroupChat.chatUid
+                  ? 'groupChatActive'
+                  : ''
+              }
+              onDoubleClick={() => {
+                console.log(item);
+                setCurrentGroupChat(item);
+                enterGroupChatRoom(item);
+              }}
             >
               {item.chatTitle}
             </GroupListLi>
