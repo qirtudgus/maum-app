@@ -113,78 +113,82 @@ const OnUserList = ({
           userList,
         ) as UserListUserInfoInterface[];
 
+        console.log(userListObj);
         setUserList(userListObj);
       }
     });
   }, []);
 
+  const enterOneToOneChatRooms = async (i: {
+    uid: string;
+    displayName: string;
+  }) => {
+    console.log('더블클릭 시 상대방 uid와 내 uid로 데이터 삽입해보기');
+
+    let currentUserUid = authService.currentUser.uid;
+    let currentUserDisplayName = authService.currentUser.displayName;
+    let opponentUid = i.uid;
+    let opponentDisplayName = i.displayName;
+    let chatRoomRandomString = createChatUid();
+    const 일대일채팅방 = createOneToOneChatRoomsRef(
+      currentUserUid,
+      opponentUid,
+    );
+    //이 값은 상대방 계정에서도 채팅방에 들어갔을 때 정상적으로 조회되도록 채팅방을 동시에 생성하는것.
+    const 상대채팅방 = createOneToOneChatRoomsRefForOpponent(
+      opponentUid,
+      currentUserUid,
+    );
+    const 채팅방 = createOneToOneChatRoom(chatRoomRandomString);
+
+    //클릭시 이미 존재하는 채팅방인지 확인하기
+    let isOpenChatRooms: {
+      chatRoomUid: string;
+      opponentName: string;
+    } | null = (await get(일대일채팅방)).val();
+
+    //   console.log(isOpenChatRooms);
+
+    if (isOpenChatRooms) {
+      //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
+      console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
+      setChatRoomInfo({
+        displayName: opponentDisplayName,
+        chatRoomUid: isOpenChatRooms.chatRoomUid,
+      });
+      setIsStartGroupChat(false);
+      setIsStartChat(true);
+    } else {
+      //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
+      console.log('새로운 채팅방이 생성');
+      set(일대일채팅방, {
+        chatRoomUid: chatRoomRandomString,
+        opponentName: opponentDisplayName,
+      });
+      set(상대채팅방, {
+        chatRoomUid: chatRoomRandomString,
+        opponentName: currentUserDisplayName,
+      });
+      push(채팅방, {
+        displayName: authService.currentUser.displayName,
+        uid: authService.currentUser.uid,
+        message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
+        createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+      });
+      // ###이 후 채팅방으로 접속하는 코드를 이어주면 ui적으로 좋을거같다.
+    }
+  };
+
   return (
     <UserListWrap>
       <div>유저 목록</div>
       {userList.map((i, index) => {
-        return (
+        return i.uid === authService.currentUser?.uid ? null : (
           <UserListli
             isOn={i.isOn}
             key={index}
-            onDoubleClick={async () => {
-              console.log(
-                '더블클릭 시 상대방 uid와 내 uid로 데이터 삽입해보기',
-              );
-
-              let currentUserUid = authService.currentUser.uid;
-              let currentUserDisplayName = authService.currentUser.displayName;
-              let opponentUid = i.uid;
-              let opponentDisplayName = i.displayName;
-              let chatRoomRandomString = createChatUid();
-              const 일대일채팅방 = createOneToOneChatRoomsRef(
-                currentUserUid,
-                opponentUid,
-              );
-              //이 값은 상대방 계정에서도 채팅방에 들어갔을 때 정상적으로 조회되도록 채팅방을 동시에 생성하는것.
-              const 상대채팅방 = createOneToOneChatRoomsRefForOpponent(
-                opponentUid,
-                currentUserUid,
-              );
-              const 채팅방 = createOneToOneChatRoom(chatRoomRandomString);
-
-              //클릭시 이미 존재하는 채팅방인지 확인하기
-              let isOpenChatRooms: {
-                chatRoomUid: string;
-                opponentName: string;
-              } | null = (await get(일대일채팅방)).val();
-
-              //   console.log(isOpenChatRooms);
-
-              if (isOpenChatRooms) {
-                //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
-                console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
-                setChatRoomInfo({
-                  displayName: opponentDisplayName,
-                  chatRoomUid: isOpenChatRooms.chatRoomUid,
-                });
-                setIsStartGroupChat(false);
-                setIsStartChat(true);
-              } else {
-                //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
-                console.log('새로운 채팅방이 생성');
-                set(일대일채팅방, {
-                  chatRoomUid: chatRoomRandomString,
-                  opponentName: opponentDisplayName,
-                });
-                set(상대채팅방, {
-                  chatRoomUid: chatRoomRandomString,
-                  opponentName: currentUserDisplayName,
-                });
-                push(채팅방, {
-                  displayName: authService.currentUser.displayName,
-                  uid: authService.currentUser.uid,
-                  message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
-                  createdAt: convertDate(
-                    Timestamp.fromDate(new Date()).seconds,
-                  ),
-                });
-                // ###이 후 채팅방으로 접속하는 코드를 이어주면 ui적으로 좋을거같다.
-              }
+            onDoubleClick={() => {
+              enterOneToOneChatRooms(i);
             }}
           >
             {i.displayName}
