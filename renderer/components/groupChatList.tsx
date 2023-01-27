@@ -133,11 +133,7 @@ const GroupChatList = ({
     [],
   );
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
-  //   const [groupChatTitleList, setGroupChatTitleList] = useState<string[]>([]);
-  //   const [groupChatUidList, setGroupChatUidList] = useState([]);
 
-  //원하는 배열의 상태는..
-  // [{chatUid:'123',chatTitle:'123}, ...]
   interface groupChatList {
     chatUid: string;
     chatTitle: string;
@@ -165,18 +161,12 @@ const GroupChatList = ({
           let groupChatUidList = groupChatListSnapshot.groupChatUid;
           getGroupChatRoomsUidToTitle2(groupChatUidList).then(
             (groupChatTitleList) => {
-              console.log('그룹채팅 uid 배열');
-              console.log(groupChatUidList);
-              console.log('그룹채팅 제목 배열');
               console.log(groupChatTitleList);
               let mergeGroupChatList = groupChatUidList.map((item, index) => {
                 return { chatUid: item, chatTitle: groupChatTitleList[index] };
               });
-
+              console.log('그룹채팅배열');
               console.log(mergeGroupChatList);
-
-              //   setGroupChatUidList(groupChatUidList);
-              //   setGroupChatTitleList(groupChatTitleList);
               setGroupChatAllList(mergeGroupChatList);
             },
           );
@@ -191,16 +181,6 @@ const GroupChatList = ({
       setGroupChatUserList(userList);
     });
   };
-
-  //   const enterGroupChatRoom = (groupChattitle: string, index: number) => {
-  //     setIsStartChat(false);
-  //     setIsStartGroupChat(true);
-  //     setChatRoomInfo({
-  //       displayName: groupChattitle,
-  //       chatRoomUid: groupChatUidList[index],
-  //     });
-  //   };
-
   const enterGroupChatRoom = (item: groupChatList) => {
     setIsStartChat(false);
     setIsStartGroupChat(true);
@@ -219,17 +199,6 @@ const GroupChatList = ({
         </span>
       </GroupListTitle>
       <GroupListWrap>
-        {/* {groupChatTitleList.map((groupChattitle, index) => {
-          return (
-            <GroupListLi
-              key={index}
-              onDoubleClick={() => enterGroupChatRoom(groupChattitle, index)}
-            >
-              {groupChattitle}
-            </GroupListLi>
-          );
-        })} */}
-
         {groupChatAllList.map((item, index) => {
           return (
             <GroupListLi
