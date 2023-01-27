@@ -176,6 +176,12 @@ const OnUserList = ({
         createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
       });
       // ###이 후 채팅방으로 접속하는 코드를 이어주면 ui적으로 좋을거같다.
+      setChatRoomInfo({
+        displayName: opponentDisplayName,
+        chatRoomUid: chatRoomRandomString,
+      });
+      setIsStartGroupChat(false);
+      setIsStartChat(true);
     }
   };
 
