@@ -133,8 +133,16 @@ const GroupChatList = ({
     [],
   );
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
-  const [groupChatTitleList, setGroupChatTitleList] = useState<string[]>([]);
-  const [groupChatUidList, setGroupChatUidList] = useState([]);
+  //   const [groupChatTitleList, setGroupChatTitleList] = useState<string[]>([]);
+  //   const [groupChatUidList, setGroupChatUidList] = useState([]);
+
+  //원하는 배열의 상태는..
+  // [{chatUid:'123',chatTitle:'123}, ...]
+  interface groupChatList {
+    chatUid: string;
+    chatTitle: string;
+  }
+  const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
 
   const chatRoomsTitleInputRef = useRef<HTMLInputElement>();
 
@@ -145,11 +153,11 @@ const GroupChatList = ({
   useEffect(() => {
     //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
     if (authService.currentUser) {
-      const 그룹채팅경로 = ref(
+      const myGroupChatListPath = ref(
         realtimeDbService,
         `userList/${authService.currentUser.uid}/myGroupChatList`,
       );
-      onValue(그룹채팅경로, async (snapshot) => {
+      onValue(myGroupChatListPath, async (snapshot) => {
         console.log('그룹채팅 온밸류 호출');
         //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
         if (snapshot.val()) {
@@ -157,10 +165,19 @@ const GroupChatList = ({
           let groupChatUidList = groupChatListSnapshot.groupChatUid;
           getGroupChatRoomsUidToTitle2(groupChatUidList).then(
             (groupChatTitleList) => {
+              console.log('그룹채팅 uid 배열');
+              console.log(groupChatUidList);
               console.log('그룹채팅 제목 배열');
               console.log(groupChatTitleList);
-              setGroupChatUidList(groupChatUidList);
-              setGroupChatTitleList(groupChatTitleList);
+              let mergeGroupChatList = groupChatUidList.map((item, index) => {
+                return { chatUid: item, chatTitle: groupChatTitleList[index] };
+              });
+
+              console.log(mergeGroupChatList);
+
+              //   setGroupChatUidList(groupChatUidList);
+              //   setGroupChatTitleList(groupChatTitleList);
+              setGroupChatAllList(mergeGroupChatList);
             },
           );
         }
@@ -175,12 +192,21 @@ const GroupChatList = ({
     });
   };
 
-  const enterGroupChatRoom = (groupChattitle: string, index: number) => {
+  //   const enterGroupChatRoom = (groupChattitle: string, index: number) => {
+  //     setIsStartChat(false);
+  //     setIsStartGroupChat(true);
+  //     setChatRoomInfo({
+  //       displayName: groupChattitle,
+  //       chatRoomUid: groupChatUidList[index],
+  //     });
+  //   };
+
+  const enterGroupChatRoom = (item: groupChatList) => {
     setIsStartChat(false);
     setIsStartGroupChat(true);
     setChatRoomInfo({
-      displayName: groupChattitle,
-      chatRoomUid: groupChatUidList[index],
+      displayName: item.chatTitle,
+      chatRoomUid: item.chatUid,
     });
   };
 
@@ -193,13 +219,24 @@ const GroupChatList = ({
         </span>
       </GroupListTitle>
       <GroupListWrap>
-        {groupChatTitleList.map((groupChattitle, index) => {
+        {/* {groupChatTitleList.map((groupChattitle, index) => {
           return (
             <GroupListLi
               key={index}
               onDoubleClick={() => enterGroupChatRoom(groupChattitle, index)}
             >
               {groupChattitle}
+            </GroupListLi>
+          );
+        })} */}
+
+        {groupChatAllList.map((item, index) => {
+          return (
+            <GroupListLi
+              key={index}
+              onDoubleClick={() => enterGroupChatRoom(item)}
+            >
+              {item.chatTitle}
             </GroupListLi>
           );
         })}
