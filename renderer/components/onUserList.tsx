@@ -24,6 +24,7 @@ const UserListWrap = styled.div`
 
 interface UserIsOnInterface {
   isOn: boolean;
+  currentChatUser?: boolean;
 }
 
 const UserListli = styled.li<UserIsOnInterface>`
@@ -33,15 +34,17 @@ const UserListli = styled.li<UserIsOnInterface>`
   margin: 0 auto;
   /* max-width: 300px; */
   flex-shrink: 0;
-  height: 50px;
+  height: 30px;
+  line-height: 30px;
   margin-bottom: 5px;
   list-style: none;
   user-select: none;
-  border: 1px solid#eee;
+  /* border: 1px solid#eee; */
   &:hover {
     background: #eee;
   }
   & .isOn {
+    margin-right: 5px;
     font-size: 12px;
     color: red;
   }
@@ -52,6 +55,26 @@ const UserListli = styled.li<UserIsOnInterface>`
         color: green;
       }
     `}
+
+  /* ${(props) =>
+    props.currentChatUser &&
+    css`
+      & {
+        background: ${({ theme }) => theme.colors.main};
+      }
+      &:hover {
+        background: ${({ theme }) => theme.colors.main};
+      }
+    `} */
+
+    &#chatUserActive {
+    & {
+      background: ${({ theme }) => theme.colors.main};
+    }
+    &#chatUserActive:hover {
+      background: ${({ theme }) => theme.colors.main};
+    }
+  }
 `;
 
 const OnUserList = ({
@@ -70,6 +93,11 @@ const OnUserList = ({
 }) => {
   const userListRef = ref(realtimeDbService, 'userList');
 
+  const [currentChatUser, setCurrentChatUser] = useState({
+    displayName: '',
+    uid: '',
+  });
+
   interface UserListUserInfoInterface {
     displayName: string;
     isOn: boolean;
@@ -81,27 +109,6 @@ const OnUserList = ({
   //로그아웃 시 db에서 uid 제거
   const [userList, setUserList] = useState<UserListUserInfoInterface[]>([]);
   useEffect(() => {
-    //실시간으로 접속유저를 볼 수가 없어서 잠시 주석처리..
-    // const getUserList = async () => {
-    //   const list = await get(userListRef);
-    //   console.log('유즈이펙트로 가져온 유저 리스트');
-    //   console.log(list.val());
-    //   const value: UserListUserInfoInterface[] = Object.values(list.val());
-    //   console.log(value);
-    //   return value;
-    // };
-    // getUserList().then((res) => {
-    //   //클라이언트 접속 종료 시 종료상태를 false로 바꿔주는 onDisconnect 설정
-    //   if (authService.currentUser) {
-    //     const myConnectionsRef = ref(
-    //       realtimeDbService,
-    //       `userList/${authService.currentUser.uid}`,
-    //     );
-    //     onDisconnect(myConnectionsRef).update({ isOn: false });
-    //   }
-    //   setUserList(res);
-    // });
-
     // 온밸류를 안쓰니 접속중인 유저를 실시간표시할수가 없다...
     onValue(userListRef, (snapshot) => {
       console.log('온밸류 호출');
@@ -193,12 +200,15 @@ const OnUserList = ({
           <UserListli
             isOn={i.isOn}
             key={index}
+            id={i.uid === currentChatUser.uid ? 'chatUserActive' : ''}
+            // currentChatUser={i.uid === currentChatUser.uid ? true : false}
             onDoubleClick={() => {
+              setCurrentChatUser(i);
               enterOneToOneChatRooms(i);
             }}
           >
-            {i.displayName}
             <span className='isOn'>{i.isOn === true ? '●' : '●'}</span>
+            {i.displayName}
           </UserListli>
         );
       })}
