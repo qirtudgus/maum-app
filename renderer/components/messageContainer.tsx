@@ -33,7 +33,7 @@ const MessageWrap = styled.div<MessageSendData>`
   }
 
   &.myMessage > li {
-    background: #79d82b;
+    background: ${({ theme }) => theme.colors.main};
   }
 
   & .sendDate {
