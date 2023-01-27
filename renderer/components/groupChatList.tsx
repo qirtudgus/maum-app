@@ -218,8 +218,17 @@ const GroupChatList = ({
   const createGroupChatRoom = () => {
     //1.한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
     let chatRoomUid = createChatUid();
+
+    //1-1. addUserList에는 아직 현재유저가 빠져있다.
+    //본인이 만드는 방이기때문에 state에 본인을 추가한다.
+    const addUserListUpdateMe = [...addUserList];
+    addUserListUpdateMe.push({
+      displayName: authService.currentUser.displayName,
+      uid: authService.currentUser.uid,
+    });
+
     //2.초대된 유저를 순회하며, 각 유저들의 채팅리스트를 업데이트해준다.
-    addUserList.forEach(async (i) => {
+    addUserListUpdateMe.forEach(async (i) => {
       updateUsersChatRoomUid(i.uid, chatRoomUid);
     });
     //2. 고유 그룹채팅방 생성하고, 시작메시지 push하기
@@ -236,7 +245,7 @@ const GroupChatList = ({
 
     set(groupChatPath, {
       chatRoomsTitle: chatRoomTitle,
-      connectedUser: addUserList,
+      connectedUser: addUserListUpdateMe,
     });
     push(groupChatMessagePath, {
       displayName: authService.currentUser.displayName,
@@ -281,7 +290,7 @@ const GroupChatList = ({
             <AddUserListWrap>
               {addUserList.map((i, index) => {
                 return (
-                  <AddUserList key={index}>
+                  <AddUserList key={i.uid}>
                     <span>{i.displayName}</span>
                     <span
                       onClick={() => {
@@ -304,7 +313,8 @@ const GroupChatList = ({
               })}
             </AddUserListWrap>
             {groupChatUserList.map((i: UserList, index: number) => {
-              return (
+              // 현재 이용유저는 렌더링하지않는다.
+              return i.uid === authService.currentUser?.uid ? null : (
                 <GroupChatModalUserList
                   key={index}
                   className={i.uid}
