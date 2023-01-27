@@ -132,69 +132,74 @@ const GroupChatList = ({
   const [groupChatUserList, setGroupChatUserList] = useState<[] | UserList[]>(
     [],
   );
-  const [addUserList, setAddUserList] = useState<any[]>([]);
-  const [groupChatTitleList, setGroupChatTitleList] = useState([]);
+  const [addUserList, setAddUserList] = useState<UserList[]>([]);
+  const [groupChatTitleList, setGroupChatTitleList] = useState<string[]>([]);
   const [groupChatUidList, setGroupChatUidList] = useState([]);
 
   const chatRoomsTitleInputRef = useRef<HTMLInputElement>();
 
+  interface GroupChatListSnapshot {
+    groupChatUid: string[];
+  }
+
   useEffect(() => {
     //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
-    if (authService.currentUser?.uid) {
+    if (authService.currentUser) {
       const 그룹채팅경로 = ref(
         realtimeDbService,
         `userList/${authService.currentUser.uid}/myGroupChatList`,
       );
       onValue(그룹채팅경로, async (snapshot) => {
-        let 그룹채팅스냅샷: any[] = snapshot.val();
-        //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 에러 처리를 했다.
-        if (그룹채팅스냅샷) {
-          let 그룹채팅스냅샷배열: string[] = [...그룹채팅스냅샷.groupChatUid];
-          console.log('그룹채팅 온밸류 호출');
-          console.log(그룹채팅스냅샷배열);
-          getGroupChatRoomsUidToTitle2(그룹채팅스냅샷배열).then((res) => {
-            console.log('테스트');
-            console.log(res);
-            setGroupChatUidList(그룹채팅스냅샷배열);
-            setGroupChatTitleList(res);
-          });
+        console.log('그룹채팅 온밸류 호출');
+        //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
+        if (snapshot.val()) {
+          let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
+          let groupChatUidList = groupChatListSnapshot.groupChatUid;
+          getGroupChatRoomsUidToTitle2(groupChatUidList).then(
+            (groupChatTitleList) => {
+              console.log('그룹채팅 제목 배열');
+              console.log(groupChatTitleList);
+              setGroupChatUidList(groupChatUidList);
+              setGroupChatTitleList(groupChatTitleList);
+            },
+          );
         }
       });
     }
   }, []);
 
+  const showUserList = () => {
+    getUserList().then((userList) => {
+      setShowAddGroupChat(true);
+      setGroupChatUserList(userList);
+    });
+  };
+
+  const enterGroupChatRoom = (groupChattitle: string, index: number) => {
+    setIsStartChat(false);
+    setIsStartGroupChat(true);
+    setChatRoomInfo({
+      displayName: groupChattitle,
+      chatRoomUid: groupChatUidList[index],
+    });
+  };
+
   return (
     <>
       <GroupListTitle>
         <span>그룹 채팅 목록</span>
-        <span
-          className='addGroupChatButton'
-          onClick={() => {
-            getUserList().then((userList) => {
-              setShowAddGroupChat(true);
-              setGroupChatUserList(userList);
-            });
-          }}
-        >
+        <span className='addGroupChatButton' onClick={showUserList}>
           +
         </span>
       </GroupListTitle>
       <GroupListWrap>
-        {groupChatTitleList.map((i, index) => {
+        {groupChatTitleList.map((groupChattitle, index) => {
           return (
             <GroupListLi
               key={index}
-              onDoubleClick={() => {
-                console.log(`입장할 채팅방 :${i}`);
-                setIsStartChat(false);
-                setIsStartGroupChat(true);
-                setChatRoomInfo({
-                  displayName: i,
-                  chatRoomUid: groupChatUidList[index],
-                });
-              }}
+              onDoubleClick={() => enterGroupChatRoom(groupChattitle, index)}
             >
-              {i}
+              {groupChattitle}
             </GroupListLi>
           );
         })}
