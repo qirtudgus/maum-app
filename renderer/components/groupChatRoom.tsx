@@ -154,7 +154,7 @@ const GroupChatRoom = ({
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     console.log(`현재 채팅방 : ${chatRoomInfo.chatRoomUid}`);
-
+    //채팅 onValue
     const 채팅경로 = ref(
       realtimeDbService,
       `groupChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
@@ -168,6 +168,18 @@ const GroupChatRoom = ({
       console.log(a);
       let messageList = Object.values(a);
       setChatList(messageList);
+    });
+    //현재채팅방 사용유저 onValue
+    let 고유채팅인원경로 = ref(
+      realtimeDbService,
+      `groupChatRooms/${chatRoomInfo.chatRoomUid}/connectedUser`,
+    );
+    onValue(고유채팅인원경로, async (snapshot) => {
+      console.log('사용자가 갱신되었습니다.');
+      let 갱신배열 = await snapshot.val();
+      console.log('그룹채팅 사용자목록에서 불러온 온밸류 배열');
+      console.log(갱신배열);
+      setConnectedUserList(갱신배열);
     });
 
     return () => {
@@ -419,7 +431,8 @@ const GroupChatRoom = ({
                 });
                 // const 선택배열 = [...addUserList];
                 await 채팅방유저리스트업데이트(addUserList);
-                //초대 기능은 완료되긴함 추후 리팩토링하자
+                //초대 기능은 완료되긴함 추후 리팩토링하자, 초대 후 초대리스트 초기화
+                setAddUserList([]);
                 setShowAddGroupChat(false);
               }}
             >
