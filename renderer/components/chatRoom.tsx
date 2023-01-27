@@ -1,4 +1,4 @@
-import { onValue, push, ref } from 'firebase/database';
+import { off, onValue, push, ref } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -153,14 +153,30 @@ const ChatRoom = ({
   const [chatList, setChatList] = useState([]);
   const messageInputRef = useRef<HTMLInputElement>();
   const messageContainerScrollHandler = useRef<HTMLDivElement>();
+  const messageSendRef = useRef<HTMLButtonElement>();
+  const [isOnlySpaceInputValue, setIsOnlySpaceInputValue] = useState(true);
 
+  const [inputValue, setInputValue] = useState('');
+
+  const blank_pattern = /^\s+\s+$/g;
   const SendMessage = async () => {
+    const message = messageInputRef.current.value;
+
+    // if (
+    //   message === '' ||
+    //   message.length === 0 ||
+    //   message === undefined ||
+    //   message === null ||
+    //   blank_pattern.test(message)
+    // ) {
+    //   return;
+    // }
+
     //저장할 경로
     const 채팅저장경로 = ref(
       realtimeDbService,
       `oneToOneChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
     );
-    let message = messageInputRef.current.value;
 
     await push(채팅저장경로, {
       displayName: authService.currentUser.displayName,
@@ -172,7 +188,8 @@ const ChatRoom = ({
 
     //메시지 작성 후 비워주기
     messageInputRef.current.focus();
-    messageInputRef.current.value = '';
+    setInputValue('');
+    setIsOnlySpaceInputValue(true);
     //메시지 작성 후 스크롤 맨 아래로
     messageContainerScrollHandler.current.scrollTop =
       messageContainerScrollHandler.current.scrollHeight;
@@ -186,13 +203,16 @@ const ChatRoom = ({
       realtimeDbService,
       `oneToOneChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
     );
+
     onValue(채팅경로, (snapshot) => {
-      console.log('채팅이 갱신되었습니다');
+      console.log(`채팅이 갱신되었습니다`);
       let messageList = Object.values(snapshot.val());
       setChatList(messageList);
     });
 
     return () => {
+      //언마운트시 해당 경로에 대한 관찰자를 off해주면 왔다갔다해도 onValue가 한번씩만 호출됨 (onValue가 쌓이는걸 방지)
+      off(채팅경로);
       console.log('채팅방을 나갔습니다.');
     };
   }, [chatRoomInfo.chatRoomUid]);
@@ -239,11 +259,34 @@ const ChatRoom = ({
         <input
           ref={messageInputRef}
           placeholder='메시지를 입력해주세요'
+          // defaultValue={''}
+          value={inputValue}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setInputValue(e.currentTarget.value);
+            if (
+              e.currentTarget.value === ' ' ||
+              e.currentTarget.value.length === 0 ||
+              blank_pattern.test(e.currentTarget.value)
+            ) {
+              setIsOnlySpaceInputValue(true);
+              // return;
+            } else {
+              setIsOnlySpaceInputValue(false);
+            }
+          }}
           onKeyDown={(e: React.KeyboardEvent) => {
-            if (e.key === 'Enter') SendMessage();
+            // if (e.key === 'Enter') SendMessage();
+            if (e.key === 'Enter') messageSendRef.current.click();
           }}
         ></input>
-        <button onClick={SendMessage}>전송</button>
+        <button
+          ref={messageSendRef}
+          disabled={isOnlySpaceInputValue}
+          // disabled={messageInputRef.current.value ? true : false}
+          onClick={SendMessage}
+        >
+          전송
+        </button>
       </MessageInput>
       <Footer />
       {/* <button onClick={SendMessage}>메시지 전송</button> */}
