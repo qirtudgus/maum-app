@@ -1,84 +1,11 @@
-import { off, onValue, push, ref } from 'firebase/database';
+import { get, off, onValue, push, ref } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
-import React, { useEffect, useRef, useState } from 'react';
+import { GetServerSideProps } from 'next';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { authService, realtimeDbService } from '../firebaseConfig';
-
-const MessageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  background: #f1f1f1;
-  padding-top: 25px;
-  /* overflow-x: hidden; */
-`;
-
-interface MessageSendData {
-  createdAt: string;
-}
-
-const MessageWrap = styled.div<MessageSendData>`
-  width: 95%;
-  margin: 0 auto;
-  position: relative;
-  display: flex;
-  align-items: flex-start;
-  /* justify-content: flex-start; */
-  flex-direction: column;
-
-  margin-bottom: 30px;
-  /* flex-direction: column; */
-  &.myMessage {
-    align-items: flex-end;
-  }
-
-  &.myMessage > li {
-    background: #79d82b;
-  }
-
-  & .sendDate {
-    font-size: 12px;
-    color: #494949;
-  }
-
-  & > li::after {
-    content: '${(props) => props.createdAt}';
-    position: absolute;
-    right: -140px;
-    font-size: 12px;
-  }
-  &.myMessage > li::after {
-    content: '';
-  }
-
-  &.myMessage > li::before {
-    content: '${(props) => props.createdAt}';
-    position: absolute;
-    left: -140px;
-    font-size: 12px;
-  }
-
-  & .messageWrite {
-    margin-bottom: 5px;
-  }
-`;
-
-const Message = styled.li`
-  width: fit-content;
-  position: relative;
-  max-width: 60%;
-  /* height: 30px; */
-  min-height: 30px;
-  max-height: fit-content;
-  padding: 13px 10px;
-  display: flex;
-  align-items: center;
-  border-radius: 7px;
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2);
-  background: #fff;
-  color: #000;
-`;
+import LoadingSpinner from './LoadingSpinner';
+import MessageContainerFront from './messageContainer';
 
 const ChatTitle = styled.div`
   width: 100%;
@@ -118,10 +45,10 @@ const MessageInput = styled.div`
     border-radius: 4px;
     flex-shrink: 0;
     padding: 10px;
-    background: #79d82b;
+    background: ${({ theme }) => theme.colors.main};
   }
   & > button:hover {
-    background: #64b91e;
+    background: ${({ theme }) => theme.colors.mainHoverColor};
   }
 `;
 
@@ -152,26 +79,14 @@ const ChatRoom = ({
 }) => {
   const [chatList, setChatList] = useState([]);
   const messageInputRef = useRef<HTMLInputElement>();
-  const messageContainerScrollHandler = useRef<HTMLDivElement>();
   const messageSendRef = useRef<HTMLButtonElement>();
   const [isOnlySpaceInputValue, setIsOnlySpaceInputValue] = useState(true);
+  const [isChatLoading, setIsChatLoading] = useState(false);
 
   const [inputValue, setInputValue] = useState('');
 
   const blank_pattern = /^\s+\s+$/g;
   const SendMessage = async () => {
-    const message = messageInputRef.current.value;
-
-    // if (
-    //   message === '' ||
-    //   message.length === 0 ||
-    //   message === undefined ||
-    //   message === null ||
-    //   blank_pattern.test(message)
-    // ) {
-    //   return;
-    // }
-
     //저장할 경로
     const 채팅저장경로 = ref(
       realtimeDbService,
@@ -181,7 +96,7 @@ const ChatRoom = ({
     await push(채팅저장경로, {
       displayName: authService.currentUser.displayName,
       uid: authService.currentUser.uid,
-      message: message,
+      message: messageInputRef.current.value,
 
       createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
     });
@@ -190,9 +105,6 @@ const ChatRoom = ({
     messageInputRef.current.focus();
     setInputValue('');
     setIsOnlySpaceInputValue(true);
-    //메시지 작성 후 스크롤 맨 아래로
-    messageContainerScrollHandler.current.scrollTop =
-      messageContainerScrollHandler.current.scrollHeight;
   };
 
   //useEffect onValue로 채팅을 계속 가져와야함
@@ -203,16 +115,20 @@ const ChatRoom = ({
       realtimeDbService,
       `oneToOneChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
     );
-
-    onValue(채팅경로, (snapshot) => {
+    onValue(채팅경로, async (snapshot) => {
       console.log(`채팅이 갱신되었습니다`);
-      let messageList = Object.values(snapshot.val());
+      //최신메시지 하나만 가져와서 이어붙이면 좋을거같은데...
+      let messageList = Object.values(await snapshot.val());
+      console.log(messageList);
+      console.log('로딩완료');
+      setIsChatLoading(true);
       setChatList(messageList);
     });
 
     return () => {
       //언마운트시 해당 경로에 대한 관찰자를 off해주면 왔다갔다해도 onValue가 한번씩만 호출됨 (onValue가 쌓이는걸 방지)
       off(채팅경로);
+      setIsChatLoading(false);
       console.log('채팅방을 나갔습니다.');
     };
   }, [chatRoomInfo.chatRoomUid]);
@@ -231,29 +147,11 @@ const ChatRoom = ({
           X
         </span>
       </ChatTitle>
-      <MessageContainer ref={messageContainerScrollHandler}>
-        {chatList.map((i, index) => {
-          return (
-            <MessageWrap
-              createdAt={i.createdAt}
-              key={index}
-              className={
-                i.displayName === authService.currentUser.displayName &&
-                'myMessage'
-              }
-            >
-              <span className='messageWrite'>{i.displayName}</span>
-              <Message
-
-              //본인 메시지일 경우에 대한 스타일링용 className
-              >
-                {i.message}
-              </Message>
-              {/* <span className='sendDate'>{i.createdAt}</span> */}
-            </MessageWrap>
-          );
-        })}
-      </MessageContainer>
+      {isChatLoading ? (
+        <MessageContainerFront chatList={chatList} />
+      ) : (
+        <LoadingSpinner />
+      )}
 
       <MessageInput>
         <input
@@ -275,38 +173,20 @@ const ChatRoom = ({
             }
           }}
           onKeyDown={(e: React.KeyboardEvent) => {
-            // if (e.key === 'Enter') SendMessage();
             if (e.key === 'Enter') messageSendRef.current.click();
           }}
         ></input>
         <button
           ref={messageSendRef}
           disabled={isOnlySpaceInputValue}
-          // disabled={messageInputRef.current.value ? true : false}
           onClick={SendMessage}
         >
           전송
         </button>
       </MessageInput>
       <Footer />
-      {/* <button onClick={SendMessage}>메시지 전송</button> */}
-      {/* <button
-        onClick={() => {
-          console.log(chatList);
-          console.log(convertDate(chatList[0].createdAt.seconds));
-        }}
-      >
-        채팅 로그 확인
-      </button> */}
-      {/* <button
-        onClick={() => {
-          setIsStartChat(false);
-        }}
-      >
-        나가기
-      </button> */}
     </>
   );
 };
 
-export default ChatRoom;
+export default React.memo(ChatRoom);
