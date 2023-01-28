@@ -8,7 +8,7 @@ const MessageContainers = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  background: #f1f1f1;
+  background: #fff;
   padding-top: 25px;
   /* overflow-x: hidden; */
 `;
