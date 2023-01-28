@@ -173,7 +173,7 @@ const FixedModalBg = styled.div`
   align-items: center;
 `;
 
-const InviteGroupChatModal = ({
+const CreateGroupChatModal = ({
   setShowAddGroupChat,
 }: {
   setShowAddGroupChat: React.Dispatch<React.SetStateAction<boolean>>;
@@ -192,6 +192,16 @@ const InviteGroupChatModal = ({
   }, []);
 
   const createGroupChatRoom = () => {
+    const blank_pattern = /^\s+\s+$/g;
+    if (
+      chatRoomsTitleInputRef.current.value === ' ' ||
+      chatRoomsTitleInputRef.current.value.length === 0 ||
+      blank_pattern.test(chatRoomsTitleInputRef.current.value)
+    ) {
+      chatRoomsTitleInputRef.current.focus();
+      return;
+    }
+
     //1.한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
     let chatRoomUid = createChatUid();
 
@@ -397,4 +407,4 @@ const InviteGroupChatModal = ({
   );
 };
 
-export default InviteGroupChatModal;
+export default CreateGroupChatModal;
