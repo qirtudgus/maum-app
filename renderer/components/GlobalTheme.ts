@@ -1,8 +1,11 @@
 // 자주 사용하는 색을 객체로 만들자.
 const colors = {
-  main: '#79d82b',
+  // main: '#79d82b',
+  main: '#006cc5',
+  sub: '#fff',
+  sub2: '#f1f1f1',
   mainHoverColor: '#64b91e',
-  borderColor: '#5c5c5c',
+  borderColor: '#bebebe',
 };
 
 const boxShadow = '0 0 3px 3px rgb(0 0 0 / 10%)';
@@ -10,6 +13,8 @@ const boxShadow = '0 0 3px 3px rgb(0 0 0 / 10%)';
 interface ThemeInterface {
   colors: {
     main: string;
+    sub: string;
+    sub2: string;
     mainHoverColor: string;
     borderColor: string;
   };
