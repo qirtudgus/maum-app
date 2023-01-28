@@ -79,7 +79,7 @@ const Message = styled.li`
   color: #000;
 `;
 
-const MessageContainerFront = ({ chatList }: { chatList: any[] }) => {
+const MessageContainerOneToOne = ({ chatList }: { chatList: any[] }) => {
   const messageContainerScrollHandler = useRef<HTMLDivElement>();
 
   //메시지dom이 그려진 후 스크롤 맨 아래로 이동
@@ -110,4 +110,4 @@ const MessageContainerFront = ({ chatList }: { chatList: any[] }) => {
   );
 };
 
-export default React.memo(MessageContainerFront);
+export default React.memo(MessageContainerOneToOne);

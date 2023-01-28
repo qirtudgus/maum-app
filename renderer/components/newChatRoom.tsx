@@ -4,7 +4,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { realtimeDbService } from '../firebaseConfig';
 import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
 import LoadingSpinner from './LoadingSpinner';
-import MessageContainerFront from './messageContainer';
+import MessageContainerOneToOne from './messageContainerOneToOne';
 import SendMessageInput from './SendMessageInput';
 
 export function convertDate(time) {
@@ -70,7 +70,7 @@ const ChatRoom = ({
       </Head>
       <ChatRoomHeaderTitle title={displayName} />
       {isChatLoading ? (
-        <MessageContainerFront chatList={chatList} />
+        <MessageContainerOneToOne chatList={chatList} />
       ) : (
         <LoadingSpinner />
       )}
