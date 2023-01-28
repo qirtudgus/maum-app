@@ -11,7 +11,7 @@ import {
   UserList,
   getGroupChatRoomsUidToTitleFunc,
 } from '../firebaseConfig';
-import { convertDate } from './chatRoom';
+import { convertDate } from '../utils/convertDate';
 
 export const GroupListTitle = styled.div`
   display: flex;

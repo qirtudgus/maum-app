@@ -9,11 +9,10 @@ import {
   realtimeDbService,
   UserList,
 } from '../firebaseConfig';
-import { convertDate } from '../components/chatRoom';
+import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
 import MessageContainerGroup from './messageContainerGroup';
 import LoadingSpinner from '../components/LoadingSpinner';
-import MessageContainerFront from '../components/messageContainer';
 import SendMessageInput from '../components/SendMessageInput';
 import { useRouter } from 'next/router';
 

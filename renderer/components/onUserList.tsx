@@ -13,8 +13,8 @@ import {
   createOneToOneChatRoomsRefForOpponent,
   realtimeDbService,
 } from '../firebaseConfig';
-import { convertDate } from './newChatRoom';
-import { GroupListTitle } from './groupChatList';
+import { convertDate } from '../utils/convertDate';
+import { GroupListTitle } from './newGroupChatList';
 
 interface UserList {
   uid: string;
