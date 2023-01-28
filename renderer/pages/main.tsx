@@ -55,7 +55,7 @@ const LogoutButton = styled.div`
     height: 30px;
   }
   &:hover svg {
-    opacity: 0.6;
+    fill: #000;
   }
 `;
 
@@ -118,7 +118,7 @@ function Home() {
   return (
     <Wrap>
       <Head>
-        <title>Home - Nextron (with-typescript)</title>
+        <title>maumTalk</title>
       </Head>
       <SideBarWrap>
         <div>메뉴</div>
