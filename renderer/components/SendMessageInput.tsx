@@ -3,7 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { realtimeDbService, authService } from '../firebaseConfig';
-import { convertDate } from './chatRoom';
+import { convertDate } from '../utils/convertDate';
 
 const MessageInput = styled.div`
   width: 100%;
