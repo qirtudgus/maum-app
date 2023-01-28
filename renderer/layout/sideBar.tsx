@@ -87,10 +87,6 @@ const SideBar = () => {
   const userSignOut = async () => {
     try {
       signOut(authService).then(() => {
-        //로그아웃시 해당 유저의 상태를 false로 만들어 렌더링 시 회색(?)으로 뜨게 하자
-        //fix:유저구조가 변경되어 안쓴다.
-        // set(myConnectionsRef, false);
-        //로그인 시 미리 할당되어있는 uid값을 사용해야함 여기서 새로 참조하면 이미 로그아웃 후라 값이 없음.
         if (uid) {
           const myConnectionsRef = ref(realtimeDbService, `userList/${uid}`);
           //유저구조중에 isOn값만 false로 만들기, 아래처럼 update 함수를 호출 // 정상작동
@@ -107,7 +103,12 @@ const SideBar = () => {
     <SideBarContainer>
       <SideBarWrap>
         <ButtonWrap>
-          <SettingButton>
+          <SettingButton
+            title='설정'
+            onClick={() => {
+              router.push('/settings');
+            }}
+          >
             <SettingSvg />
           </SettingButton>
           <LogoutButton title='로그아웃' onClick={userSignOut}>
