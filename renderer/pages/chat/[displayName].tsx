@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
-import ChatRoom from '../../components/chatRoom';
+import ChatRoom from '../../components/newChatRoom';
 
 const ChatWrap = styled.div`
   width: 100%;
