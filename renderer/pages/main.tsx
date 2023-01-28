@@ -2,15 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { authService, realtimeDbService } from '../firebaseConfig';
 import { ref, update } from 'firebase/database';
-import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import OnUserList from '../components/onUserList';
 import styled from 'styled-components';
 import ChatRoom from '../components/chatRoom';
 import GroupChatList from '../components/groupChatList';
 import GroupChatRoom from '../components/groupChatRoom';
-import LogoutSvg from '../components/svg/logoutSvg';
 import Login from './home';
+import SideBar from '../layout/sideBar';
 
 const Wrap = styled.div`
   width: 100%;
@@ -34,34 +33,6 @@ const ChatWrap = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
-const SideBarWrap = styled.div`
-  width: 60px;
-  flex-shrink: 0;
-  height: 100%;
-  background: #006cc5;
-  border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
-  position: relative;
-`;
-
-const LogoutButton = styled.div`
-  cursor: pointer;
-  position: absolute;
-  bottom: 10px;
-  width: 100%;
-  height: 35px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  & svg {
-    width: 30px;
-    height: 30px;
-  }
-  &:hover svg {
-    fill: #000;
-  }
-`;
-
 function Home() {
   // 마음연구소 솔루션이라면 어떻게 생겼을지 상상하며..
   //채팅방 자료구조는?
@@ -88,24 +59,6 @@ function Home() {
   const uid = authService.currentUser?.uid;
   const displayName = authService.currentUser?.displayName;
   const router = useRouter();
-  const userSignOut = async () => {
-    try {
-      signOut(authService).then(() => {
-        //로그아웃시 해당 유저의 상태를 false로 만들어 렌더링 시 회색(?)으로 뜨게 하자
-        //fix:유저구조가 변경되어 안쓴다.
-        // set(myConnectionsRef, false);
-        //로그인 시 미리 할당되어있는 uid값을 사용해야함 여기서 새로 참조하면 이미 로그아웃 후라 값이 없음.
-        if (uid) {
-          const myConnectionsRef = ref(realtimeDbService, `userList/${uid}`);
-          //유저구조중에 isOn값만 false로 만들기, 아래처럼 update 함수를 호출 // 정상작동
-          update(myConnectionsRef, { isOn: false });
-          router.push('/home');
-        }
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   interface groupChatListInterface {
     groupChatUid: string;
@@ -123,12 +76,7 @@ function Home() {
       <Head>
         <title>maumTalk</title>
       </Head>
-      <SideBarWrap>
-        <div></div>
-        <LogoutButton title='로그아웃' onClick={userSignOut}>
-          <LogoutSvg />
-        </LogoutButton>
-      </SideBarWrap>
+      <SideBar />
       <MenuWrap>
         {/* {uid && <div>환영합니다 {displayName}님!</div>} */}
 
