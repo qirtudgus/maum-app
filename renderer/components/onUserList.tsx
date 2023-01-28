@@ -13,7 +13,7 @@ import {
   createOneToOneChatRoomsRefForOpponent,
   realtimeDbService,
 } from '../firebaseConfig';
-import { convertDate } from './chatRoom';
+import { convertDate } from './newChatRoom';
 import { GroupListTitle } from './groupChatList';
 
 interface UserList {
