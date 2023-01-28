@@ -16,17 +16,19 @@ const Wrap = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
+  border-top: 1px solid ${({ theme }) => theme.colors.borderColor};
 `;
 
 const MenuWrap = styled.div`
   max-width: 300px;
-  border-right: 1px solid #eee;
+  border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
   display: flex;
   flex-direction: column;
 `;
 
 const ChatWrap = styled.div`
   width: 100%;
+  height: 100%;
   position: relative;
   min-width: 400px;
   display: flex;
@@ -34,10 +36,11 @@ const ChatWrap = styled.div`
 `;
 
 const SideBarWrap = styled.div`
-  width: 50px;
+  width: 60px;
   flex-shrink: 0;
   height: 100%;
-  background: #eee;
+  background: #006cc5;
+  border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
   position: relative;
 `;
 
@@ -121,13 +124,13 @@ function Home() {
         <title>maumTalk</title>
       </Head>
       <SideBarWrap>
-        <div>메뉴</div>
+        <div></div>
         <LogoutButton title='로그아웃' onClick={userSignOut}>
           <LogoutSvg />
         </LogoutButton>
       </SideBarWrap>
       <MenuWrap>
-        {uid && <div>환영합니다 {displayName}님!</div>}
+        {/* {uid && <div>환영합니다 {displayName}님!</div>} */}
 
         {
           <>
