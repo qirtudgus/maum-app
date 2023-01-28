@@ -38,6 +38,9 @@ const UserListli = styled.li<UserIsOnInterface>`
   line-height: 30px;
   margin-bottom: 5px;
   user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   /* border: 1px solid#eee; */
   &:hover {
     background: #eee;
