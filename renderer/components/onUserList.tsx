@@ -1,6 +1,7 @@
 import { push, ref, set, get } from '@firebase/database';
 import { onValue } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
+import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
@@ -82,22 +83,10 @@ const UserListli = styled.li<UserIsOnInterface>`
   }
 `;
 
-const OnUserList = ({
-  setIsStartChat,
-  setIsStartGroupChat,
-  setChatRoomInfo,
-}: {
-  setIsStartChat: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsStartGroupChat: React.Dispatch<React.SetStateAction<boolean>>;
-  setChatRoomInfo: React.Dispatch<
-    React.SetStateAction<{
-      displayName: string;
-      chatRoomUid: string;
-    }>
-  >;
-}) => {
+const OnUserList = () => {
   const userListRef = ref(realtimeDbService, 'userList');
 
+  const router = useRouter();
   const [currentChatUser, setCurrentChatUser] = useState({
     displayName: '',
     uid: '',
@@ -158,18 +147,10 @@ const OnUserList = ({
       chatRoomUid: string;
       opponentName: string;
     } | null = (await get(일대일채팅방)).val();
-
-    //   console.log(isOpenChatRooms);
-
     if (isOpenChatRooms) {
       //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
       console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
-      setChatRoomInfo({
-        displayName: opponentDisplayName,
-        chatRoomUid: isOpenChatRooms.chatRoomUid,
-      });
-      setIsStartGroupChat(false);
-      setIsStartChat(true);
+      router.push(`/chat/${i.displayName}?uid=${isOpenChatRooms.chatRoomUid}`);
     } else {
       //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
       console.log('새로운 채팅방이 생성');
@@ -187,13 +168,7 @@ const OnUserList = ({
         message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
         createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
       });
-      // ###이 후 채팅방으로 접속하는 코드를 이어주면 ui적으로 좋을거같다.
-      setChatRoomInfo({
-        displayName: opponentDisplayName,
-        chatRoomUid: chatRoomRandomString,
-      });
-      setIsStartGroupChat(false);
-      setIsStartChat(true);
+      router.push(`/chat/${i.displayName}?uid=${chatRoomRandomString}`);
     }
   };
 
