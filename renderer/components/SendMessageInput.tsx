@@ -40,10 +40,12 @@ const Footer = styled.div`
 `;
 
 const SendMessageInput = ({
-  chatRoomInfo,
+  displayName,
+  chatRoomUid,
   isOneToOneOrGroup,
 }: {
-  chatRoomInfo: { displayName: string; chatRoomUid: string };
+  displayName: string;
+  chatRoomUid: string;
   isOneToOneOrGroup: 'oneToOne' | 'group';
 }) => {
   const [inputValue, setInputValue] = useState('');
@@ -57,14 +59,8 @@ const SendMessageInput = ({
     //저장할 경로 - props로 일대일, 그룹일 경우로 분기
     const 채팅저장경로분기 =
       isOneToOneOrGroup === 'oneToOne'
-        ? ref(
-            realtimeDbService,
-            `oneToOneChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
-          )
-        : ref(
-            realtimeDbService,
-            `groupChatRooms/${chatRoomInfo.chatRoomUid}/chat`,
-          );
+        ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
+        : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
 
     await push(채팅저장경로분기, {
       displayName: authService.currentUser.displayName,
