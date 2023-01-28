@@ -1,22 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
-import {
-  authService,
-  createChatUid,
-  getUserDataRef,
-  getUserList,
-  realtimeDbService,
-} from '../firebaseConfig';
-import { get, onDisconnect, push, ref, set, update } from 'firebase/database';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { authService, realtimeDbService } from '../firebaseConfig';
+import { ref, update } from 'firebase/database';
+import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import OnUserList from '../components/onUserList';
-import { Timestamp } from 'firebase/firestore';
 import styled from 'styled-components';
 import ChatRoom from '../components/chatRoom';
 import GroupChatList from '../components/groupChatList';
 import GroupChatRoom from '../components/groupChatRoom';
+import LogoutSvg from '../components/svg/logoutSvg';
+import Login from './home';
 
 const Wrap = styled.div`
   width: 100%;
@@ -44,6 +38,25 @@ const SideBarWrap = styled.div`
   flex-shrink: 0;
   height: 100%;
   background: #eee;
+  position: relative;
+`;
+
+const LogoutButton = styled.div`
+  cursor: pointer;
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & svg {
+    width: 30px;
+    height: 30px;
+  }
+  &:hover svg {
+    opacity: 0.6;
+  }
 `;
 
 function Home() {
@@ -62,7 +75,6 @@ function Home() {
   /oneToOneChatRooms/${chatRoomsUid} 에서 데이터를 가져와서 나열시킨다.
   2-2. 들어있지않다면 chatRoomsUid를 생성 후 데이터를 가져와서 나열시킨다.   
   */
-
   const [isStartChat, setIsStartChat] = useState(false);
   const [isStartGroupChat, setIsStartGroupChat] = useState(false);
   const [chatRoomInfo, setChatRoomInfo] = useState({
@@ -100,6 +112,9 @@ function Home() {
     groupChatUid: string;
   }
 
+  //로그인정보가 없을경우 로그인창으로 이동
+  if (authService.currentUser === null) return <Login />;
+
   return (
     <Wrap>
       <Head>
@@ -107,17 +122,12 @@ function Home() {
       </Head>
       <SideBarWrap>
         <div>메뉴</div>
+        <LogoutButton title='로그아웃' onClick={userSignOut}>
+          <LogoutSvg />
+        </LogoutButton>
       </SideBarWrap>
       <MenuWrap>
         {uid && <div>환영합니다 {displayName}님!</div>}
-        {uid ? (
-          <button onClick={userSignOut}>로그아웃</button>
-        ) : (
-          <>
-            <Link href='/home'>로그인</Link>
-            <Link href='/register'>회원가입</Link>
-          </>
-        )}
 
         {
           <>
