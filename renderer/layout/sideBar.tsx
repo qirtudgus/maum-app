@@ -1,15 +1,23 @@
 import { signOut } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
 import router from 'next/router';
+import { useState } from 'react';
 import styled from 'styled-components';
+import GroupChatList from '../components/newGroupChatList';
+import OnUserList from '../components/onUserList';
 import LogoutSvg from '../components/svg/logoutSvg';
 import SettingSvg from '../components/svg/settingSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
 
+const SideBarContainer = styled.div`
+  display: flex;
+  height: 100%;
+`;
+
 const SideBarWrap = styled.div`
   width: 60px;
   flex-shrink: 0;
-  height: 100%;
+  /* height: 100%; */
   background: #006cc5;
   border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
   position: relative;
@@ -65,6 +73,15 @@ const SettingButton = styled.div`
   }
 `;
 
+const MenuWrap = styled.div`
+  max-width: 300px;
+  position: relative;
+  height: 100%;
+  border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
+  display: flex;
+  flex-direction: column;
+`;
+
 const SideBar = () => {
   const uid = authService.currentUser?.uid;
   const userSignOut = async () => {
@@ -87,7 +104,7 @@ const SideBar = () => {
   };
 
   return (
-    <>
+    <SideBarContainer>
       <SideBarWrap>
         <ButtonWrap>
           <SettingButton>
@@ -98,7 +115,13 @@ const SideBar = () => {
           </LogoutButton>
         </ButtonWrap>
       </SideBarWrap>
-    </>
+      <MenuWrap>
+        <>
+          <OnUserList />
+          <GroupChatList />
+        </>
+      </MenuWrap>
+    </SideBarContainer>
   );
 };
 
