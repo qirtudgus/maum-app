@@ -13,14 +13,25 @@ import {
   realtimeDbService,
 } from '../firebaseConfig';
 import { convertDate } from './chatRoom';
+import { GroupListTitle } from './groupChatList';
 
 interface UserList {
   uid: string;
   displayName: string;
 }
-const UserListWrap = styled.div`
+
+const UserListContainer = styled.div`
   width: 100%;
   height: 50%;
+  position: relative;
+  background: ${({ theme }) => theme.colors.sub};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
+`;
+
+const UserListWrap = styled.div`
+  width: 100%;
+  height: calc(100% - 40px);
+  background: ${({ theme }) => theme.colors.sub2};
   overflow-y: auto;
 `;
 
@@ -30,8 +41,10 @@ interface UserIsOnInterface {
 
 const UserListli = styled.li<UserIsOnInterface>`
   cursor: pointer;
-  width: 95%;
+  width: 100%;
   margin: 0 auto;
+  padding-left: 10px;
+  font-size: 14px;
   /* max-width: 300px; */
   flex-shrink: 0;
   height: 30px;
@@ -41,6 +54,7 @@ const UserListli = styled.li<UserIsOnInterface>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: #1a1a1a;
   /* border: 1px solid#eee; */
   &:hover {
     background: #eee;
@@ -48,7 +62,7 @@ const UserListli = styled.li<UserIsOnInterface>`
   & .isOn {
     margin-right: 5px;
     font-size: 12px;
-    color: red;
+    color: #6d6d6d;
   }
   ${(props) =>
     props.isOn &&
@@ -59,6 +73,7 @@ const UserListli = styled.li<UserIsOnInterface>`
     `}
   &#chatUserActive {
     & {
+      color: #fff;
       background: ${({ theme }) => theme.colors.main};
     }
     &#chatUserActive:hover {
@@ -183,8 +198,8 @@ const OnUserList = ({
   };
 
   return (
-    <>
-      <div>유저 목록</div>
+    <UserListContainer>
+      <GroupListTitle>유저 목록</GroupListTitle>
       <UserListWrap>
         {userList.map((i, index) => {
           return i.uid === authService.currentUser?.uid ? null : (
@@ -203,7 +218,7 @@ const OnUserList = ({
           );
         })}
       </UserListWrap>
-    </>
+    </UserListContainer>
   );
 };
 

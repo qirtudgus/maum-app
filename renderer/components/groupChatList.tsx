@@ -12,12 +12,18 @@ import {
 } from '../firebaseConfig';
 import { convertDate } from './chatRoom';
 
-const GroupListTitle = styled.div`
+export const GroupListTitle = styled.div`
   display: flex;
+  height: 40px;
   align-items: center;
   justify-content: space-between;
-  width: 95%;
+  width: 100%;
+  padding: 5px;
+  font-weight: bold;
   margin: 0 auto;
+  color: #1a1a1a;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
+  font-size: 15px;
   & .addGroupChatButton {
     cursor: pointer;
     font-size: 22px;
@@ -27,15 +33,23 @@ const GroupListTitle = styled.div`
   }
 `;
 
-const GroupListWrap = styled.div`
-  width: 95%;
+const GroupChatContainer = styled.div`
+  width: 100%;
   height: 50%;
-  margin: 0 auto;
+  position: relative;
+  background: ${({ theme }) => theme.colors.sub};
+`;
+
+const GroupListWrap = styled.div`
+  width: 100%;
+  height: calc(100% - 40px);
+  background: ${({ theme }) => theme.colors.sub2};
   overflow-y: auto;
 `;
 
 const GroupListLi = styled.li`
   cursor: pointer;
+  width: 95%;
   margin: 0 auto;
   /* max-width: 300px; */
   flex-shrink: 0;
@@ -44,6 +58,9 @@ const GroupListLi = styled.li`
   margin-bottom: 5px;
   user-select: none;
   border: 1px solid#eee;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   &:hover {
     background: #eee;
   }
@@ -267,7 +284,7 @@ const GroupChatList = ({
   };
 
   return (
-    <>
+    <GroupChatContainer>
       <GroupListTitle>
         <span>그룹 채팅 목록</span>
         <span className='addGroupChatButton' onClick={showUserList}>
@@ -374,7 +391,7 @@ const GroupChatList = ({
           </>
         </AddGroupChatModal>
       )}
-    </>
+    </GroupChatContainer>
   );
 };
 
