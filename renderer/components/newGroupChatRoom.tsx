@@ -11,7 +11,7 @@ import {
 } from '../firebaseConfig';
 import { convertDate } from '../components/chatRoom';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
-import GroupMessageContainer from '../components/groupMessageContainer';
+import MessageContainerGroup from './messageContainerGroup';
 import LoadingSpinner from '../components/LoadingSpinner';
 import MessageContainerFront from '../components/messageContainer';
 import SendMessageInput from '../components/SendMessageInput';
@@ -169,7 +169,7 @@ const NewGroupChatRoom = ({
         })}
       </div>
       {isChatLoading ? (
-        <GroupMessageContainer chatList={chatList} />
+        <MessageContainerGroup chatList={chatList} />
       ) : (
         <LoadingSpinner />
       )}

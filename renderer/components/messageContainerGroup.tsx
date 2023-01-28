@@ -89,7 +89,7 @@ const Message = styled.li`
   color: #000;
 `;
 
-const GroupMessageContainerFront = ({
+const MessageContainerGroup = ({
   chatList,
 }: {
   chatList: { displayName: string; createdAt: string; message: string }[];
@@ -126,4 +126,4 @@ const GroupMessageContainerFront = ({
   );
 };
 
-export default React.memo(GroupMessageContainerFront);
+export default React.memo(MessageContainerGroup);
