@@ -20,6 +20,8 @@ interface UserList {
 }
 const UserListWrap = styled.div`
   width: 100%;
+  height: 50%;
+  overflow-y: auto;
 `;
 
 interface UserIsOnInterface {
@@ -178,25 +180,27 @@ const OnUserList = ({
   };
 
   return (
-    <UserListWrap>
+    <>
       <div>유저 목록</div>
-      {userList.map((i, index) => {
-        return i.uid === authService.currentUser?.uid ? null : (
-          <UserListli
-            isOn={i.isOn}
-            key={index}
-            id={i.uid === currentChatUser.uid ? 'chatUserActive' : ''}
-            onDoubleClick={() => {
-              setCurrentChatUser(i);
-              enterOneToOneChatRooms(i);
-            }}
-          >
-            <span className='isOn'>{i.isOn === true ? '●' : '●'}</span>
-            {i.displayName}
-          </UserListli>
-        );
-      })}
-    </UserListWrap>
+      <UserListWrap>
+        {userList.map((i, index) => {
+          return i.uid === authService.currentUser?.uid ? null : (
+            <UserListli
+              isOn={i.isOn}
+              key={index}
+              id={i.uid === currentChatUser.uid ? 'chatUserActive' : ''}
+              onDoubleClick={() => {
+                setCurrentChatUser(i);
+                enterOneToOneChatRooms(i);
+              }}
+            >
+              <span className='isOn'>{i.isOn === true ? '●' : '●'}</span>
+              {i.displayName}
+            </UserListli>
+          );
+        })}
+      </UserListWrap>
+    </>
   );
 };
 

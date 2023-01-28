@@ -29,7 +29,9 @@ const GroupListTitle = styled.div`
 
 const GroupListWrap = styled.div`
   width: 95%;
+  height: 50%;
   margin: 0 auto;
+  overflow-y: auto;
 `;
 
 const GroupListLi = styled.li`
