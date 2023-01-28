@@ -18,7 +18,7 @@ const Box = styled.div`
   align-items: center;
   justify-content: center;
   position: fixed;
-  background: #b5d692;
+  background: ${({ theme }) => theme.colors.main}
   flex-direction: column;
 `;
 
@@ -99,6 +99,8 @@ const Login = () => {
       emailInput.value = 방금가입한메일;
       emailInput.focus();
       passwordInput.focus();
+    } else {
+      emailInput.focus();
     }
   }, []);
 
