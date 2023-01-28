@@ -1,21 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { authService, realtimeDbService } from '../firebaseConfig';
-import { ref, update } from 'firebase/database';
 import { useRouter } from 'next/router';
-import OnUserList from '../components/onUserList';
 import styled from 'styled-components';
 import ChatRoom from '../components/chatRoom';
-import GroupChatList from '../components/groupChatList';
 import GroupChatRoom from '../components/groupChatRoom';
-import Login from './home';
-import SideBar from '../layout/sideBar';
 
 const Wrap = styled.div`
   width: 100%;
-  height: 100vh;
+  /* height: 100vh; */
+  height: 100%;
   display: flex;
-  border-top: 1px solid ${({ theme }) => theme.colors.borderColor};
+  /* border-top: 1px solid ${({ theme }) => theme.colors.borderColor}; */
 `;
 
 const MenuWrap = styled.div`
@@ -68,51 +64,12 @@ function Home() {
     groupChatUid: string;
   }
 
-  //로그인정보가 없을경우 로그인창으로 이동
-  if (authService.currentUser === null) return <Login />;
-
   return (
     <Wrap>
       <Head>
         <title>maumTalk</title>
       </Head>
-      <SideBar />
-      <MenuWrap>
-        {/* {uid && <div>환영합니다 {displayName}님!</div>} */}
-
-        {
-          <>
-            <OnUserList
-              setIsStartChat={setIsStartChat}
-              setIsStartGroupChat={setIsStartGroupChat}
-              setChatRoomInfo={setChatRoomInfo}
-            />
-            <GroupChatList
-              setIsStartChat={setIsStartChat}
-              setIsStartGroupChat={setIsStartGroupChat}
-              setChatRoomInfo={setChatRoomInfo}
-            />
-          </>
-        }
-      </MenuWrap>
-      {isStartChat && (
-        <ChatWrap>
-          <ChatRoom
-            chatRoomInfo={chatRoomInfo}
-            setIsStartChat={setIsStartChat}
-            setIsStartGroupChat={setIsStartGroupChat}
-          />
-        </ChatWrap>
-      )}
-      {isStartGroupChat && (
-        <ChatWrap>
-          <GroupChatRoom
-            chatRoomInfo={chatRoomInfo}
-            setIsStartChat={setIsStartChat}
-            setIsStartGroupChat={setIsStartGroupChat}
-          />
-        </ChatWrap>
-      )}
+      <div>메인페이지</div>
     </Wrap>
   );
 }
