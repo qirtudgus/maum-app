@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 
 const ChatTitle = styled.div`
@@ -8,7 +9,8 @@ const ChatTitle = styled.div`
   text-align: center;
   font-size: 20px;
   font-weight: bold;
-  border-bottom: 1px solid#eee;
+
+  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
   position: relative;
   & .closeBtn {
     cursor: pointer;
@@ -19,11 +21,13 @@ const ChatTitle = styled.div`
 
 const ChatRoomHeaderTitle = ({
   title,
-  ChatStatesetState,
-}: {
+}: // ChatStatesetState,
+{
   title: string;
-  ChatStatesetState: React.Dispatch<React.SetStateAction<boolean>>;
+  // ChatStatesetState: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const router = useRouter();
+
   return (
     <ChatTitle>
       {title}와의 대화
@@ -31,7 +35,8 @@ const ChatRoomHeaderTitle = ({
         title='닫기'
         className='closeBtn'
         onClick={() => {
-          ChatStatesetState(false);
+          router.push('/main');
+          // ChatStatesetState(false);
         }}
       >
         X
