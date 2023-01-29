@@ -1,6 +1,6 @@
-import { get, onValue, push, ref, set } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import { useRouter } from 'next/router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   authService,
@@ -142,7 +142,6 @@ const GroupChatList = () => {
                   : ''
               }
               onDoubleClick={() => {
-                console.log(item);
                 setCurrentGroupChat(item);
                 enterGroupChatRoom(item);
               }}
