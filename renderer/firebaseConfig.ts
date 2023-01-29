@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { get, getDatabase, ref, update } from 'firebase/database';
+import { get, getDatabase, ref, set, update } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
@@ -122,7 +122,7 @@ export const updateUserGroupChatList = async (
   });
 };
 
-//유저배열을 받아와 각 유저들의 그룹채팅리스트에 그룹채팅을 추가하는 함수
+//유저배열과 그룹채팅uid를 받아와 받아와 각 유저들의 그룹채팅리스트에 그룹채팅을 추가하는 함수
 export const updateUsersGroupChatList = async (
   userList: UserList[],
   chatRoomUid: string,
@@ -148,4 +148,27 @@ export const updateGroupChatConnectedUsers = async (
       [데이터사이즈 + index]: userList[index],
     });
   });
+};
+
+//특정유저가 그룹채팅방에서 퇴장 시 자신의 채팅리스트에서 삭제해주는 함수
+export const exitUserCleanUpMyGroupChatList = async (
+  uid: string,
+  chatRoomUid: string,
+) => {
+  let 내그룹채팅리스트 = [
+    ...(await (await get(getUserConnectedGroupChatList(uid))).val()),
+  ];
+  //삭제해야하는 채팅방의 인덱스를 구한다.
+  let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
+  if (삭제인덱스 !== -1) {
+    //삭제
+    내그룹채팅리스트.splice(삭제인덱스, 1);
+    //삭제한 배열을 다시 set해준다.
+    let 그룹채팅 = ref(realtimeDbService, `userList/${uid}/myGroupChatList`);
+    set(그룹채팅, {
+      groupChatUid: 내그룹채팅리스트,
+    });
+  } else {
+    alert('존재하지않는 채팅방입니다.');
+  }
 };
