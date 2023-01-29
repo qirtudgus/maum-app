@@ -12,6 +12,8 @@ import { authService, realtimeDbService } from '../firebaseConfig';
 const SideBarContainer = styled.div`
   display: flex;
   height: 100%;
+  position: relative;
+  z-index: 100;
 `;
 
 const SideBarWrap = styled.div`
