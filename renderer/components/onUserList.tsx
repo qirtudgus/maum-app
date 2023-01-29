@@ -16,11 +16,6 @@ import {
 import { convertDate } from '../utils/convertDate';
 import { GroupListTitle } from './newGroupChatList';
 
-interface UserList {
-  uid: string;
-  displayName: string;
-}
-
 const UserListContainer = styled.div`
   width: 100%;
   height: 50%;
