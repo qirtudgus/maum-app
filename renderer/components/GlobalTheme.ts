@@ -4,7 +4,7 @@ const colors = {
   main: '#006cc5',
   sub: '#fff',
   sub2: '#f1f1f1',
-  mainHoverColor: '#64b91e',
+  mainHoverColor: '#005092',
   borderColor: '#bebebe',
 };
 
