@@ -46,6 +46,7 @@ const UserListWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   cursor: default;
+  border-radius: 5px;
 `;
 
 const UserListli = styled.li`
