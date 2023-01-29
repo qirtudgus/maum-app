@@ -1,6 +1,7 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
 import Head from 'next/head';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useLayoutEffect, useRef, useState } from 'react';
@@ -191,7 +192,7 @@ const Login = () => {
       <Box>
         <Wrap>
           <Logo>
-            {/* <image src={logo}/> */}
+            <Image src={logo} />
             <p>마음톡에 오신걸 환영해요!</p>
           </Logo>
           <BasicInput
