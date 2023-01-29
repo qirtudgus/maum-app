@@ -32,7 +32,6 @@ export const signUpWithEmail = async (email, password, nickname) => {
     });
     return response;
   } catch (error) {
-    console.log(error);
     console.log(error.code);
     if (error.code === 'auth/email-already-in-use')
       alert('사용중인 이메일입니다!');

@@ -21,76 +21,6 @@ import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
 import InviteGroupChatModal from './inviteGroupChatModal';
 
-const GroupChatModalUserList = styled.li`
-  width: 90%;
-  height: 40px;
-  display: flex;
-  margin: 0 auto;
-  align-items: center;
-  justify-content: space-between;
-
-  &.active {
-    background: #964545;
-  }
-  &:hover {
-    background: red;
-  }
-
-  & .isActive::after {
-    content: '추가';
-    cursor: pointer;
-  }
-  &.active .isActive::after {
-    content: '해제';
-    cursor: pointer;
-  }
-`;
-
-const AddGroupChatModal = styled.div`
-  top: 300px;
-  left: 400px;
-  right: 0;
-  position: fixed;
-  margin: 0 auto;
-  width: 300px;
-  height: 300px;
-  background: #eee;
-`;
-
-const AddUserListWrap = styled.div`
-  width: 95%;
-  min-height: 40px;
-  margin: 10px auto;
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const AddUserList = styled.li`
-  width: fit-content;
-  height: 30px;
-  padding: 1px 10px;
-  background: #fff;
-  border-radius: 5px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  & .cancelUser {
-  }
-
-  & .cancelUser:hover {
-    cursor: pointer;
-    font-weight: bold;
-  }
-`;
-
-const InviteUserList = styled.div`
-  height: 300px;
-  overflow-y: auto;
-`;
-
 const NewGroupChatRoom = ({
   displayName,
   chatRoomUid,
@@ -102,7 +32,6 @@ const NewGroupChatRoom = ({
   const [connectedUserList, setConnectedUserList] = useState<UserList[]>([]);
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
-  const [addUserList, setAddUserList] = useState<UserList[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const router = useRouter();
   const groupChatListPath = getGroupChatListPath(chatRoomUid);
