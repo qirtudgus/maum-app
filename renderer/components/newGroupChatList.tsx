@@ -19,7 +19,7 @@ export const GroupListTitle = styled.div`
   font-weight: bold;
   margin: 0 auto;
   color: #1a1a1a;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
+  /* border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor}; */
   font-size: 15px;
   & .addGroupChatButton {
     cursor: pointer;
