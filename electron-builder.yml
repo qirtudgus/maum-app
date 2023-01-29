@@ -1,6 +1,6 @@
-appId: com.example.nextron
-productName: My Nextron App
-copyright: Copyright © 2018 Yoshihide Shiono
+appId: com.maumTalk.sunghyun
+productName: maumTalk
+copyright: Copyright © 2023 maumTalk
 directories:
   output: dist
   buildResources: resources
