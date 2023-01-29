@@ -89,7 +89,7 @@ const AddUserListWrap = styled.div`
   display: flex;
   flex-wrap: wrap;
   max-height: 100px;
-  overflow-y: auto;
+  overflow-y: scroll;
 `;
 
 const AddUserList = styled.li`
@@ -122,7 +122,7 @@ const AddUserList = styled.li`
 
 const PossibleInviteUserListWrap = styled.div`
   height: 250px;
-  overflow-y: auto;
+  overflow-y: scroll;
 `;
 
 const ModalTitle = styled.div`
