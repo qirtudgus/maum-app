@@ -1,5 +1,5 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { ref, update } from 'firebase/database';
+import { onDisconnect, ref, update } from 'firebase/database';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -177,6 +177,8 @@ const Login = () => {
             window.localStorage.setItem('oneToOneChatLayout', 'oneToOne');
             window.localStorage.setItem('groupChatLayout', 'group');
           }
+          //로그인 시점에 onDisconnect를 설정하여 앱을 바로 종료하여도 종료 업데이트가 되도록 오류 수정
+          onDisconnect(connectedRef).update({ isOn: false });
 
           router.push('/main');
         }
