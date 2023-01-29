@@ -2,7 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { get, getDatabase, ref } from 'firebase/database';
+import { get, getDatabase, ref, update } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
@@ -98,4 +98,26 @@ export const getOneToOneChatListPath = (chatRoomUid: string) => {
 //그룹 채팅룸에서 채팅리스트를 불러오기 위한 경로
 export const getGroupChatListPath = (chatRoomUid: string) => {
   return ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
+};
+
+//그룹내 채팅인원 리스트를 불러오기 위한 경로
+export const getGroupUserListPath = (chatRoomUid: string) => {
+  return ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`);
+};
+
+//특정 유저가 참여중인 그룹채팅 리스트를 불러오기 위한 경로
+export const getUserConnectedGroupChatList = (uid: string) => {
+  return ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`);
+};
+
+//특정 유저의 그룹채팅리스트에 그룹채팅을 추가하는 함수
+export const updateUserGroupChatList = async (
+  uid: string,
+  chatRoomUid: string,
+) => {
+  const myGroupChatListPath = getUserConnectedGroupChatList(uid);
+  const 데이터사이즈 = (await get(myGroupChatListPath)).size;
+  update(myGroupChatListPath, {
+    [데이터사이즈]: chatRoomUid,
+  });
 };
