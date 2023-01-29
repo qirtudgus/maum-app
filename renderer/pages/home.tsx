@@ -171,6 +171,13 @@ const Login = () => {
             `userList/${authService.currentUser.uid}`,
           );
           update(connectedRef, { isOn: true });
+          //로컬스토리지에서 채팅방 레이아웃 확인 후 없으면 초기값 세팅
+          if (!localStorage.getItem('oneToOneChatLayout')) {
+            console.log('채팅레이아웃 설정값없어서 세팅!');
+            localStorage.setItem('oneToOneChatLayout', 'oneToOne');
+            localStorage.setItem('groupChatLayout', 'group');
+          }
+
           router.push('/main');
         }
       },
