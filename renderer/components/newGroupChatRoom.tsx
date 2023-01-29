@@ -201,25 +201,7 @@ const NewGroupChatRoom = ({
               createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
             });
 
-            // 내 채팅리스트에서 삭제하고,
-            // let 내그룹채팅리스트 = [
-            //   ...(await (await get(userConnectedGroupChatListPath)).val()),
-            // ];
-
-            // let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
-            // if (삭제인덱스 !== -1) {
-            //   내그룹채팅리스트.splice(삭제인덱스, 1);
-            //   let 그룹채팅 = ref(
-            //     realtimeDbService,
-            //     `userList/${authService.currentUser.uid}/myGroupChatList`,
-            //   );
-            //   set(그룹채팅, {
-            //     groupChatUid: 내그룹채팅리스트,
-            //   });
-            // } else {
-            //   alert('존재하지않는 채팅방입니다.');
-            // }
-            //위 함수 모듈화
+            //내 채팅리스트에서 삭제
             await exitUserCleanUpMyGroupChatList(
               authService.currentUser.uid,
               chatRoomUid,
