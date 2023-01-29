@@ -5,9 +5,13 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import {
   authService,
+  getGroupChatListPath,
+  getGroupUserListPath,
+  getUserConnectedGroupChatList,
   getUserList,
   realtimeDbService,
   UserList,
+  유저채팅리스트업데이트,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
@@ -96,6 +100,11 @@ const NewGroupChatRoom = ({
   const [isChatLoading, setIsChatLoading] = useState(false);
 
   const router = useRouter();
+  const groupChatListPath = getGroupChatListPath(chatRoomUid);
+  const groupUserListPath = getGroupUserListPath(chatRoomUid);
+  const userConnectedGroupChatListPath = getUserConnectedGroupChatList(
+    authService.currentUser.uid,
+  );
 
   const showUserList = () => {
     getUserList().then((userList) => {
@@ -112,38 +121,31 @@ const NewGroupChatRoom = ({
   };
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
-    console.log(`현재 채팅방 : ${chatRoomUid}`);
     //채팅 onValue
-    const 채팅경로 = ref(
-      realtimeDbService,
-      `groupChatRooms/${chatRoomUid}/chat`,
-    );
-    onValue(채팅경로, (snapshot) => {
+    onValue(groupChatListPath, (snapshot) => {
       console.log('채팅이 갱신되었습니다');
-      const chatData = snapshot.val();
-      console.log(chatData);
-      const messageList = Object.values(chatData);
+      let messageList = Object.values(snapshot.val());
       setChatList(messageList);
     });
+    setIsChatLoading(true);
+    return () => {
+      off(groupChatListPath);
+      console.log('채팅방을 나갔습니다.');
+    };
+  }, [chatRoomUid]);
+
+  //채팅방 인원 옵저버
+  useEffect(() => {
     //현재채팅방 사용유저 onValue
-    const 고유채팅인원경로 = ref(
-      realtimeDbService,
-      `groupChatRooms/${chatRoomUid}/connectedUser`,
-    );
-    onValue(고유채팅인원경로, async (snapshot) => {
+    onValue(groupUserListPath, async (snapshot) => {
       console.log('사용자가 갱신되었습니다.');
       let 갱신배열 = await snapshot.val();
       console.log('그룹채팅 사용자목록에서 불러온 온밸류 배열');
       console.log(갱신배열);
       setConnectedUserList(갱신배열);
     });
-
-    setIsChatLoading(true);
-
     return () => {
-      off(채팅경로);
-      off(고유채팅인원경로);
-      console.log('채팅방을 나갔습니다.');
+      off(groupUserListPath);
     };
   }, [chatRoomUid]);
 
@@ -184,12 +186,8 @@ const NewGroupChatRoom = ({
         onClick={async () => {
           if (confirm(`${chatRoomUid} 방에서 나가시겠습니까?`)) {
             //퇴장했다는 메시지를 생성하고,
-            const 채팅저장경로 = ref(
-              realtimeDbService,
-              `groupChatRooms/${chatRoomUid}/chat`,
-            );
 
-            await push(채팅저장경로, {
+            await push(groupChatListPath, {
               displayName: authService.currentUser.displayName,
               uid: authService.currentUser.uid,
               message: `${authService.currentUser.displayName}님이 채팅방에서 나가셨습니다..`,
@@ -222,23 +220,15 @@ const NewGroupChatRoom = ({
             }
 
             //고유 채팅리스트에서 유저정보 삭제하고.
-            let 고유채팅인원경로 = ref(
-              realtimeDbService,
-              `groupChatRooms/${chatRoomUid}/connectedUser`,
-            );
             let 고유채팅인원리스트 = [
-              ...(await (await get(고유채팅인원경로)).val()),
+              ...(await (await get(groupUserListPath)).val()),
             ];
-            let 고유채팅인원세팅경로 = ref(
-              realtimeDbService,
-              `groupChatRooms/${chatRoomUid}/connectedUser`,
-            );
             고유채팅인원리스트.forEach((i, index) => {
               if (i.uid === authService.currentUser.uid) {
                 고유채팅인원리스트.splice(index, 1);
               }
             });
-            set(고유채팅인원세팅경로, 고유채팅인원리스트);
+            set(groupUserListPath, 고유채팅인원리스트);
             //삭제 후 퇴장
             router.push('/main');
           }
@@ -323,16 +313,16 @@ const NewGroupChatRoom = ({
                 console.log(addUserList); //초대목록이 들어있다...
 
                 //사용자 uid를 순회하면서 /groupChatList/값 update해야한다.
-                const 유저채팅리스트업데이트 = async (uid: string) => {
-                  const 내채팅방 = ref(
-                    realtimeDbService,
-                    `userList/${uid}/myGroupChatList/groupChatUid`,
-                  );
-                  const 데이터사이즈 = (await get(내채팅방)).size;
-                  update(내채팅방, {
-                    [데이터사이즈]: chatRoomUid,
-                  });
-                };
+                // const 유저채팅리스트업데이트 = async (uid: string) => {
+                //   const 내채팅방 = ref(
+                //     realtimeDbService,
+                //     `userList/${uid}/myGroupChatList/groupChatUid`,
+                //   );
+                //   const 데이터사이즈 = (await get(내채팅방)).size;
+                //   update(내채팅방, {
+                //     [데이터사이즈]: chatRoomUid,
+                //   });
+                // };
 
                 //2. 고유채팅방에 유저목록 업데이트하기
                 const 고유채팅방 = ref(
@@ -354,7 +344,7 @@ const NewGroupChatRoom = ({
 
                 //여기서 업데이트를 시켜주고..
                 addUserList.forEach(async (i, index) => {
-                  await 유저채팅리스트업데이트(i.uid);
+                  await 유저채팅리스트업데이트(i.uid, chatRoomUid);
                 });
                 // const 선택배열 = [...addUserList];
                 await 채팅방유저리스트업데이트(addUserList);
