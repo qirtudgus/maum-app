@@ -1,7 +1,8 @@
+import { pushNotifications } from 'electron';
 import { off, onValue, push, ref } from 'firebase/database';
 import Head from 'next/head';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { getOneToOneChatListPath, realtimeDbService } from '../firebaseConfig';
+import { authService, getOneToOneChatListPath } from '../firebaseConfig';
 import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerGroup from './messageContainerGroup';
@@ -21,13 +22,34 @@ const ChatRoom = ({
   // const 레이아웃 = localStorage.getItem('oneToOneChatLayout');
   const [레이아웃, 레이아웃설정] = useState('');
 
+  {
+  }
+
+  interface ChatData {
+    createdAt: string;
+    displayName: string;
+    message: string;
+    uid: string;
+  }
+
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
     onValue(getChatListPath, (snapshot) => {
       console.log(`채팅이 갱신되었습니다`);
       //최신메시지 하나만 가져와서 이어붙이면 좋을거같은데...
-      let messageList = Object.values(snapshot.val());
+      let messageList: ChatData[] = Object.values(snapshot.val());
+      console.log(messageList);
+      //메시지...가능..아래처럼 분기하면 마지막 메시지가
+      // 내가 보낸게 아닐때만 알람이 뜬다.
+      if (
+        messageList[messageList.length - 1].displayName !==
+        authService.currentUser.displayName
+      ) {
+        const notification = new Notification(`${displayName}`, {
+          body: messageList[messageList.length - 1].message,
+        });
+      }
 
       console.log('로딩완료');
       setIsChatLoading(true);
