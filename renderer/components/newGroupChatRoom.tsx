@@ -13,6 +13,7 @@ import {
   UserList,
   updateGroupChatConnectedUsers,
   updateUsersGroupChatList,
+  exitUserCleanUpMyGroupChatList,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
@@ -201,23 +202,28 @@ const NewGroupChatRoom = ({
             });
 
             // 내 채팅리스트에서 삭제하고,
-            let 내그룹채팅리스트 = [
-              ...(await (await get(userConnectedGroupChatListPath)).val()),
-            ];
+            // let 내그룹채팅리스트 = [
+            //   ...(await (await get(userConnectedGroupChatListPath)).val()),
+            // ];
 
-            let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
-            if (삭제인덱스 !== -1) {
-              내그룹채팅리스트.splice(삭제인덱스, 1);
-              let 그룹채팅 = ref(
-                realtimeDbService,
-                `userList/${authService.currentUser.uid}/myGroupChatList`,
-              );
-              set(그룹채팅, {
-                groupChatUid: 내그룹채팅리스트,
-              });
-            } else {
-              alert('존재하지않는 채팅방입니다.');
-            }
+            // let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
+            // if (삭제인덱스 !== -1) {
+            //   내그룹채팅리스트.splice(삭제인덱스, 1);
+            //   let 그룹채팅 = ref(
+            //     realtimeDbService,
+            //     `userList/${authService.currentUser.uid}/myGroupChatList`,
+            //   );
+            //   set(그룹채팅, {
+            //     groupChatUid: 내그룹채팅리스트,
+            //   });
+            // } else {
+            //   alert('존재하지않는 채팅방입니다.');
+            // }
+            //위 함수 모듈화
+            await exitUserCleanUpMyGroupChatList(
+              authService.currentUser.uid,
+              chatRoomUid,
+            );
 
             //고유 채팅리스트에서 유저정보 삭제하고.
             let 고유채팅인원리스트 = [
@@ -313,25 +319,6 @@ const NewGroupChatRoom = ({
                 //1.선택된 사용자들의 채팅리스트와, 고유채팅방에 유저목록을 업데이트해주어야한다.
                 console.log('초대시도');
                 console.log(addUserList); //초대목록이 들어있다...
-
-                //2. 고유채팅방에 유저목록 업데이트하기
-                const 고유채팅방 = ref(
-                  realtimeDbService,
-                  `groupChatRooms/${chatRoomUid}/connectedUser`,
-                );
-
-                //순회하면서 동시에 요청하면 길이 갱신이 안되고 마지막껄로 덮혀쓰이ㅝ진다.
-                //배열을 매개변수로 전달하여 한번에 넣어야겠다.
-                // const 채팅방유저리스트업데이트 = async (item: UserList[]) => {
-                //   const 데이터사이즈 = (await get(고유채팅방)).size; //두명이면 2겠지
-                //   //들어온 배열을 순회하며, 채팅방에 유저 업데이트.
-                //   item.forEach(async (i, index) => {
-                //     await update(고유채팅방, {
-                //       [데이터사이즈 + index]: item[index],
-                //     });
-                //   });
-                // };
-
                 //초대할 유저들의 그룹목록에 추가
                 await updateUsersGroupChatList(addUserList, chatRoomUid);
                 //초대할 그룹에 유저들 추가
