@@ -5,7 +5,10 @@ import {
 } from 'electron';
 import Store from 'electron-store';
 
-export default (windowName: string, options: BrowserWindowConstructorOptions): BrowserWindow => {
+export default (
+  windowName: string,
+  options: BrowserWindowConstructorOptions,
+): BrowserWindow => {
   const key = 'window-state';
   const name = `window-state-${windowName}`;
   const store = new Store({ name });
@@ -46,8 +49,8 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
     });
   };
 
-  const ensureVisibleOnSomeDisplay = windowState => {
-    const visible = screen.getAllDisplays().some(display => {
+  const ensureVisibleOnSomeDisplay = (windowState) => {
+    const visible = screen.getAllDisplays().some((display) => {
       return windowWithinBounds(windowState, display.bounds);
     });
     if (!visible) {
@@ -70,9 +73,13 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
   const browserOptions: BrowserWindowConstructorOptions = {
     ...state,
     ...options,
+    minWidth: 1000, // 최소 너비
+    minHeight: 800, // 최소 높이
+    autoHideMenuBar: true, // 기본 메뉴바 숨기기
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
+      devTools: false, //개발자도구 비활성화
       ...options.webPreferences,
     },
   };
