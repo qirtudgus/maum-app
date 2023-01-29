@@ -158,15 +158,9 @@ const NewGroupChatRoom = ({
   return (
     <>
       <Head>
-        <title>maumTalk - {displayName} 그룹채팅</title>
+        <title>maumTalk - {displayName}</title>
       </Head>
-      <ChatRoomHeaderTitle title={displayName} />
-      <div>
-        참여자:{' '}
-        {connectedUserList.map((i, index) => {
-          return <li key={index}>{i.displayName}</li>;
-        })}
-      </div>
+      <ChatRoomHeaderTitle title={displayName} userList={connectedUserList} />
       {isChatLoading ? (
         <MessageContainerGroup chatList={chatList} />
       ) : (
