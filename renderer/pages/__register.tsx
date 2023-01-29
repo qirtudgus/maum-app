@@ -71,8 +71,12 @@ const Register = () => {
   const nicknameRef = useRef<HTMLDivElement>();
   const emailRef = useRef<HTMLDivElement>();
   const passwordRef = useRef<HTMLDivElement>();
-  const [isLoginError, setIsLoginError] = useState(false);
-  const [isLoginText, setIsLoginText] = useState('');
+
+  const [isNicknameError, setIsNicknameError] = useState(false);
+  const [isNicknameText, setIsNicknameText] = useState('');
+
+  const [isEmailError, setIsEmailError] = useState(false);
+  const [isEmailText, setIsEmailText] = useState('');
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [isPasswordText, setIsPasswordText] = useState('');
 
@@ -110,13 +114,19 @@ const Register = () => {
     let email = emailInput.value;
     let password = passwordInput.value;
     const blank_pattern = /^\s+\s+$/g;
+    //닉네임을 우선 체크한다.
     if (
       nicknameInput.value === ' ' ||
       nicknameInput.value.length === 0 ||
       blank_pattern.test(nicknameInput.value)
     ) {
+      setIsNicknameError(true);
+      setIsNicknameText('닉네임을 확인해주세요!');
       nicknameInput.focus();
       return;
+    } else {
+      setIsNicknameError(false);
+      setIsNicknameText('');
     }
 
     signUpWithEmail(email, password, nickname).then((res) => {
@@ -127,7 +137,25 @@ const Register = () => {
 
         switch (errorCode) {
           case 'auth/invalid-email': {
+            setIsEmailError(true);
+            setIsEmailText('이메일 양식을 확인해주세요!');
             emailInput.focus();
+            break;
+          }
+          case 'auth/email-already-in-use': {
+            setIsEmailError(true);
+            setIsEmailText('이미 사용중인 이메일이에요!');
+            setIsPasswordError(false);
+            setIsPasswordText('');
+            emailInput.focus();
+            break;
+          }
+          case 'auth/weak-password': {
+            setIsEmailError(false);
+            setIsEmailText('');
+            setIsPasswordError(true);
+            setIsPasswordText('비밀번호는 6자 이상이여야 해요!');
+            passwordInput.focus();
             break;
           }
           case 'auth/internal-error': {
@@ -160,21 +188,21 @@ const Register = () => {
           <BasicInput
             ref={nicknameRef}
             placeholderValue='닉네임'
-            // isError={isLoginError}
-            // statusText={isLoginText}
+            isError={isNicknameError}
+            statusText={isNicknameText}
           ></BasicInput>
           <BasicInput
             ref={emailRef}
             placeholderValue='이메일'
-            // isError={isLoginError}
-            // statusText={isLoginText}
+            isError={isEmailError}
+            statusText={isEmailText}
           ></BasicInput>
           <BasicInput
             type='password'
             ref={passwordRef}
             placeholderValue='비밀번호'
-            // isError={isPasswordError}
-            // statusText={isPasswordText}
+            isError={isPasswordError}
+            statusText={isPasswordText}
           ></BasicInput>
           <SolidButton
             BasicButtonValue='회원가입'
