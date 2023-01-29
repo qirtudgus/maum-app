@@ -33,6 +33,7 @@ const MessageWrap = styled.div<MessageSendData>`
   }
 
   &.myMessage > li {
+    color: #fff;
     background: ${({ theme }) => theme.colors.main};
   }
 
@@ -74,7 +75,7 @@ const Message = styled.li`
   display: flex;
   align-items: center;
   border-radius: 7px;
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: ${({ theme }) => theme.boxShadow};
   background: #fff;
   color: #000;
 `;
