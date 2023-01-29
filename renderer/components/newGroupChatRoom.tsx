@@ -1,15 +1,13 @@
-import { get, off, onValue, push, ref, set, update } from 'firebase/database';
+import { off, onValue, push } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import Head from 'next/head';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   authService,
   getGroupChatListPath,
   getGroupUserListPath,
-  getUserConnectedGroupChatList,
   getUserList,
-  realtimeDbService,
   UserList,
   updateGroupChatConnectedUsers,
   updateUsersGroupChatList,
@@ -22,6 +20,7 @@ import MessageContainerGroup from './messageContainerGroup';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SendMessageInput from '../components/SendMessageInput';
 import { useRouter } from 'next/router';
+import MessageContainerOneToOne from './messageContainerOneToOne';
 
 const GroupChatModalUserList = styled.li`
   width: 90%;
@@ -106,13 +105,10 @@ const NewGroupChatRoom = ({
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
-
+  const 레이아웃 = localStorage.getItem('groupChatLayout');
   const router = useRouter();
   const groupChatListPath = getGroupChatListPath(chatRoomUid);
   const groupUserListPath = getGroupUserListPath(chatRoomUid);
-  const userConnectedGroupChatListPath = getUserConnectedGroupChatList(
-    authService.currentUser.uid,
-  );
 
   const showUserList = () => {
     getUserList().then((userList) => {
@@ -147,20 +143,20 @@ const NewGroupChatRoom = ({
     //현재채팅방 사용유저 onValue
     onValue(groupUserListPath, async (snapshot) => {
       console.log('사용자가 갱신되었습니다.');
-      let 갱신배열 = await snapshot.val();
-      console.log('그룹채팅 사용자목록에서 불러온 온밸류 배열');
-      console.log(갱신배열);
-      setConnectedUserList(갱신배열);
+      let inviteUserList = await snapshot.val();
+      setConnectedUserList(inviteUserList);
     });
     return () => {
       off(groupUserListPath);
     };
   }, [chatRoomUid]);
 
+  //화면에 들어오면 기존
+
   useLayoutEffect(() => {
     return () => {
       if (document.getElementById('groupChatActive')) {
-        document.getElementById('groupChatActive').removeAttribute('id');
+        document.getElementById('groupChatActive').id = '';
       }
     };
   }, []);
@@ -172,7 +168,11 @@ const NewGroupChatRoom = ({
       </Head>
       <ChatRoomHeaderTitle title={displayName} userList={connectedUserList} />
       {isChatLoading ? (
-        <MessageContainerGroup chatList={chatList} />
+        레이아웃 === 'group' ? (
+          <MessageContainerGroup chatList={chatList} />
+        ) : (
+          <MessageContainerOneToOne chatList={chatList} />
+        )
       ) : (
         <LoadingSpinner />
       )}
