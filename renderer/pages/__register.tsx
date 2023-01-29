@@ -189,7 +189,7 @@ const Register = () => {
           <BasicInput
             type='password'
             ref={passwordRef}
-            placeholderValue='비밀번호'
+            placeholderValue='비밀번호(6자 이상)'
             isError={isPasswordError}
             statusText={isPasswordText}
           ></BasicInput>
