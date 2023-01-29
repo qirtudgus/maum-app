@@ -119,8 +119,6 @@ const OnUserList = () => {
     uid: string;
     displayName: string;
   }) => {
-    console.log('더블클릭 시 상대방 uid와 내 uid로 데이터 삽입해보기');
-
     let currentUserUid = authService.currentUser.uid;
     let currentUserDisplayName = authService.currentUser.displayName;
     let opponentUid = i.uid;
