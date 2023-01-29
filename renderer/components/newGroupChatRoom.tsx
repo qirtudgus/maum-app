@@ -14,6 +14,7 @@ import {
   updateGroupChatConnectedUsers,
   updateUsersGroupChatList,
   exitUserCleanUpMyGroupChatList,
+  exitUserCleanUpThisGroupChatList,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
@@ -208,15 +209,22 @@ const NewGroupChatRoom = ({
             );
 
             //고유 채팅리스트에서 유저정보 삭제하고.
-            let 고유채팅인원리스트 = [
-              ...(await (await get(groupUserListPath)).val()),
-            ];
-            고유채팅인원리스트.forEach((i, index) => {
-              if (i.uid === authService.currentUser.uid) {
-                고유채팅인원리스트.splice(index, 1);
-              }
-            });
-            set(groupUserListPath, 고유채팅인원리스트);
+            // let 고유채팅인원리스트 = [
+            //   ...(await (await get(groupUserListPath)).val()),
+            // ];
+            // 고유채팅인원리스트.forEach((i, index) => {
+            //   if (i.uid === authService.currentUser.uid) {
+            //     고유채팅인원리스트.splice(index, 1);
+            //   }
+            // });
+            // set(groupUserListPath, 고유채팅인원리스트);
+
+            //채팅리스트에서 나를 삭제
+            await exitUserCleanUpThisGroupChatList(
+              authService.currentUser.uid,
+              chatRoomUid,
+            );
+
             //삭제 후 퇴장
             router.push('/main');
           }
