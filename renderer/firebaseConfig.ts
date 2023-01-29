@@ -89,3 +89,13 @@ export const getGroupChatRoomsUidToTitleFunc = async (roomUid: string[]) => {
 export const createChatUid = () => {
   return Math.random().toString(36).substring(2, 12);
 };
+
+//일대일 채팅룸에서 채팅리스트를 불러오기 위한 경로
+export const getOneToOneChatListPath = (chatRoomUid: string) => {
+  return ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`);
+};
+
+//그룹 채팅룸에서 채팅리스트를 불러오기 위한 경로
+export const getGroupChatListPath = (chatRoomUid: string) => {
+  return ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
+};
