@@ -77,11 +77,21 @@ const SettingButton = styled.div`
 
 const MenuWrap = styled.div`
   max-width: 300px;
+  min-width: 150px;
   position: relative;
   height: 100%;
   border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
   display: flex;
   flex-direction: column;
+`;
+
+const MyDisplayName = styled.div`
+  font-size: 15px;
+  font-weight: bold;
+  height: 40px;
+  text-align: center;
+  line-height: 40px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
 `;
 
 const SideBar = () => {
@@ -120,6 +130,7 @@ const SideBar = () => {
       </SideBarWrap>
       <MenuWrap>
         <>
+          <MyDisplayName>{authService.currentUser.displayName}</MyDisplayName>
           <OnUserList />
           <GroupChatList />
         </>
