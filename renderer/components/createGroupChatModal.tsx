@@ -7,6 +7,7 @@ import {
   createChatUid,
   getUserList,
   realtimeDbService,
+  updateUsersGroupChatList,
   UserList,
 } from '../firebaseConfig';
 import { checkBlankValue } from '../utils/checkBlankValue';
@@ -211,9 +212,11 @@ const CreateGroupChatModal = ({
     });
 
     //2.초대된 유저를 순회하며, 각 유저들의 채팅리스트를 업데이트해준다.
-    addUserListUpdateMe.forEach(async (i) => {
-      updateUsersChatRoomUid(i.uid, chatRoomUid);
-    });
+    // addUserListUpdateMe.forEach(async (i) => {
+    //   updateUsersChatRoomUid(i.uid, chatRoomUid);
+    // });
+    updateUsersGroupChatList(addUserListUpdateMe, chatRoomUid);
+
     //2. 고유 그룹채팅방 생성하고, 시작메시지 push하기
     let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
     let groupChatMessagePath = ref(
@@ -240,31 +243,38 @@ const CreateGroupChatModal = ({
   };
 
   //uid배열과 chatRoomUid를 받아와 uid들의 그룹채팅리스트에 그룹채팅uid를 추가해준다.
-  const updateUsersChatRoomUid = async (uid: string, chatRoomUid: string) => {
-    let myGroupChatListPath = ref(
-      realtimeDbService,
-      `userList/${uid}/myGroupChatList`,
-    );
-    const checkCurrentGroupChatRoomsArr: string[] | null = await (
-      await get(myGroupChatListPath)
-    ).val()?.groupChatUid;
-    //checkCurrentGroupChatRooms이 true일때 false일때(참여한 채팅방이 없는상태)로 분기된다.
-    if (checkCurrentGroupChatRoomsArr) {
-      //기존에 가지고있던 채팅리스트에 새로 생성된 채팅방을 추가하여 set해준다.
-      const updateCurrentGroupChatRoomsArr = [
-        ...checkCurrentGroupChatRoomsArr,
-        chatRoomUid,
-      ];
-      set(myGroupChatListPath, {
-        groupChatUid: updateCurrentGroupChatRoomsArr,
-      });
-    } else {
-      //그룹채팅이 아예 처음 초대됐기때문에 바로 채팅방을 set해준다.
-      set(myGroupChatListPath, {
-        groupChatUid: [chatRoomUid],
-      });
-    }
-  };
+
+  //유저정보에 myGroupChatList가 없어도 초대가된다.
+  //이를 참고하여 수정할 것
+  //지금 로직은 update가 아닌 set으로 하기때문에
+  //기존 데이터가 있는지없는지를 기준으로 분기한다.
+  //새로만든 모듈은 update로 하기때문에 분기가 필요없다.
+
+  // const updateUsersChatRoomUid = async (uid: string, chatRoomUid: string) => {
+  //   let myGroupChatListPath = ref(
+  //     realtimeDbService,
+  //     `userList/${uid}/myGroupChatList`,
+  //   );
+  //   const checkCurrentGroupChatRoomsArr: string[] | null = await (
+  //     await get(myGroupChatListPath)
+  //   ).val()?.groupChatUid;
+  //   //checkCurrentGroupChatRooms이 true일때 false일때(참여한 채팅방이 없는상태)로 분기된다.
+  //   if (checkCurrentGroupChatRoomsArr) {
+  //     //기존에 가지고있던 채팅리스트에 새로 생성된 채팅방을 추가하여 set해준다.
+  //     const updateCurrentGroupChatRoomsArr = [
+  //       ...checkCurrentGroupChatRoomsArr,
+  //       chatRoomUid,
+  //     ];
+  //     set(myGroupChatListPath, {
+  //       groupChatUid: updateCurrentGroupChatRoomsArr,
+  //     });
+  //   } else {
+  //     //그룹채팅이 아예 처음 초대됐기때문에 바로 채팅방을 set해준다.
+  //     set(myGroupChatListPath, {
+  //       groupChatUid: [chatRoomUid],
+  //     });
+  //   }
+  // };
 
   return (
     <FixedModalBg>
