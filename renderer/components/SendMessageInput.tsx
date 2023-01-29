@@ -29,7 +29,15 @@ const MessageInput = styled.div`
     padding: 10px;
     background: ${({ theme }) => theme.colors.main};
   }
-  & > button:hover {
+  & > button:disabled {
+    background-color: #eee;
+  }
+
+  & > button:enabled {
+    color: #fff;
+  }
+
+  & > button:enabled:hover {
     background: ${({ theme }) => theme.colors.mainHoverColor};
   }
 `;
