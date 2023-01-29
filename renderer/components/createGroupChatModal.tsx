@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
@@ -182,7 +183,7 @@ const CreateGroupChatModal = ({
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const chatRoomsTitleInputRef = useRef<HTMLInputElement>();
   const [inviteUserCount, setInviteUserCount] = useState(0);
-
+  const router = useRouter();
   useEffect(() => {
     getUserList().then((userList) => {
       console.log(userList);
@@ -206,7 +207,6 @@ const CreateGroupChatModal = ({
       displayName: authService.currentUser.displayName,
       uid: authService.currentUser.uid,
     });
-
     //2.초대된 유저를 순회하며, 각 유저들의 채팅리스트를 업데이트해준다.
     updateUsersGroupChatList(addUserListUpdateMe, chatRoomUid);
     //3.그룹채팅방을 생성한다.
@@ -215,8 +215,11 @@ const CreateGroupChatModal = ({
       chatRoomUid,
       chatRoomsTitleInputRef.current.value,
     );
-
     setShowAddGroupChat(false);
+    //바로 입장?
+    router.push(
+      `/groupchat/${chatRoomsTitleInputRef.current.value}?uid=${chatRoomUid}`,
+    );
   };
 
   return (
