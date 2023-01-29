@@ -226,7 +226,7 @@ const Settings = () => {
         </CheckZone>
         <CheckZone
           onClick={() => {
-            oneToOneSettings('group');
+            groupSettings('group');
             groupLayoutRef2.current.checked = true;
           }}
         >
