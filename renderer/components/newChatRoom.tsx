@@ -56,7 +56,7 @@ const ChatRoom = ({
   return (
     <>
       <Head>
-        <title>maumTalk - {displayName}와의 대화</title>
+        <title>maumTalk - {displayName}</title>
       </Head>
       <ChatRoomHeaderTitle title={displayName} />
       {isChatLoading ? (
