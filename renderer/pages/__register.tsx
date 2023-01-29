@@ -22,7 +22,7 @@ const Box = styled.div`
   align-items: center;
   justify-content: center;
   position: fixed;
-  background: #b5d692;
+  /* background: #b5d692; */
   flex-direction: column;
 `;
 
@@ -36,17 +36,6 @@ const Wrap = styled.div`
   border-radius: 10px;
   box-shadow: ${({ theme }) => theme.boxShadow};
   background: #fff;
-`;
-
-const RegisterLink = styled.p`
-margin: 5px 0 15px 0;
-font-size:14px;
-width: 100%;
-text-align: left;
-& span {
-  text-decoration: underline;
-  color:${({ theme }) => theme.colors.main}}
-}
 `;
 
 const Logo = styled.div`

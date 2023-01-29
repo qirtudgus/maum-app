@@ -21,7 +21,7 @@ export default function Layout({ children }) {
   const router = useRouter();
   const checkNotLayoutPathname = (): boolean => {
     let isLayoutRendering = false;
-    const notLayout = ['/home', '/register'];
+    const notLayout = ['/home', '/__register'];
     if (notLayout.includes(router.pathname)) {
       isLayoutRendering = true;
     }
