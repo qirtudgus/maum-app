@@ -18,14 +18,17 @@ const ChatRoom = ({
   const [chatList, setChatList] = useState([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const getChatListPath = getOneToOneChatListPath(chatRoomUid);
-  const 레이아웃 = localStorage.getItem('oneToOneChatLayout');
+  // const 레이아웃 = localStorage.getItem('oneToOneChatLayout');
+  const [레이아웃, 레이아웃설정] = useState('');
 
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
+    레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
     onValue(getChatListPath, (snapshot) => {
       console.log(`채팅이 갱신되었습니다`);
       //최신메시지 하나만 가져와서 이어붙이면 좋을거같은데...
       let messageList = Object.values(snapshot.val());
+
       console.log('로딩완료');
       setIsChatLoading(true);
       setChatList(messageList);
