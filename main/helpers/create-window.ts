@@ -70,20 +70,36 @@ export default (
 
   state = ensureVisibleOnSomeDisplay(restore());
 
-  const browserOptions: BrowserWindowConstructorOptions = {
-    ...state,
-    ...options,
-    minWidth: 1000, // 최소 너비
-    minHeight: 800, // 최소 높이
-    autoHideMenuBar: true, // 기본 메뉴바 숨기기
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      devTools: false, //개발자도구 비활성화
-      ...options.webPreferences,
-    },
-  };
-  win = new BrowserWindow(browserOptions);
+  if (process.env.NODE_ENV === 'production') {
+    const browserOptions: BrowserWindowConstructorOptions = {
+      ...state,
+      ...options,
+      minWidth: 1000, // 최소 너비
+      minHeight: 800, // 최소 높이
+
+      autoHideMenuBar: true, // 기본 메뉴바 숨기기
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        devTools: false, //개발자도구 비활성화
+        ...options.webPreferences,
+      },
+    };
+    win = new BrowserWindow(browserOptions);
+  } else {
+    const browserOptions: BrowserWindowConstructorOptions = {
+      ...state,
+      ...options,
+      minWidth: 1000, // 최소 너비
+      minHeight: 800, // 최소 높이
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+        ...options.webPreferences,
+      },
+    };
+    win = new BrowserWindow(browserOptions);
+  }
 
   win.on('close', saveState);
 
