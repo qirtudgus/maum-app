@@ -1,8 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { get, getDatabase, ref, set, update } from 'firebase/database';
+import { getFirestore, Timestamp } from 'firebase/firestore';
+import { get, getDatabase, push, ref, set, update } from 'firebase/database';
+import { convertDate } from './utils/convertDate';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
@@ -189,4 +190,28 @@ export const exitUserCleanUpThisGroupChatList = async (
   });
   //삭제한 배열로 다시 set
   set(getGroupUserListPath(chatRoomUid), groupChatConnectedUserList);
+};
+
+//그룹 채팅 생성 시 방을 생성하고, 유저목록 set 후, 시작메시지를 작성해주는 함수
+export const createGroupChat = (
+  inviteUserList: UserList[],
+  chatRoomUid: string,
+  chatRoomTitle: string,
+) => {
+  let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
+  let groupChatMessagePath = ref(
+    realtimeDbService,
+    `groupChatRooms/${chatRoomUid}/chat`,
+  );
+
+  set(groupChatPath, {
+    chatRoomsTitle: chatRoomTitle,
+    connectedUser: inviteUserList,
+  });
+  push(groupChatMessagePath, {
+    displayName: authService.currentUser.displayName,
+    uid: authService.currentUser.uid,
+    message: `그룹채팅이 시작되었습니다.`,
+    createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+  });
 };
