@@ -1,5 +1,3 @@
-import { get, push, ref, set } from 'firebase/database';
-import { Timestamp } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import {
@@ -7,12 +5,10 @@ import {
   createChatUid,
   createGroupChat,
   getUserList,
-  realtimeDbService,
   updateUsersGroupChatList,
   UserList,
 } from '../firebaseConfig';
 import { checkBlankValue } from '../utils/checkBlankValue';
-import { convertDate } from '../utils/convertDate';
 import { RandomTitle } from '../utils/createRandomChatTitle';
 import { BasicButton, SolidButton } from './ButtonGroup';
 import CloseSvg from './svg/closeSvg';
@@ -201,10 +197,8 @@ const CreateGroupChatModal = ({
       chatRoomsTitleInputRef.current.focus();
       return;
     }
-
     //1.한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
     let chatRoomUid = createChatUid();
-
     //1-1. addUserList에는 아직 현재유저가 빠져있다.
     //본인이 만드는 방이기때문에 state에 본인을 추가한다.
     const addUserListUpdateMe = [...addUserList];
@@ -221,29 +215,7 @@ const CreateGroupChatModal = ({
       chatRoomUid,
       chatRoomsTitleInputRef.current.value,
     );
-    //2. 고유 그룹채팅방 생성하고, 시작메시지 push하기
-    // let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
-    // let groupChatMessagePath = ref(
-    //   realtimeDbService,
-    //   `groupChatRooms/${chatRoomUid}/chat`,
-    // );
-    //3.채팅방제목을 적으면 그걸로 사용, 안적었을 시 고유번호로 사용
-    //인풋이 무조건 들어있을것이기때문에 필요없음
-    // let chatRoomTitle =
-    //   chatRoomsTitleInputRef.current.value !== ''
-    //     ? chatRoomsTitleInputRef.current.value
-    //     : chatRoomUid;
 
-    // set(groupChatPath, {
-    //   chatRoomsTitle: chatRoomTitle,
-    //   connectedUser: addUserListUpdateMe,
-    // });
-    // push(groupChatMessagePath, {
-    //   displayName: authService.currentUser.displayName,
-    //   uid: authService.currentUser.uid,
-    //   message: `그룹채팅이 시작되었습니다.`,
-    //   createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-    // });
     setShowAddGroupChat(false);
   };
 
