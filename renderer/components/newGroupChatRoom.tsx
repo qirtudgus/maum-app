@@ -104,10 +104,11 @@ const NewGroupChatRoom = ({
   const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
   const [addUserList, setAddUserList] = useState<UserList[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
-  const 레이아웃 = localStorage.getItem('groupChatLayout');
   const router = useRouter();
   const groupChatListPath = getGroupChatListPath(chatRoomUid);
   const groupUserListPath = getGroupUserListPath(chatRoomUid);
+
+  const [레이아웃, 레이아웃설정] = useState('');
 
   const showUserList = () => {
     getUserList().then((userList) => {
@@ -122,8 +123,10 @@ const NewGroupChatRoom = ({
       setGroupChatUserList(duplicateDeleteArr);
     });
   };
+
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
+    레이아웃설정(localStorage.getItem('groupChatLayout'));
     //채팅 onValue
     onValue(groupChatListPath, (snapshot) => {
       console.log('채팅이 갱신되었습니다');
