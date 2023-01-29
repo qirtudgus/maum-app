@@ -1,7 +1,6 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
 import Head from 'next/head';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useLayoutEffect, useRef, useState } from 'react';
@@ -81,7 +80,7 @@ const Login = () => {
     //저장은 해놨고, 방금 가입을 했으면 방금 가입한 메일을 인풋에
     //저장만 해놨으면 인풋에
     //저장 안해놨고 가입했으면 가입을 인풋에
-    const isMailSave = localStorage.getItem('mail');
+    const isMailSave = window.localStorage.getItem('mail');
     const emailInput = emailRef.current.firstChild as HTMLInputElement;
     const passwordInput = passwordRef.current.firstChild as HTMLInputElement;
     if (isMailSave && 방금가입한메일) {
@@ -112,10 +111,10 @@ const Login = () => {
     //check가 false면 로컬스토리지에 이메일을 삭제시킨다.
     if (isEmailSave) {
       //로컬스토리지에 저장
-      localStorage.setItem('mail', emailInput.value);
+      window.localStorage.setItem('mail', emailInput.value);
     } else {
       //로컬스토리지에서 삭제
-      localStorage.removeItem('mail');
+      window.localStorage.removeItem('mail');
     }
 
     signInWithEmail(emailInput.value, passwordInput.value).then(
@@ -172,10 +171,10 @@ const Login = () => {
           );
           update(connectedRef, { isOn: true });
           //로컬스토리지에서 채팅방 레이아웃 확인 후 없으면 초기값 세팅
-          if (!localStorage.getItem('oneToOneChatLayout')) {
+          if (!window.localStorage.getItem('oneToOneChatLayout')) {
             console.log('채팅레이아웃 설정값없어서 세팅!');
-            localStorage.setItem('oneToOneChatLayout', 'oneToOne');
-            localStorage.setItem('groupChatLayout', 'group');
+            window.localStorage.setItem('oneToOneChatLayout', 'oneToOne');
+            window.localStorage.setItem('groupChatLayout', 'group');
           }
 
           router.push('/main');
@@ -192,7 +191,7 @@ const Login = () => {
       <Box>
         <Wrap>
           <Logo>
-            <Image src={logo} />
+            {/* <image src={logo}/> */}
             <p>마음톡에 오신걸 환영해요!</p>
           </Logo>
           <BasicInput
