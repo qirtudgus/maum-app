@@ -5,6 +5,7 @@ import styled, { keyframes } from 'styled-components';
 import {
   authService,
   createChatUid,
+  createGroupChat,
   getUserList,
   realtimeDbService,
   updateUsersGroupChatList,
@@ -195,6 +196,7 @@ const CreateGroupChatModal = ({
   }, []);
 
   const createGroupChatRoom = () => {
+    //제목 인풋의 공백 검사
     if (checkBlankValue(chatRoomsTitleInputRef.current.value)) {
       chatRoomsTitleInputRef.current.focus();
       return;
@@ -213,29 +215,35 @@ const CreateGroupChatModal = ({
 
     //2.초대된 유저를 순회하며, 각 유저들의 채팅리스트를 업데이트해준다.
     updateUsersGroupChatList(addUserListUpdateMe, chatRoomUid);
-
-    //2. 고유 그룹채팅방 생성하고, 시작메시지 push하기
-    let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
-    let groupChatMessagePath = ref(
-      realtimeDbService,
-      `groupChatRooms/${chatRoomUid}/chat`,
+    //3.그룹채팅방을 생성한다.
+    createGroupChat(
+      addUserListUpdateMe,
+      chatRoomUid,
+      chatRoomsTitleInputRef.current.value,
     );
+    //2. 고유 그룹채팅방 생성하고, 시작메시지 push하기
+    // let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
+    // let groupChatMessagePath = ref(
+    //   realtimeDbService,
+    //   `groupChatRooms/${chatRoomUid}/chat`,
+    // );
     //3.채팅방제목을 적으면 그걸로 사용, 안적었을 시 고유번호로 사용
-    let chatRoomTitle =
-      chatRoomsTitleInputRef.current.value !== ''
-        ? chatRoomsTitleInputRef.current.value
-        : chatRoomUid;
+    //인풋이 무조건 들어있을것이기때문에 필요없음
+    // let chatRoomTitle =
+    //   chatRoomsTitleInputRef.current.value !== ''
+    //     ? chatRoomsTitleInputRef.current.value
+    //     : chatRoomUid;
 
-    set(groupChatPath, {
-      chatRoomsTitle: chatRoomTitle,
-      connectedUser: addUserListUpdateMe,
-    });
-    push(groupChatMessagePath, {
-      displayName: authService.currentUser.displayName,
-      uid: authService.currentUser.uid,
-      message: `그룹채팅이 시작되었습니다.`,
-      createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-    });
+    // set(groupChatPath, {
+    //   chatRoomsTitle: chatRoomTitle,
+    //   connectedUser: addUserListUpdateMe,
+    // });
+    // push(groupChatMessagePath, {
+    //   displayName: authService.currentUser.displayName,
+    //   uid: authService.currentUser.uid,
+    //   message: `그룹채팅이 시작되었습니다.`,
+    //   createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+    // });
     setShowAddGroupChat(false);
   };
 
