@@ -121,3 +121,31 @@ export const updateUserGroupChatList = async (
     [데이터사이즈]: chatRoomUid,
   });
 };
+
+//유저배열을 받아와 각 유저들의 그룹채팅리스트에 그룹채팅을 추가하는 함수
+export const updateUsersGroupChatList = async (
+  userList: UserList[],
+  chatRoomUid: string,
+) => {
+  userList.forEach(async (i, index) => {
+    const myGroupChatListPath = getUserConnectedGroupChatList(i.uid);
+    const 데이터사이즈 = (await get(myGroupChatListPath)).size;
+    update(myGroupChatListPath, {
+      [데이터사이즈]: chatRoomUid,
+    });
+  });
+};
+
+//유저배열과 그룹채팅uid를 받아와 그룹채팅의 유저리스트에 추가해준다. (초대 시 사용)
+export const updateGroupChatConnectedUsers = async (
+  userList: UserList[],
+  groupChatRoomUid: string,
+) => {
+  const 데이터사이즈 = (await get(getGroupUserListPath(groupChatRoomUid))).size; //두명이면 2겠지
+  //들어온 배열을 순회하며, 채팅방에 유저 업데이트.
+  userList.forEach(async (i, index) => {
+    await update(getGroupUserListPath(groupChatRoomUid), {
+      [데이터사이즈 + index]: userList[index],
+    });
+  });
+};
