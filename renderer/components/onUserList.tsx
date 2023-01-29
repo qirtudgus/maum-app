@@ -97,6 +97,7 @@ const OnUserList = () => {
   //로그인했을 때 해당 state에 추가,
   //로그아웃 시 db에서 uid 제거
   const [userList, setUserList] = useState<UserListUserInfoInterface[]>([]);
+
   useEffect(() => {
     // 온밸류를 안쓰니 접속중인 유저를 실시간표시할수가 없다...
     onValue(userListRef, (snapshot) => {
@@ -167,7 +168,7 @@ const OnUserList = () => {
 
   return (
     <UserListContainer>
-      <GroupListTitle>유저 목록</GroupListTitle>
+      <GroupListTitle>일대일 채팅 목록</GroupListTitle>
       <UserListWrap>
         {userList.map((i, index) => {
           return i.uid === authService.currentUser?.uid ? null : (
