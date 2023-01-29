@@ -155,7 +155,7 @@ const SideBar = () => {
       </SideBarWrap>
       <MenuWrap>
         <>
-          <MyDisplayName>{authService.currentUser.displayName}</MyDisplayName>
+          <MyDisplayName>{authService.currentUser?.displayName}</MyDisplayName>
           <OnUserList />
           <GroupChatList />
         </>
