@@ -82,7 +82,6 @@ const ChatRoomHeaderTitle = ({
 }) => {
   const router = useRouter();
   const [isOpenUserList, setIsOpenUserList] = useState(false);
-  console.log(router);
   useEffect(() => {
     return () => {
       setIsOpenUserList(false);
