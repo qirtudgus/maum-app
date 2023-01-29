@@ -9,6 +9,7 @@ import {
   realtimeDbService,
   UserList,
 } from '../firebaseConfig';
+import { checkBlankValue } from '../utils/checkBlankValue';
 import { convertDate } from '../utils/convertDate';
 import { RandomTitle } from '../utils/createRandomChatTitle';
 import { BasicButton, SolidButton } from './ButtonGroup';
@@ -193,12 +194,7 @@ const CreateGroupChatModal = ({
   }, []);
 
   const createGroupChatRoom = () => {
-    const blank_pattern = /^\s+\s+$/g;
-    if (
-      chatRoomsTitleInputRef.current.value === ' ' ||
-      chatRoomsTitleInputRef.current.value.length === 0 ||
-      blank_pattern.test(chatRoomsTitleInputRef.current.value)
-    ) {
+    if (checkBlankValue(chatRoomsTitleInputRef.current.value)) {
       chatRoomsTitleInputRef.current.focus();
       return;
     }

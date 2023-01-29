@@ -3,6 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { realtimeDbService, authService } from '../firebaseConfig';
+import { checkBlankValue } from '../utils/checkBlankValue';
 import { convertDate } from '../utils/convertDate';
 
 const MessageInput = styled.div`
@@ -50,8 +51,6 @@ const SendMessageInput = ({
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [isOnlySpaceInputValue, setIsOnlySpaceInputValue] = useState(true);
-  const blank_pattern = /^\s+\s+$/g;
-
   const messageInputRef = useRef<HTMLInputElement>();
   const messageSendRef = useRef<HTMLButtonElement>();
 
@@ -85,11 +84,7 @@ const SendMessageInput = ({
           value={inputValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setInputValue(e.currentTarget.value);
-            if (
-              e.currentTarget.value === ' ' ||
-              e.currentTarget.value.length === 0 ||
-              blank_pattern.test(e.currentTarget.value)
-            ) {
+            if (checkBlankValue(e.currentTarget.value)) {
               setIsOnlySpaceInputValue(true);
             } else {
               setIsOnlySpaceInputValue(false);
