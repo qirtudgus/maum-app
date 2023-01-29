@@ -9,8 +9,6 @@ import {
   getGroupUserListPath,
   getUserList,
   UserList,
-  updateGroupChatConnectedUsers,
-  updateUsersGroupChatList,
   exitUserCleanUpMyGroupChatList,
   exitUserCleanUpThisGroupChatList,
 } from '../firebaseConfig';
@@ -21,6 +19,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import SendMessageInput from '../components/SendMessageInput';
 import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
+import InviteGroupChatModal from './inviteGroupChatModal';
 
 const GroupChatModalUserList = styled.li`
   width: 90%;
@@ -183,14 +182,6 @@ const NewGroupChatRoom = ({
         isOneToOneOrGroup='group'
       />
       <button
-        onClick={() => {
-          console.log(chatList);
-          console.log(convertDate(chatList[0].createdAt.seconds));
-        }}
-      >
-        채팅 로그 확인
-      </button>
-      <button
         onClick={async () => {
           if (confirm(`${chatRoomUid} 방에서 나가시겠습니까?`)) {
             //퇴장했다는 메시지를 생성하고,
@@ -228,96 +219,12 @@ const NewGroupChatRoom = ({
       >
         초대하기
       </button>
-
       {showAddGroupChat && (
-        <AddGroupChatModal>
-          <>
-            초대할 사용자를 선택해주세요!
-            <AddUserListWrap>
-              {addUserList.map((i, index) => {
-                return (
-                  <AddUserList key={i.uid}>
-                    <span>{i.displayName}</span>
-                    <span
-                      onClick={() => {
-                        console.log('취소할 이름');
-                        console.log(i.displayName);
-                        setAddUserList((prev) =>
-                          prev.filter((todo) => todo.uid !== i.uid),
-                        );
-                        //className이 i.displayName인 아이를 찾아서 active 제거
-                        const removeDom = document.querySelector(`.${i.uid}`);
-                        removeDom.classList.remove('active');
-                        console.log(document.querySelector(`.${i.uid}`));
-                      }}
-                      className='cancelUser'
-                    >
-                      X
-                    </span>
-                  </AddUserList>
-                );
-              })}
-            </AddUserListWrap>
-            <InviteUserList>
-              {groupChatUserList.map((i: UserList, index: number) => {
-                // 현재 이용유저는 렌더링하지않는다.
-                return i.uid === authService.currentUser?.uid ? null : (
-                  // return i.uid === connectedUserList[index] ? null : (
-                  <GroupChatModalUserList
-                    key={index}
-                    className={i.uid}
-                    //   선택 시 클래스를 넣고, 다시 눌렀을 때 클래스가 있는지 확인 후 있으면 삭제, 없으면 추가
-                    onClick={(e: React.MouseEvent) => {
-                      //액티브가 있는 경우에는 state에서 삭제 후, active 제거
-                      if (e.currentTarget.classList.contains('active')) {
-                        setAddUserList((prev) =>
-                          prev.filter((todo) => todo.uid !== i.uid),
-                        );
-                        e.currentTarget.classList.remove('active');
-                      }
-                      //액티브가 없는 경우에는 추가
-                      else {
-                        e.currentTarget.classList.add('active');
-                        setAddUserList((prev) => [
-                          ...prev,
-                          { displayName: i.displayName, uid: i.uid },
-                        ]);
-                      }
-                    }}
-                  >
-                    {i.displayName}
-                    {/* 버튼을 active 시킬 때 가상선택자로 추가 해제를 알려준다 */}
-                    <div className='isActive'></div>
-                  </GroupChatModalUserList>
-                );
-              })}
-            </InviteUserList>
-            <button
-              onClick={async () => {
-                //1.선택된 사용자들의 채팅리스트와, 고유채팅방에 유저목록을 업데이트해주어야한다.
-                console.log('초대시도');
-                console.log(addUserList); //초대목록이 들어있다...
-                //초대할 유저들의 그룹목록에 추가
-                await updateUsersGroupChatList(addUserList, chatRoomUid);
-                //초대할 그룹에 유저들 추가
-                await updateGroupChatConnectedUsers(addUserList, chatRoomUid);
-                //초대 기능은 완료되긴함 추후 리팩토링하자, 초대 후 초대리스트 초기화
-                setAddUserList([]);
-                setShowAddGroupChat(false);
-              }}
-            >
-              초대
-            </button>
-            <button
-              onClick={() => {
-                setShowAddGroupChat(false);
-                setAddUserList([]);
-              }}
-            >
-              취소
-            </button>
-          </>
-        </AddGroupChatModal>
+        <InviteGroupChatModal
+          chatRoomUid={chatRoomUid}
+          connectedUserList={connectedUserList}
+          setShowAddGroupChat={setShowAddGroupChat}
+        />
       )}
     </>
   );
