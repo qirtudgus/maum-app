@@ -5,6 +5,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import GroupChatList from '../components/newGroupChatList';
 import OnUserList from '../components/onUserList';
+import HomeSvg from '../components/svg/homeSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
 import SettingSvg from '../components/svg/settingSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
@@ -25,13 +26,13 @@ const SideBarWrap = styled.div`
   position: relative;
 `;
 
-const ButtonWrap = styled.div`
+const HeaderButtonWrap = styled.div`
   width: 100%;
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  bottom: 5px;
+  top: 5px;
   height: fit-content;
 
   & > div {
@@ -54,6 +55,20 @@ const LogoutButton = styled.div`
   }
   &:hover svg {
     fill: #000;
+  }
+`;
+
+const FooterButtonWrap = styled.div`
+  width: 100%;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  bottom: 5px;
+  height: fit-content;
+
+  & > div {
+    margin: 5px 0;
   }
 `;
 
@@ -114,7 +129,17 @@ const SideBar = () => {
   return (
     <SideBarContainer>
       <SideBarWrap>
-        <ButtonWrap>
+        <HeaderButtonWrap>
+          <SettingButton
+            title='홈으로'
+            onClick={() => {
+              router.push('/main');
+            }}
+          >
+            <HomeSvg />
+          </SettingButton>
+        </HeaderButtonWrap>
+        <FooterButtonWrap>
           <SettingButton
             title='설정'
             onClick={() => {
@@ -126,7 +151,7 @@ const SideBar = () => {
           <LogoutButton title='로그아웃' onClick={userSignOut}>
             <LogoutSvg />
           </LogoutButton>
-        </ButtonWrap>
+        </FooterButtonWrap>
       </SideBarWrap>
       <MenuWrap>
         <>
