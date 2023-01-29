@@ -111,8 +111,8 @@ const ChatRoomHeaderTitle = ({
           <PeopleSvg />
           {isOpenUserList && (
             <UserListWrap>
-              {userList.map((i) => {
-                return <UserListli>{i.displayName}</UserListli>;
+              {userList.map((i, index) => {
+                return <UserListli key={index}>{i.displayName}</UserListli>;
               })}
             </UserListWrap>
           )}
