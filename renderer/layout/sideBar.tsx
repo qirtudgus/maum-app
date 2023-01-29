@@ -5,6 +5,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import GroupChatList from '../components/newGroupChatList';
 import OnUserList from '../components/onUserList';
+import ChatListSvg from '../components/svg/chatListSvg';
 import HomeSvg from '../components/svg/homeSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
 import SettingSvg from '../components/svg/settingSvg';
@@ -137,6 +138,14 @@ const SideBar = () => {
             }}
           >
             <HomeSvg />
+          </SettingButton>
+          <SettingButton
+            title='채팅 목록'
+            onClick={() => {
+              router.push('/chatList');
+            }}
+          >
+            <ChatListSvg />
           </SettingButton>
         </HeaderButtonWrap>
         <FooterButtonWrap>
