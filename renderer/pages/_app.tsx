@@ -6,6 +6,12 @@ import { ThemeProvider } from 'styled-components';
 import theme from '../components/GlobalTheme';
 import Layout from '../layout/layout';
 
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+  console.error = () => {};
+  console.debug = () => {};
+}
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
