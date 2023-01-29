@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "my-nextron-app",
-  "description": "My application description",
+  "name": "maum-talk",
+  "description": "chating-app",
   "version": "1.0.0",
-  "author": "Yoshihide Shiono <shiono.yoshihide@gmail.com>",
+  "author": "park sung hyun <wlslek0015@gmail.com>",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
