@@ -11,7 +11,7 @@ import {
   getUserList,
   realtimeDbService,
   UserList,
-  유저채팅리스트업데이트,
+  updateUserGroupChatList,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
@@ -195,12 +195,8 @@ const NewGroupChatRoom = ({
             });
 
             // 내 채팅리스트에서 삭제하고,
-            let 내채팅리스트경로 = ref(
-              realtimeDbService,
-              `userList/${authService.currentUser.uid}/myGroupChatList/groupChatUid`,
-            );
             let 내그룹채팅리스트 = [
-              ...(await (await get(내채팅리스트경로)).val()),
+              ...(await (await get(userConnectedGroupChatListPath)).val()),
             ];
 
             let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
@@ -210,8 +206,6 @@ const NewGroupChatRoom = ({
                 realtimeDbService,
                 `userList/${authService.currentUser.uid}/myGroupChatList`,
               );
-
-              console.log(내그룹채팅리스트);
               set(그룹채팅, {
                 groupChatUid: 내그룹채팅리스트,
               });
@@ -312,18 +306,6 @@ const NewGroupChatRoom = ({
                 console.log('초대시도');
                 console.log(addUserList); //초대목록이 들어있다...
 
-                //사용자 uid를 순회하면서 /groupChatList/값 update해야한다.
-                // const 유저채팅리스트업데이트 = async (uid: string) => {
-                //   const 내채팅방 = ref(
-                //     realtimeDbService,
-                //     `userList/${uid}/myGroupChatList/groupChatUid`,
-                //   );
-                //   const 데이터사이즈 = (await get(내채팅방)).size;
-                //   update(내채팅방, {
-                //     [데이터사이즈]: chatRoomUid,
-                //   });
-                // };
-
                 //2. 고유채팅방에 유저목록 업데이트하기
                 const 고유채팅방 = ref(
                   realtimeDbService,
@@ -344,7 +326,7 @@ const NewGroupChatRoom = ({
 
                 //여기서 업데이트를 시켜주고..
                 addUserList.forEach(async (i, index) => {
-                  await 유저채팅리스트업데이트(i.uid, chatRoomUid);
+                  await updateUserGroupChatList(i.uid, chatRoomUid);
                 });
                 // const 선택배열 = [...addUserList];
                 await 채팅방유저리스트업데이트(addUserList);
