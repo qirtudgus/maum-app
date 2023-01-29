@@ -172,3 +172,21 @@ export const exitUserCleanUpMyGroupChatList = async (
     alert('존재하지않는 채팅방입니다.');
   }
 };
+
+//그룹채팅에서 특정 유저를 삭제하는 것
+export const exitUserCleanUpThisGroupChatList = async (
+  uid: string,
+  chatRoomUid: string,
+) => {
+  const groupChatConnectedUserList = [
+    ...(await (await get(getGroupUserListPath(chatRoomUid))).val()),
+  ];
+  //리스트에서 특정 유저를 삭제
+  groupChatConnectedUserList.forEach((i, index) => {
+    if (i.uid === uid) {
+      groupChatConnectedUserList.splice(index, 1);
+    }
+  });
+  //삭제한 배열로 다시 set
+  set(getGroupUserListPath(chatRoomUid), groupChatConnectedUserList);
+};
