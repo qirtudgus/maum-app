@@ -14,7 +14,7 @@ import { BasicButton, SolidButton } from './ButtonGroup';
 import CloseSvg from './svg/closeSvg';
 
 const Ani = keyframes`
-    from {opacity:0; transform:translateY(-30px)}
+    from {opacity:0; transform:translateY(-20px)}
     to {opacity:1;transform:translateY(0px)}
 `;
 
@@ -33,7 +33,7 @@ const AddGroupChatModal = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  animation: ${Ani} 0.3s;
+  animation: ${Ani} 0.2s;
 `;
 
 const GroupChatModalUserList = styled.li`
