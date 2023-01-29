@@ -7,7 +7,7 @@ import {
   realtimeDbService,
   getGroupChatRoomsUidToTitleFunc,
 } from '../firebaseConfig';
-import InviteGroupChatModal from './inviteGroupChatModal';
+import CreateGroupChatModal from './createGroupChatModal';
 
 export const GroupListTitle = styled.div`
   display: flex;
@@ -153,7 +153,7 @@ const GroupChatList = () => {
         })}
       </GroupListWrap>
       {showAddGroupChat && (
-        <InviteGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />
+        <CreateGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />
       )}
     </GroupChatContainer>
   );
