@@ -1,7 +1,6 @@
 import React from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { authService } from '../firebaseConfig';
 
 const MessageContainers = styled.div`
   position: relative;
@@ -104,9 +103,9 @@ const MessageContainerGroup = ({
 
   return (
     <MessageContainers id='msgWrap' ref={messageContainerScrollHandler}>
-      {chatList.map((i, index, mine) => {
+      {chatList.map((i, index) => {
         return (
-          <>
+          <React.Fragment key={index}>
             <MessageWrap
               createdAt={i.createdAt}
               key={index}
@@ -119,7 +118,7 @@ const MessageContainerGroup = ({
               <span className='messageWrite'>{i.displayName}</span>
               <Message>{i.message}</Message>
             </MessageWrap>
-          </>
+          </React.Fragment>
         );
       })}
     </MessageContainers>
