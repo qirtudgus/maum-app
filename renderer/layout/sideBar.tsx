@@ -8,6 +8,7 @@ import OnUserList from '../components/onUserList';
 import ChatListSvg from '../components/svg/chatListSvg';
 import HomeSvg from '../components/svg/homeSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
+import PeopleSvg from '../components/svg/peopleSvg';
 import SettingSvg from '../components/svg/settingSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
 
@@ -110,6 +111,25 @@ const MyDisplayName = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
 `;
 
+const PeopleButton = styled.div`
+  cursor: pointer;
+  /* position: absolute; */
+
+  width: fit-content;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & svg {
+    width: 30px;
+    fill: white;
+    height: 30px;
+  }
+  &:hover svg {
+    fill: #000;
+  }
+`;
+
 const SideBar = () => {
   const uid = authService.currentUser?.uid;
   const userSignOut = async () => {
@@ -139,6 +159,14 @@ const SideBar = () => {
           >
             <HomeSvg />
           </SettingButton>
+          <PeopleButton
+            title='유저 목록'
+            onClick={() => {
+              router.push('/userList');
+            }}
+          >
+            <PeopleSvg />
+          </PeopleButton>
           <SettingButton
             title='채팅 목록'
             onClick={() => {
