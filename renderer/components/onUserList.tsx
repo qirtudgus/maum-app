@@ -180,12 +180,13 @@ const OnUserList = () => {
         },
       });
 
-      push(채팅방, {
-        displayName: authService.currentUser.displayName,
-        uid: authService.currentUser.uid,
-        message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
-        createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-      });
+      //안읽은 메시지 체크할 때 값을 못읽어와서 잠시 주석처리
+      // push(채팅방, {
+      //   displayName: authService.currentUser.displayName,
+      //   uid: authService.currentUser.uid,
+      //   message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
+      //   createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+      // });
 
       router.push(
         `/chat/${i.displayName}?chatRoomUid=${chatRoomRandomString}&opponentUid=${opponentUid}`,
