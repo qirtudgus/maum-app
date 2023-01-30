@@ -1,4 +1,4 @@
-import { push, ref, set, get } from '@firebase/database';
+import { push, ref, set, get, update } from '@firebase/database';
 import { onValue } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import { useRouter } from 'next/router';
@@ -144,25 +144,50 @@ const OnUserList = () => {
     if (isOpenChatRooms) {
       //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
       console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
-      router.push(`/chat/${i.displayName}?uid=${isOpenChatRooms.chatRoomUid}`);
+      router.push(
+        `/chat/${i.displayName}?chatRoomUid=${isOpenChatRooms.chatRoomUid}&opponentUid=${opponentUid}`,
+      );
     } else {
       //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
       console.log('새로운 채팅방이 생성');
       set(일대일채팅방, {
         chatRoomUid: chatRoomRandomString,
         opponentName: opponentDisplayName,
+        opponentUid: opponentUid,
       });
       set(상대채팅방, {
         chatRoomUid: chatRoomRandomString,
         opponentName: currentUserDisplayName,
+        opponentUid: currentUserUid,
       });
+
+      const 채팅방에uid기록 = ref(
+        realtimeDbService,
+        `oneToOneChatRooms/${chatRoomRandomString}/connectedUser`,
+      );
+      update(채팅방에uid기록, {
+        [currentUserUid]: {
+          displayName: currentUserDisplayName,
+          lastConnectTimeStamp: 0,
+        },
+      });
+      update(채팅방에uid기록, {
+        [opponentUid]: {
+          displayName: opponentDisplayName,
+          lastConnectTimeStamp: 0,
+        },
+      });
+
       push(채팅방, {
         displayName: authService.currentUser.displayName,
         uid: authService.currentUser.uid,
         message: `${opponentDisplayName}님과 채팅이 시작되었습니다.`,
         createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
       });
-      router.push(`/chat/${i.displayName}?uid=${chatRoomRandomString}`);
+
+      router.push(
+        `/chat/${i.displayName}?chatRoomUid=${chatRoomRandomString}&opponentUid=${opponentUid}`,
+      );
     }
   };
 
