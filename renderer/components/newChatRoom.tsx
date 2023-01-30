@@ -133,6 +133,7 @@ const ChatRoom = () =>
         <SendMessageInput
           displayName={displayName2}
           chatRoomUid={chatRoomUid2}
+          opponentUid={opponentUid2}
           isOneToOneOrGroup='oneToOne'
         />
       </>
