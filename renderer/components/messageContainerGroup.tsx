@@ -1,6 +1,9 @@
+import { Timestamp } from 'firebase/firestore';
 import React from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { ChatDataNew } from '../pages/chatList';
+import Message from './Message';
 
 const MessageContainers = styled.div`
   position: relative;
@@ -72,27 +75,23 @@ const MessageWrap = styled.div<MessageSendData>`
   }
 `;
 
-const Message = styled.li`
-  width: fit-content;
-  position: relative;
-  max-width: 60%;
-  /* height: 30px; */
-  min-height: 30px;
-  max-height: fit-content;
-  /* padding: 13px 10px; */
-  display: flex;
-  align-items: center;
-  /* border-radius: 7px; */
-  /* box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2); */
-  /* background: #fff; */
-  color: #000;
-`;
+// const Message = styled.li`
+//   width: fit-content;
+//   position: relative;
+//   max-width: 60%;
+//   /* height: 30px; */
+//   min-height: 30px;
+//   max-height: fit-content;
+//   /* padding: 13px 10px; */
+//   display: flex;
+//   align-items: center;
+//   /* border-radius: 7px; */
+//   /* box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2); */
+//   /* background: #fff; */
+//   color: #000;
+// `;
 
-const MessageContainerGroup = ({
-  chatList,
-}: {
-  chatList: { displayName: string; createdAt: string; message: string }[];
-}) => {
+const MessageContainerGroup = ({ chatList }: { chatList: ChatDataNew[] }) => {
   const messageContainerScrollHandler = useRef<HTMLDivElement>();
 
   //메시지dom이 그려진 후 스크롤 맨 아래로 이동
@@ -104,6 +103,11 @@ const MessageContainerGroup = ({
   return (
     <MessageContainers id='msgWrap' ref={messageContainerScrollHandler}>
       {chatList.map((i, index) => {
+        // console.log(i.createdAt);
+        // console.log(chatList[1].createdAt);
+        //작은쪽이 과거, 큰쪽이 미래다
+        // console.log(i.createdAt <= chatList[1].createdAt);
+        // console.log(new Date(i.createdAt).getSeconds());
         return (
           <React.Fragment key={index}>
             <MessageWrap
@@ -116,7 +120,8 @@ const MessageContainerGroup = ({
               // }
             >
               <span className='messageWrite'>{i.displayName}</span>
-              <Message>{i.message}</Message>
+
+              <Message message={i} />
             </MessageWrap>
           </React.Fragment>
         );

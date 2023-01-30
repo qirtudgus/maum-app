@@ -2,6 +2,8 @@ import React from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { authService } from '../firebaseConfig';
+import { ChatDataNew } from '../pages/chatList';
+import Message from './Message';
 
 const MessageContainers = styled.div`
   position: relative;
@@ -64,23 +66,27 @@ const MessageWrap = styled.div<MessageSendData>`
   }
 `;
 
-const Message = styled.li`
-  width: fit-content;
-  position: relative;
-  max-width: 60%;
-  /* height: 30px; */
-  min-height: 30px;
-  max-height: fit-content;
-  padding: 13px 10px;
-  display: flex;
-  align-items: center;
-  border-radius: 7px;
-  box-shadow: ${({ theme }) => theme.boxShadow};
-  background: #fff;
-  color: #000;
-`;
+// const Message = styled.li`
+//   width: fit-content;
+//   position: relative;
+//   max-width: 60%;
+//   /* height: 30px; */
+//   min-height: 30px;
+//   max-height: fit-content;
+//   padding: 13px 10px;
+//   display: flex;
+//   align-items: center;
+//   border-radius: 7px;
+//   box-shadow: ${({ theme }) => theme.boxShadow};
+//   background: #fff;
+//   color: #000;
+// `;
 
-const MessageContainerOneToOne = ({ chatList }: { chatList: any[] }) => {
+const MessageContainerOneToOne = ({
+  chatList,
+}: {
+  chatList: ChatDataNew[];
+}) => {
   const messageContainerScrollHandler = useRef<HTMLDivElement>();
 
   //메시지dom이 그려진 후 스크롤 맨 아래로 이동
@@ -103,7 +109,10 @@ const MessageContainerOneToOne = ({ chatList }: { chatList: any[] }) => {
             }
           >
             <span className='messageWrite'>{i.displayName}</span>
-            <Message>{i.message}</Message>
+            <span>{i.readUsers.length}</span>
+
+            <Message message={i} />
+            {/* <Message>{i.message}</Message> */}
           </MessageWrap>
         );
       })}
