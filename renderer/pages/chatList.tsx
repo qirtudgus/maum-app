@@ -59,6 +59,17 @@ const ChatListWrap = styled.div`
   }
 `;
 
+export interface ChatDataNew {
+  createdAt: string;
+  createdSecondsAt: number;
+  displayName: string;
+  message: string;
+  readUsers: {
+    [key: string]: boolean;
+  };
+  uid: string;
+}
+
 function ChatList() {
   const [myChatList, setMyChatList] = useState([]);
 
@@ -268,17 +279,6 @@ function ChatList() {
     // const notReadCountMessage = { ...resultInsertMessage, notReadCount };
     // //안읽은 메시지 구하기 끝
 
-    interface chatData {
-      createdAt: string;
-      createdSecondsAt: number;
-      displayName: string;
-      message: string;
-      readUsers: {
-        [key: string]: boolean;
-      };
-      uid: 'Z05znci6ZvceevU8qeCjzOA3i5d2';
-    }
-
     const 안읽은메시지관찰할채팅방옵저버 = (chatUid: string) => {
       console.log(`${chatUid}방 옵저버 실행`);
       const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
@@ -288,7 +288,7 @@ function ChatList() {
         let 사이즈 = snapshot.size;
         console.log(typeof snapshot.val());
         if (typeof snapshot.val() === 'object') {
-          let 메시지들: chatData[] = Object.values(snapshot.val());
+          let 메시지들: ChatDataNew[] = Object.values(snapshot.val());
           console.log('메시지와 사이즈');
           console.log(메시지들);
           console.log(사이즈);
@@ -301,18 +301,23 @@ function ChatList() {
           console.log('내가 안읽은 갯수는 총');
           console.log(사이즈 - 안읽은메시지인덱스);
 
-          let 안읽은메시지갯수 = 사이즈 - 안읽은메시지인덱스;
+          //안읽은메시지가 없을경우 -1이 반환된다 그에대한 예외처리
+          if (안읽은메시지인덱스 === -1) {
+            return;
+          } else {
+            let 안읽은메시지갯수 = 사이즈 - 안읽은메시지인덱스;
 
-          setMyChatLastMessage((prev) => {
-            //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
-            let a = prev.map((i, index) => {
-              if (i.chatRoomUid.chatRoomUid === chatUid) {
-                i.notReadCount = 안읽은메시지갯수;
-              }
-              return i;
+            setMyChatLastMessage((prev) => {
+              //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
+              let a = prev.map((i, index) => {
+                if (i.chatRoomUid.chatRoomUid === chatUid) {
+                  i.notReadCount = 안읽은메시지갯수;
+                }
+                return i;
+              });
+              return a;
             });
-            return a;
-          });
+          }
         }
       });
     };
@@ -342,7 +347,7 @@ function ChatList() {
 
       <>
         <>대화 목록</>
-        <button
+        {/* <button
           onClick={async () => {
             let count = 0;
             // Create a query against the collection.
@@ -388,7 +393,7 @@ function ChatList() {
           }}
         >
           채팅방가져오기 실행
-        </button>
+        </button> */}
 
         {isLoading ? (
           <ChatListWrap>
