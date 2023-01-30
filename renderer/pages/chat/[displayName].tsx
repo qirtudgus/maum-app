@@ -17,8 +17,10 @@ const User = () => {
     <>
       <ChatWrap>
         <ChatRoom
-          displayName={router.query.displayName as string}
-          chatRoomUid={router.query.uid as string}
+        //해당 컴포넌트에서 쿼리를 직접 사용한다.
+        // displayName={router.query.displayName as string}
+        // chatRoomUid={router.query.chatRoomUid as string}
+        // opponentUid={router.query.opponentUid as string}
         />
       </ChatWrap>
     </>
