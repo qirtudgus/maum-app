@@ -73,9 +73,17 @@ function ChatList() {
     );
 
     const 채팅리스트가져오기2 = async () => {
+      let 채팅방있는지체크 = await (await get(getMyChatListRef)).val();
+
+      //아직 채팅방이 0개일 때 예외처리 이러면 res에 undifined가 할당된다.
+      if (!채팅방있는지체크) {
+        return;
+      }
+
       const getMyChatListArray = Object.values(
         await (await get(getMyChatListRef)).val(),
       ) as ChatInfoArray;
+
       //맵에 async를 넣는순간 프로미스를 반환
       let resultInsertMessageArray = getMyChatListArray.map(
         async (i, index) => {
@@ -122,9 +130,16 @@ function ChatList() {
     };
 
     채팅리스트가져오기2().then((res) => {
-      setMyChatList(res);
-      setMyChatLastMessage(res);
-      setIsLoading(true);
+      console.log('가져오기결과');
+      console.log(res);
+      //결과가 언디파인드일때의 분기처리
+      if (res) {
+        setMyChatList(res);
+        setMyChatLastMessage(res);
+        setIsLoading(true);
+      } else {
+        setIsLoading(true);
+      }
 
       //여기서 각 채팅방 리스너 달아주기
       // const getMyChatListRef = (chatRoomUid: string) => {
@@ -200,13 +215,15 @@ function ChatList() {
       });
     };
 
-    const 관찰끄기 = async (chatUid: string) => {
+    const 관찰끄기 = (chatUid: string) => {
       const refs = ref(
         realtimeDbService,
         `oneToOneChatRooms/${chatUid}/lastMessage`,
       );
       off(refs);
     };
+
+    if (myChatList.length === 0) return;
 
     myChatList.forEach((i, index) => {
       console.log('내 채팅방');
@@ -229,7 +246,93 @@ function ChatList() {
   //콜백함수는 chat이 감지될때마다, 스냅샷에는 각 chat의 데이터가 들어있다.
   //chat을 뒤집어서 최신순으로 정렬한 뒤에 readUsers.uid가 currentUesr.uid와 같은 값을 체크하면서
   //카운트에 ++해주고, 콜백함수를 중지시키고 카운트를 set
-  useEffect(() => {}, []);
+  useEffect(() => {
+    // //안읽은 메시지 구하기 시작 준비물 : 채팅uid = i.chatRoomUid.chatRoomUid
+    // let notReadCount = 0;
+    // const refs = ref(
+    //   realtimeDbService,
+    //   `oneToOneChatRooms/${i.chatRoomUid.chatRoomUid}/chat`,
+    // );
+    // const gets = (await get(refs)).val();
+    // const values = Object.values(gets);
+    // // console.log(values);
+    // values.forEach((i, index) => {
+    //   if (i.readUsers) {
+    //     // console.log(i.readUsers[authService.currentUser?.uid]);
+    //     i.readUsers[authService.currentUser?.uid] ? null : notReadCount++;
+    //   }
+    // });
+    // // console.log('안읽은 갯수');
+    // // console.log(notReadCount);
+    // //리절트에 안읽은 메시지 갯수 추가하기
+    // const notReadCountMessage = { ...resultInsertMessage, notReadCount };
+    // //안읽은 메시지 구하기 끝
+
+    interface chatData {
+      createdAt: string;
+      createdSecondsAt: number;
+      displayName: string;
+      message: string;
+      readUsers: {
+        [key: string]: boolean;
+      };
+      uid: 'Z05znci6ZvceevU8qeCjzOA3i5d2';
+    }
+
+    const 안읽은메시지관찰할채팅방옵저버 = (chatUid: string) => {
+      console.log(`${chatUid}방 옵저버 실행`);
+      const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
+      onValue(refs, (snapshot) => {
+        //라스트인덱스오브를 통해 뒤에서부터 true를 찾은 뒤 그 인덱스 = 마지막으로 읽은 메시지 index
+        //스냅샷의 사이즈를 가져와서, 스냅샷 - index = 안읽은 메시지 갯수
+        let 사이즈 = snapshot.size;
+        console.log(typeof snapshot.val());
+        if (typeof snapshot.val() === 'object') {
+          let 메시지들: chatData[] = Object.values(snapshot.val());
+          console.log('메시지와 사이즈');
+          console.log(메시지들);
+          console.log(사이즈);
+
+          let 안읽은메시지인덱스 = 메시지들.findIndex((i) => {
+            return i?.readUsers[authService.currentUser?.uid] === false;
+          });
+
+          console.log(안읽은메시지인덱스);
+          console.log('내가 안읽은 갯수는 총');
+          console.log(사이즈 - 안읽은메시지인덱스);
+
+          let 안읽은메시지갯수 = 사이즈 - 안읽은메시지인덱스;
+
+          setMyChatLastMessage((prev) => {
+            //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
+            let a = prev.map((i, index) => {
+              if (i.chatRoomUid.chatRoomUid === chatUid) {
+                i.notReadCount = 안읽은메시지갯수;
+              }
+              return i;
+            });
+            return a;
+          });
+        }
+      });
+    };
+
+    myChatList.forEach((i, index) => {
+      안읽은메시지관찰할채팅방옵저버(i.chatRoomUid.chatRoomUid);
+    });
+
+    const 관찰끄기 = (chatUid: string) => {
+      const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
+      console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
+      off(refs);
+    };
+
+    return () => {
+      myChatList.forEach((i) => {
+        관찰끄기(i.chatRoomUid.chatRoomUid);
+      });
+    };
+  }, [myChatList]);
 
   return (
     <Wrap>
@@ -289,22 +392,25 @@ function ChatList() {
 
         {isLoading ? (
           <ChatListWrap>
-            {myChatLastMessage.map((i, index) => {
-              return (
-                <li
-                  key={index}
-                  onClick={() => {
-                    router.push(
-                      `/chat/${i.chatRoomUid.displayName}?chatRoomUid=${i.chatRoomUid.chatRoomUid}&opponentUid=${i.chatRoomUid.opponentUid}`,
-                    );
-                  }}
-                >
-                  <span> {i.chatRoomUid.opponentName}</span>
-                  <div>{i.lastMessage}</div>
-                  {/* <div>{i.notReadCount !== 0 ? i.notReadCount : null}</div> */}
-                </li>
-              );
-            })}
+            {myChatLastMessage.length === 0
+              ? null
+              : myChatLastMessage.map((i, index) => {
+                  return (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        router.push(
+                          `/chat/${i.chatRoomUid.displayName}?chatRoomUid=${i.chatRoomUid.chatRoomUid}&opponentUid=${i.chatRoomUid.opponentUid}`,
+                        );
+                      }}
+                    >
+                      <span> {i.chatRoomUid.opponentName}</span>
+                      <div>{i.lastMessage}</div>
+                      <div>안읽은갯수:{i?.notReadCount}</div>
+                      {/* <div>{i.notReadCount !== 0 ? i.notReadCount : null}</div> */}
+                    </li>
+                  );
+                })}
           </ChatListWrap>
         ) : (
           <LoadingSpinner />
