@@ -167,12 +167,14 @@ const OnUserList = () => {
       );
       update(채팅방에uid기록, {
         [currentUserUid]: {
+          uid: currentUserUid,
           displayName: currentUserDisplayName,
           lastConnectTimeStamp: 0,
         },
       });
       update(채팅방에uid기록, {
         [opponentUid]: {
+          uid: opponentUid,
           displayName: opponentDisplayName,
           lastConnectTimeStamp: 0,
         },
