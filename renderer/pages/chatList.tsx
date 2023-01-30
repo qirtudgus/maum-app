@@ -111,7 +111,7 @@ function ChatList() {
                   key={index}
                   onClick={() => {
                     router.push(
-                      `/chat/${i.chatRoomUid.displayName}?uid=${i.chatRoomUid.chatRoomUid}`,
+                      `/chat/${i.chatRoomUid.displayName}?chatRoomUid=${i.chatRoomUid.chatRoomUid}&opponentUid=${i.chatRoomUid.opponentUid}`,
                     );
                   }}
                 >
