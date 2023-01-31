@@ -49,10 +49,10 @@ interface oneToOneChatList {
   createdSecondsAt: number;
 }
 
-const Wrap = styled.div`
+export const Wrap = styled.div`
   width: 100%;
   height: 100%;
-
+  padding: 10px 0 10px 10px;
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
@@ -63,7 +63,7 @@ const Wrap = styled.div`
 const ChatListHeader = styled.div`
   width: 100%;
   display: flex;
-  padding: 15px 10px 5px 10px;
+
   align-items: center;
 `;
 
@@ -80,7 +80,7 @@ const ChatListWrap = styled.div`
   flex-direction: column;
 `;
 
-const ChatRoomList = styled.li`
+export const ChatRoomList = styled.li`
   cursor: pointer;
   width: 100%;
   background: #fff;
@@ -91,7 +91,7 @@ const ChatRoomList = styled.li`
     background: #eee;
   }
 `;
-const ChatRoomInfo = styled.div`
+export const ChatRoomInfo = styled.div`
   width: 100%;
 `;
 
@@ -124,7 +124,8 @@ const ChatRoomTitleAndTime = styled.div`
   }
 `;
 
-const ChatIcon = styled.div`
+export const ChatIcon = styled.div`
+  position: relative;
   width: 45px;
   height: 45px;
   background: #d0ddff;
