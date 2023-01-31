@@ -190,13 +190,14 @@ const SideBar = () => {
           </LogoutButton>
         </FooterButtonWrap>
       </SideBarWrap>
-      <MenuWrap>
+      {/* 구조변경으로 인해 기존 메뉴레이아웃 주석처리 */}
+      {/* <MenuWrap>
         <>
           <MyDisplayName>{authService.currentUser?.displayName}</MyDisplayName>
           <OnUserList />
           <GroupChatList />
         </>
-      </MenuWrap>
+      </MenuWrap> */}
     </SideBarContainer>
   );
 };
