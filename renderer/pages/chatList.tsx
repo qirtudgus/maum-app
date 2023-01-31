@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
-import {
-  authService,
-  getGroupChatRoomsUidToTitleFunc,
-  realtimeDbService,
-} from '../firebaseConfig';
-import {
-  get,
-  query,
-  ref,
-  limitToLast,
-  onChildAdded,
-  off,
-  onValue,
-} from 'firebase/database';
+import { authService, realtimeDbService } from '../firebaseConfig';
+import { get, query, ref, limitToLast, off, onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PeopleSvg from '../components/svg/peopleSvg';
+import PersonSvg from '../components/svg/personSvg';
 
 export interface ChatDataNew {
   createdAt: string;
@@ -27,22 +17,6 @@ export interface ChatDataNew {
     [key: string]: boolean;
   };
   uid: string;
-}
-interface groupChatList {
-  chatUid: string;
-  chatTitle: string;
-}
-interface GroupChatListSnapshot {
-  groupChatUid: string[];
-}
-
-interface OneMessage {
-  [key: string]: {
-    createdAt: string;
-    displayName: string;
-    message: string;
-    uid: string;
-  };
 }
 
 interface ResultMessage {
@@ -75,25 +49,137 @@ interface oneToOneChatList {
 const Wrap = styled.div`
   width: 100%;
   height: 100%;
+
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
   align-items: flex-start;
+  overflow-y: auto;
+`;
+
+export const PageTitle = styled.div`
+  font-size: 20px;
+  font-weight: bold;
+  color: #444;
+  padding: 15px 10px 5px 10px;
 `;
 
 const ChatListWrap = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 50px;
-
+  /* padding: 50px; */
+  /* 
   & > li {
     width: 100%;
     height: 40px;
     border-left: 2px solid#eee;
     display: flex;
     flex-direction: column;
+  } */
+`;
+
+const ChatRoomList = styled.li`
+  cursor: pointer;
+  width: 100%;
+  background: #fff;
+  padding: 10px;
+  height: fit-content;
+  display: flex;
+  &:hover {
+    background: #eee;
   }
 `;
+const ChatRoomInfo = styled.div`
+  width: 100%;
+`;
+
+const ChatRoomLastMessage = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: #444;
+`;
+const ChatRoomNotReadCount = styled.div`
+  padding: 3px 5px;
+  text-align: center;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 10px;
+  background: #d61818;
+`;
+const ChatRoomTitleAndTime = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  & .title {
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  & .timeStamp {
+    font-size: 15px;
+    color: #555;
+  }
+`;
+
+const ChatIcon = styled.div`
+  width: 45px;
+  height: 45px;
+  background: #d0ddff;
+  border-radius: 10px;
+  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & svg {
+    width: 30px;
+    height: 30px;
+    fill: #fff;
+  }
+`;
+
+//특정 유저의 채팅방 리스트를 반환해주는 함수.
+// const getUserChatRoomList = async (
+//   userUid: string,
+//   chatRoomType: 'oneToOne' | 'group',
+// ) => {
+//   const chatRef =
+//     chatRoomType === 'oneToOne'
+//       ? ref(realtimeDbService, `oneToOneChatRooms/${userUid}`)
+//       : ref(realtimeDbService, `userList/${userUid}/myGroupChatList`);
+
+//   // group일 경우 결과값
+//   interface GroupTypeResult {
+//     groupChatUid: string[];
+//   }
+
+//   interface OneToOneTypeResult {
+//     [key: string]: {
+//       chatRoomUid: {
+//         chatRoomUid: string;
+//         opponentName: string;
+//         opponentUid: string;
+//       };
+//     };
+//   }
+
+//   let result: OneToOneTypeResult | GroupTypeResult | null = null;
+
+//   if (chatRoomType === 'oneToOne') {
+//     const 채팅방있는지체크: OneToOneTypeResult | null = await (
+//       await get(chatRef)
+//     ).val();
+//     result = 채팅방있는지체크;
+//   } else {
+//     const 채팅방있는지체크: GroupTypeResult | null = await (
+//       await get(chatRef)
+//     ).val();
+//     result = 채팅방있는지체크;
+//   }
+
+//   return result;
+// };
 
 /**
  * 채팅의 uid와 종류를 넘겨주면 메시지가 있을때 마지막 메시지를, 없으면 null을 반환합니다.
@@ -126,21 +212,22 @@ const getChatRoomLastMessage = async (
 
 function ChatList() {
   const [myChatList, setMyChatList] = useState<oneToOneChatList[]>([]);
-  const [myChatLastMessage, setMyChatLastMessage] = useState<
-    oneToOneChatList[]
-  >([]);
+  // const [myChatLastMessage, setMyChatLastMessage] = useState<
+  //   oneToOneChatList[]
+  // >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [groupChatList, setGroupChatList] = useState<GroupChatList[]>([]);
   const [groupChatList2, setGroupChatList2] = useState<GroupChatList[]>([]);
 
-  const [통합배열, set통합배열] = useState([]);
+  const [combineChatList, setCombineChatList] = useState([]);
+  const [sortChatList, setSortChatList] = useState([]);
 
   const router = useRouter();
-  const enterGroupChatRoom = (item: GroupChatList) => {
-    router.push(
-      `/groupchat/${item.chatRoomsTitle}?chatRoomUid=${item.chatRoomUid}`,
-    );
-  };
+  // const enterGroupChatRoom = (item: GroupChatList) => {
+  //   router.push(
+  //     `/groupchat/${item.chatRoomsTitle}?chatRoomUid=${item.chatRoomUid}`,
+  //   );
+  // };
 
   //이제 그룹 채팅 리스트에 각 마지막 메세지와, 안읽은 메세지 갯수를 만들어주자.
   //렌더링할 때 필요한것 그룹채팅uid, 채팅마지막메시지, 안읽음갯수, 그룹채팅title
@@ -151,26 +238,18 @@ function ChatList() {
     );
 
     const 그룹채팅리스트가져오기 = async () => {
-      let 채팅방있는지체크 = await (await get(myGroupChatListPath)).val();
-      //아직 채팅방이 0개일 때 예외처리 이러면 res에 undifined가 할당된다.
-      if (!채팅방있는지체크) return;
-
+      let hasUserGroupChatRooms = await (await get(myGroupChatListPath)).val();
+      //아직 채팅방이 0개일 때 예외처리 이러면 res에 null이 할당된다.
+      if (!hasUserGroupChatRooms) return;
       //이 배열들에 uid를 순회하면서 가져올거다
-      const 그룹채팅목록배열: string[][] = Object.values(
-        await (await get(myGroupChatListPath)).val(),
-      );
-      // console.log('그룹채팅목록배열');
-      // console.log(그룹채팅목록배열);
-
+      const 그룹채팅목록배열: string[][] = Object.values(hasUserGroupChatRooms);
       const 결과 = 그룹채팅목록배열[0].map(async (i, index) => {
-        // console.log(i);
         let 결과객체 = {
           chatRoomUid: i,
           chatRoomsTitle: '',
           lastMessage: '',
           notReadCount: 0,
           createdSecondsAt: 0,
-          // readUsers: {},
         };
 
         const groupChatRoomTitle = ref(
@@ -205,8 +284,8 @@ function ChatList() {
           );
           let 메시지길이 = 메시지들.length;
           let 안읽은메시지인덱스 = 메시지들.findIndex((i) => {
-            console.log('안읽은메시디지인덱스');
-            console.log(i);
+            // console.log('안읽은메시디지인덱스');
+            // console.log(i);
 
             return i?.readUsers[authService.currentUser?.uid] === false;
           });
@@ -227,8 +306,12 @@ function ChatList() {
       console.log('그룹채팅 리스트 가져오기 결과');
       //끝! res를 렌더링해줄 state에 할당하고 렌더링 시켜주자.
       console.log(res);
-      setGroupChatList(res);
-      setGroupChatList2(res);
+      //res 결과값 undifined 예외처리
+      if (res) {
+        setGroupChatList(res);
+        setGroupChatList2(res);
+        setCombineChatList((prev) => [...prev, ...res]);
+      }
     });
   }, []);
 
@@ -240,14 +323,18 @@ function ChatList() {
     );
 
     const 채팅리스트가져오기2 = async () => {
-      let 채팅방있는지체크 = await (await get(getMyChatListRef)).val();
+      let hasUserGroupChatRooms = await (await get(getMyChatListRef)).val();
       //아직 채팅방이 0개일 때 예외처리 이러면 res에 undifined가 할당된다.
-      if (!채팅방있는지체크) {
-        return;
-      }
-      const getMyChatListArray = Object.values(
-        await (await get(getMyChatListRef)).val(),
-      ) as ResultMessage[];
+      console.log('hasUserGroupChatRooms');
+      console.log(hasUserGroupChatRooms);
+      if (!hasUserGroupChatRooms) return;
+      // const getMyChatListArray = Object.values(
+      //   await (await get(getMyChatListRef)).val(),
+      // ) as ResultMessage[];
+
+      const getMyChatListArray: ResultMessage[] = Object.values(
+        hasUserGroupChatRooms,
+      );
 
       //맵에 async를 넣는순간 프로미스를 반환
       //각 일대일채팅의 메시지를 가공하여 마지막메세지와 안읽은 갯수를 추가해준다.
@@ -283,17 +370,6 @@ function ChatList() {
             const createdSecondsAt = newLastMessage.createdSecondsAt;
             result2['createdSecondsAt'] = createdSecondsAt;
             result2['lastMessage'] = newLastMessage.message;
-            console.log('시간 넣은것');
-            console.log(result2);
-            //   {
-            //     "chatRoomUid": "zq0mlhjvh",
-            //     "opponentName": "박성현",
-            //     "opponentUid": "Z05znci6ZvceevU8qeCjzOA3i5d2",
-            //     "lastMessage": "",
-            //     "notReadCount": 0,
-            //     "timeStamp": 1675135908
-            // }
-
             //안읽은 갯수 넣기 시작
             let 메시지들: ChatDataNew[] = Object.values(
               (await get(oneToOneChatRoomPath)).val(),
@@ -325,7 +401,8 @@ function ChatList() {
         console.log(res);
         // console.log(res.flat());
         setMyChatList(res);
-        setMyChatLastMessage(res);
+        // setMyChatLastMessage(res);
+        setCombineChatList((prev) => [...prev.flat(), ...res]);
         setIsLoading(true);
       } else {
         setIsLoading(true);
@@ -342,7 +419,7 @@ function ChatList() {
         //라스트인덱스오브를 통해 뒤에서부터 true를 찾은 뒤 그 인덱스 = 마지막으로 읽은 메시지 index
         //스냅샷의 사이즈를 가져와서, 스냅샷 - index = 안읽은 메시지 갯수
         console.log(typeof snapshot.val());
-        if (typeof snapshot.val() === 'object') {
+        if (snapshot.val()) {
           //마지막 메시지넣기 시작
 
           const newLastMessage = await getChatRoomLastMessage(
@@ -350,20 +427,31 @@ function ChatList() {
             'oneToOne',
           );
           if (newLastMessage) {
-            const lastMessage = newLastMessage.message;
-            const createdSecondsAt = newLastMessage.createdSecondsAt;
             const isLastMessageLead =
               newLastMessage.readUsers[authService.currentUser?.uid];
 
             //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
 
             if (!isLastMessageLead) {
-              setMyChatLastMessage((prev) => {
+              // setMyChatLastMessage((prev) => {
+              //   //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
+              //   let updateChatList = prev.map((i, index) => {
+              //     if (i.chatRoomUid === chatUid) {
+              //       i.lastMessage = newLastMessage.message;
+              //       i.createdSecondsAt = newLastMessage.createdSecondsAt;
+              //       i.notReadCount++;
+              //       //   if(i[0].readUsers[authService.currentUser?.uid]){}
+              //     }
+              //     return i;
+              //   });
+              //   return updateChatList;
+              // });
+              setCombineChatList((prev) => {
                 //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
                 let updateChatList = prev.map((i, index) => {
                   if (i.chatRoomUid === chatUid) {
-                    i.lastMessage = lastMessage;
-                    i.createdSecondsAt = createdSecondsAt;
+                    i.lastMessage = newLastMessage.message;
+                    i.createdSecondsAt = newLastMessage.createdSecondsAt;
                     i.notReadCount++;
                     //   if(i[0].readUsers[authService.currentUser?.uid]){}
                   }
@@ -396,6 +484,15 @@ function ChatList() {
     };
   }, [myChatList]);
 
+  useEffect(() => {
+    let b = combineChatList.sort((a, b) => {
+      return b.createdSecondsAt - a.createdSecondsAt;
+    });
+    setSortChatList([...b]);
+
+    // set통합배열([b]);
+  }, [myChatList, groupChatList, combineChatList]);
+
   //그룹챗 마지막메세지 옵저버 설정
   useEffect(() => {
     const 그룹채팅갯수옵저버 = async (chatUid: string) => {
@@ -415,9 +512,22 @@ function ChatList() {
               newLastMessage.readUsers[authService.currentUser?.uid];
 
             //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
-
             if (!isLastMessageLead) {
-              setGroupChatList((prev) => {
+              // setGroupChatList((prev) => {
+              //   //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
+              //   let updateChatList = prev.map((i, index) => {
+              //     if (i.chatRoomUid === chatUid) {
+              //       i.lastMessage = newLastMessage.message;
+              //       i.createdSecondsAt = newLastMessage.createdSecondsAt;
+              //       i.notReadCount++;
+              //       //   if(i[0].readUsers[authService.currentUser?.uid]){}
+              //     }
+              //     return i;
+              //   });
+              //   return updateChatList;
+              // });
+
+              setCombineChatList((prev) => {
                 //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
                 let updateChatList = prev.map((i, index) => {
                   if (i.chatRoomUid === chatUid) {
@@ -462,10 +572,80 @@ function ChatList() {
       </Head>
 
       <>
-        <>대화 목록</>
+        <PageTitle>대화 목록</PageTitle>
         {isLoading ? (
           <ChatListWrap>
-            <div>일대일채팅 목록</div>
+            {sortChatList.length === 0 && <div>대화중인 상대가 없어요!</div>}
+            {sortChatList.map((item, index) => {
+              return item && item.chatRoomsTitle ? (
+                <ChatRoomList
+                  key={item.chatRoomUid}
+                  // onDoubleClick={() => {
+                  //   enterGroupChatRoom(item);
+                  // }}
+                  onClick={() => {
+                    router.push(
+                      `/groupchat/${item.chatRoomsTitle}?chatRoomUid=${item.chatRoomUid}`,
+                    );
+                  }}
+                >
+                  <ChatIcon>
+                    <PeopleSvg />
+                  </ChatIcon>
+                  <ChatRoomInfo>
+                    <ChatRoomTitleAndTime>
+                      <span className='title'>{item?.chatRoomsTitle}</span>
+                      <span className='timeStamp'>{item.createdSecondsAt}</span>
+                    </ChatRoomTitleAndTime>
+                    <ChatRoomLastMessage>
+                      <div>{item.lastMessage}</div>
+
+                      {item.notReadCount !== 0 && (
+                        <ChatRoomNotReadCount>
+                          {item.notReadCount}
+                        </ChatRoomNotReadCount>
+                      )}
+                    </ChatRoomLastMessage>
+                  </ChatRoomInfo>
+                </ChatRoomList>
+              ) : (
+                <ChatRoomList
+                  key={item.chatRoomUid}
+                  onClick={() => {
+                    router.push(
+                      `/chat/${item?.opponentName}?chatRoomUid=${item?.chatRoomUid}&opponentUid=${item?.opponentUid}`,
+                    );
+                  }}
+                >
+                  <ChatIcon>
+                    <PersonSvg />
+                  </ChatIcon>
+                  <ChatRoomInfo>
+                    <ChatRoomTitleAndTime>
+                      <span className='title'> {item?.opponentName}</span>
+                      <span className='timeStamp'>{item.createdSecondsAt}</span>
+                    </ChatRoomTitleAndTime>
+                    <ChatRoomLastMessage>
+                      <div>{item.lastMessage}</div>
+                      {item.notReadCount !== 0 && (
+                        <ChatRoomNotReadCount>
+                          {item.notReadCount}
+                        </ChatRoomNotReadCount>
+                      )}
+                    </ChatRoomLastMessage>
+                  </ChatRoomInfo>
+                </ChatRoomList>
+              );
+            })}
+
+            {/* <div>일대일채팅 목록</div>
+            <button
+              onClick={() => {
+                console.log(통합배열);
+              }}
+            >
+              통합목록 확인
+            </button>
             {myChatLastMessage.length === 0
               ? null
               : myChatLastMessage.map((i, index) => {
@@ -484,7 +664,7 @@ function ChatList() {
                       <div>마지막시간:{i?.createdSecondsAt}</div>
                     </li>
                   );
-                })}
+                })} */}
           </ChatListWrap>
         ) : (
           <LoadingSpinner />
@@ -503,7 +683,7 @@ function ChatList() {
             </li>
           ) : null;
         })} */}
-
+        {/* 
         {groupChatList.map((item, index) => {
           return item.chatRoomsTitle !== '' ? (
             <li
@@ -518,7 +698,7 @@ function ChatList() {
               <div>마지막시간:{item.createdSecondsAt}</div>
             </li>
           ) : null;
-        })}
+        })} */}
       </>
     </Wrap>
   );
