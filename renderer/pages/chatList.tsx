@@ -101,7 +101,7 @@ function ChatList() {
     oneToOneChatList[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
+  // const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
 
   const [groupChatList, setGroupChatList] = useState<GroupChatList[]>([]);
   const [groupChatList2, setGroupChatList2] = useState<GroupChatList[]>([]);
@@ -115,35 +115,35 @@ function ChatList() {
     );
   };
 
-  //유저의 그룹채팅 리스트를 가져와 state에 넣어주는 함수
-  useEffect(() => {
-    //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
-    if (authService.currentUser) {
-      const myGroupChatListPath = ref(
-        realtimeDbService,
-        `userList/${authService.currentUser.uid}/myGroupChatList`,
-      );
-      console.log('그룹채팅 온밸류 호출');
-      onValue(myGroupChatListPath, async (snapshot) => {
-        //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
-        if (snapshot.val()) {
-          let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
-          let groupChatUidList = groupChatListSnapshot.groupChatUid;
-          getGroupChatRoomsUidToTitleFunc(groupChatUidList).then(
-            (groupChatTitleList) => {
-              // console.log(groupChatTitleList);
-              let mergeGroupChatList = groupChatUidList.map((item, index) => {
-                return { chatUid: item, chatTitle: groupChatTitleList[index] };
-              });
-              //   console.log('그룹채팅배열');
-              //   console.log(mergeGroupChatList);
-              setGroupChatAllList(mergeGroupChatList);
-            },
-          );
-        }
-      });
-    }
-  }, []);
+  // //유저의 그룹채팅 리스트를 가져와 state에 넣어주는 함수
+  // useEffect(() => {
+  //   //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
+  //   if (authService.currentUser) {
+  //     const myGroupChatListPath = ref(
+  //       realtimeDbService,
+  //       `userList/${authService.currentUser.uid}/myGroupChatList`,
+  //     );
+  //     console.log('그룹채팅 온밸류 호출');
+  //     onValue(myGroupChatListPath, async (snapshot) => {
+  //       //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
+  //       if (snapshot.val()) {
+  //         let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
+  //         let groupChatUidList = groupChatListSnapshot.groupChatUid;
+  //         getGroupChatRoomsUidToTitleFunc(groupChatUidList).then(
+  //           (groupChatTitleList) => {
+  //             // console.log(groupChatTitleList);
+  //             // let mergeGroupChatList = groupChatUidList.map((item, index) => {
+  //             //   return { chatUid: item, chatTitle: groupChatTitleList[index] };
+  //             // });
+  //             //   console.log('그룹채팅배열');
+  //             //   console.log(mergeGroupChatList);
+  //             // setGroupChatAllList(mergeGroupChatList);
+  //           },
+  //         );
+  //       }
+  //     });
+  //   }
+  // }, []);
 
   //이제 그룹 채팅 리스트에 각 마지막 메세지와, 안읽은 메세지 갯수를 만들어주자.
   //렌더링할 때 필요한것 그룹채팅uid, 채팅마지막메시지, 안읽음갯수, 그룹채팅title
@@ -184,7 +184,8 @@ function ChatList() {
         // console.log('제목들');
         // console.log(제목들);
         if (제목들) {
-          결과객체 = { ...결과객체, chatRoomsTitle: 제목들 };
+          // 결과객체 = { ...결과객체, chatRoomsTitle: 제목들 };
+          결과객체['chatRoomsTitle'] = 제목들;
         }
 
         const groupChatRoomPath = ref(
@@ -201,11 +202,13 @@ function ChatList() {
           );
           // console.log(마지막메시지);
           // console.log(마지막메시지[0].message);
-          결과객체 = {
-            ...결과객체,
-            lastMessage: 마지막메시지[0].message,
-            createdSecondsAt: 마지막메시지[0].createdSecondsAt,
-          };
+          // 결과객체 = {
+          //   ...결과객체,
+          //   lastMessage: 마지막메시지[0].message,
+          //   createdSecondsAt: 마지막메시지[0].createdSecondsAt,
+          // };
+          결과객체['lastMessage'] = 마지막메시지[0].message;
+          결과객체['createdSecondsAt'] = 마지막메시지[0].createdSecondsAt;
 
           //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
           const 메시지들: ChatDataNew[] = Object.values(
@@ -220,7 +223,7 @@ function ChatList() {
           });
           if (안읽은메시지인덱스 !== -1) {
             let 안읽은메시지갯수 = 메시지길이 - 안읽은메시지인덱스;
-            결과객체 = { ...결과객체, notReadCount: 안읽은메시지갯수 };
+            결과객체['notReadCount'] = 안읽은메시지갯수;
           }
 
           //안읽음 카운트 넣기 끝
@@ -267,11 +270,11 @@ function ChatList() {
             `oneToOneChatRooms/${i.chatRoomUid.chatRoomUid}/chat`,
           );
           //마지막 메시지넣기 시작
-          let resultMessage: ResultMessage = {
-            ...i,
-            lastMessage: '',
-            notReadCount: 0,
-          };
+          // let resultMessage: ResultMessage = {
+          //   ...i,
+          //   lastMessage: '',
+          //   notReadCount: 0,
+          // };
 
           // console.log(resultMessage);
           // console.log('밸류스 한것');
@@ -291,7 +294,7 @@ function ChatList() {
             const lastMessageAfter: ChatDataNew[] =
               Object.values(lastMessageBefore);
             const lastMessage = lastMessageAfter[0].message;
-            resultMessage = { ...i, lastMessage };
+            // resultMessage = { ...i, lastMessage };
 
             console.log('lastMessageAfter');
             console.log(lastMessageAfter);
@@ -320,10 +323,10 @@ function ChatList() {
               return i?.readUsers[authService.currentUser?.uid] === false;
             });
             if (안읽은메시지인덱스 === -1) {
-              resultMessage['notReadCount'] = 0;
+              // resultMessage['notReadCount'] = 0;
             } else {
               let 안읽은메시지갯수 = 메시지길이 - 안읽은메시지인덱스;
-              resultMessage['notReadCount'] = 안읽은메시지갯수;
+              // resultMessage['notReadCount'] = 안읽은메시지갯수;
               result2['notReadCount'] = 안읽은메시지갯수;
             }
             //안읽은 갯수 넣기 끝
