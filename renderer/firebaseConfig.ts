@@ -69,14 +69,19 @@ export const createOneToOneChatRoom = (chatUid: string) => {
 //그룹채팅의 uid배열을 매개변수로 넣으면 그룹채팅의 title배열을 반환해준다.
 export const getGroupChatRoomsUidToTitleFunc = async (roomUid: string[]) => {
   //roomUid를 배열로 받아와 내부에서 순회시킨다.
+
   const getGroupChatRoomsUidToTitle = async () => {
+    let titleArr = [];
+
     let groupChatTitleArr = Promise.all(
       roomUid.map(async (i, index) => {
-        return (
+        let result = (
           await get(
             ref(realtimeDbService, `groupChatRooms/${i}/chatRoomsTitle`),
           )
         ).val();
+
+        return result;
       }),
     );
     return groupChatTitleArr;
@@ -179,17 +184,26 @@ export const exitUserCleanUpThisGroupChatList = async (
   uid: string,
   chatRoomUid: string,
 ) => {
-  const groupChatConnectedUserList = [
-    ...(await (await get(getGroupUserListPath(chatRoomUid))).val()),
-  ];
+  console.log('groupChatConnectedUserList');
+  let groupChatConnectedUserList: {
+    [key: string]: {
+      displayName: string;
+      isOn: boolean;
+      lastConnectTimeStamp: number;
+      uid: string;
+    };
+  } = (await get(getGroupUserListPath(chatRoomUid))).val();
+  let groupChatConnectedUserListValues = Object.values(
+    groupChatConnectedUserList,
+  );
   //리스트에서 특정 유저를 삭제
-  groupChatConnectedUserList.forEach((i, index) => {
+  groupChatConnectedUserListValues.forEach((i, index) => {
     if (i.uid === uid) {
-      groupChatConnectedUserList.splice(index, 1);
+      groupChatConnectedUserListValues.splice(index, 1);
     }
   });
   //삭제한 배열로 다시 set
-  set(getGroupUserListPath(chatRoomUid), groupChatConnectedUserList);
+  set(getGroupUserListPath(chatRoomUid), groupChatConnectedUserListValues);
 };
 
 //그룹 채팅 생성 시 방을 생성하고, 유저목록 set 후, 시작메시지를 작성해주는 함수
@@ -199,19 +213,35 @@ export const createGroupChat = (
   chatRoomTitle: string,
 ) => {
   let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
-  let groupChatMessagePath = ref(
-    realtimeDbService,
-    `groupChatRooms/${chatRoomUid}/chat`,
-  );
+
+  console.log(inviteUserList);
+  let 초대할유저접속상태객체 = {};
+  inviteUserList.forEach((i, index) => {
+    // 초대할유저접속상태객체[i.uid] = {  };
+    // 초대할유저접속상태객체[i.uid] = {};
+    // 초대할유저접속상태객체[i.uid] = {
+
+    // };
+    초대할유저접속상태객체[i.uid] = {
+      displayName: i.displayName,
+      isOn: false,
+      lastConnectTimeStamp: 0,
+      uid: i.uid,
+    };
+  });
+
+  console.log(초대할유저접속상태객체);
 
   set(groupChatPath, {
     chatRoomsTitle: chatRoomTitle,
-    connectedUser: inviteUserList,
+    //여기서 객체로 잘 넣어줘야한다.
+    connectedUser: 초대할유저접속상태객체,
   });
-  push(groupChatMessagePath, {
-    displayName: authService.currentUser.displayName,
-    uid: authService.currentUser.uid,
-    message: `그룹채팅이 시작되었습니다.`,
-    createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-  });
+  // 초기 메시지 삭제
+  // push(groupChatMessagePath, {
+  //   displayName: authService.currentUser.displayName,
+  //   uid: authService.currentUser.uid,
+  //   message: `그룹채팅이 시작되었습니다.`,
+  //   createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+  // });
 };
