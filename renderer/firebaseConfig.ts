@@ -2,8 +2,18 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, Timestamp } from 'firebase/firestore';
-import { get, getDatabase, push, ref, set, update } from 'firebase/database';
+import {
+  get,
+  getDatabase,
+  limitToLast,
+  push,
+  query,
+  ref,
+  set,
+  update,
+} from 'firebase/database';
 import { convertDate } from './utils/convertDate';
+import { ChatDataNew } from './pages/chatList';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
@@ -244,4 +254,33 @@ export const createGroupChat = (
   //   message: `그룹채팅이 시작되었습니다.`,
   //   createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
   // });
+};
+
+/**
+ * 채팅의 uid와 종류를 넘겨주면 메시지가 있을때 마지막 메시지를, 없으면 null을 반환합니다.
+ * @param chatRoomUid : 채팅방의 고유 uid
+ * @param chatRoomType : 채팅방이 그룹인지 일대일인지 구분할 값
+ * @returns Promise<ChatDataNew | null>
+ */
+export const getChatRoomLastMessage = async (
+  chatRoomUid: string,
+  chatRoomType: 'oneToOne' | 'group',
+): Promise<ChatDataNew | null> => {
+  let resultLastMessage = null;
+  //들어온값에 따라서 적절한 ref를 할당시킨다.
+  const chatRef =
+    chatRoomType === 'oneToOne'
+      ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
+      : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
+
+  //메시지를 가져온다. 해당 채팅방에 메시지가 없으면 null이 나온다.
+  const queryLastMessage = await (
+    await get(query(chatRef, limitToLast(1)))
+  ).val();
+
+  if (queryLastMessage) {
+    //메시지가 있으면 values로 풀어준다
+    resultLastMessage = Object.values(queryLastMessage)[0];
+  }
+  return resultLastMessage;
 };
