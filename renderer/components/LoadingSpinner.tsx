@@ -11,7 +11,7 @@ const Wrap = styled.div`
   align-items: center;
   z-index: 1;
   /* background: rgba(0, 0, 0, 0.3); */
-  background: #f1f1f1;
+  background: #fff;
 `;
 const P = styled.div`
   width: 100%;
