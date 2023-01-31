@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import NewGroupChatRoom from '../../components/newGroupChatRoom';
 
@@ -11,14 +10,12 @@ const ChatWrap = styled.div`
 `;
 
 const User = () => {
-  const router = useRouter();
-
   return (
     <>
       <ChatWrap>
         <NewGroupChatRoom
-          displayName={router.query.displayName as string}
-          chatRoomUid={router.query.uid as string}
+        // displayName={router.query.displayName as string}
+        // chatRoomUid={router.query.uid as string}
         />
       </ChatWrap>
     </>
