@@ -7,6 +7,9 @@ import { useRouter } from 'next/router';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PeopleSvg from '../components/svg/peopleSvg';
 import PersonSvg from '../components/svg/personSvg';
+import CreateGroupChatModal from '../components/createGroupChatModal';
+import AddSvg from '../components/svg/addSvg';
+import { convertDate } from '../utils/convertDate';
 
 export interface ChatDataNew {
   createdAt: string;
@@ -57,11 +60,17 @@ const Wrap = styled.div`
   overflow-y: auto;
 `;
 
+const ChatListHeader = styled.div`
+  width: 100%;
+  display: flex;
+  padding: 15px 10px 5px 10px;
+  align-items: center;
+`;
+
 export const PageTitle = styled.div`
   font-size: 20px;
   font-weight: bold;
   color: #444;
-  padding: 15px 10px 5px 10px;
 `;
 
 const ChatListWrap = styled.div`
@@ -143,6 +152,24 @@ const ZeroChatRoom = styled.div`
   color: #555;
 `;
 
+const CreateGroupChatButton = styled.div`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.main};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+  cursor: pointer;
+  & svg {
+    fill: white;
+  }
+  &:hover {
+    background: ${({ theme }) => theme.colors.mainHoverColor};
+  }
+`;
+
 //특정 유저의 채팅방 리스트를 반환해주는 함수.
 // const getUserChatRoomList = async (
 //   userUid: string,
@@ -221,6 +248,7 @@ function ChatList() {
   const [groupChatList2, setGroupChatList2] = useState<GroupChatList[]>([]);
   const [combineChatList, setCombineChatList] = useState([]);
   const [sortChatList, setSortChatList] = useState([]);
+  const [showAddGroupChat, setShowAddGroupChat] = useState(false);
   const router = useRouter();
 
   //이제 그룹 채팅 리스트에 각 마지막 메세지와, 안읽은 메세지 갯수를 만들어주자.
@@ -496,19 +524,29 @@ function ChatList() {
       <Head>
         <title>maumTalk</title>
       </Head>
-      <PageTitle>대화 목록</PageTitle>
+      <ChatListHeader>
+        <PageTitle>대화 목록</PageTitle>
+        <CreateGroupChatButton
+          className='addGroupChatButton'
+          onClick={() => setShowAddGroupChat((prev) => !prev)}
+        >
+          <AddSvg />
+        </CreateGroupChatButton>
+      </ChatListHeader>
       {isLoading ? (
         <ChatListWrap>
           {sortChatList.length === 0 ? (
             <ZeroChatRoom>대화가 존재하지않아요!</ZeroChatRoom>
           ) : (
             sortChatList.map((item, index) => {
+              console.log(item.createdSecondsAt);
+
               return item && item.chatRoomsTitle ? (
                 <ChatRoomList
                   key={item.chatRoomUid}
                   onClick={() => {
                     router.push(
-                      `/groupchat/${item.chatRoomsTitle}?chatRoomUid=${item.chatRoomUid}`,
+                      `/chatRooms/group?chatRoomsTitle=${item.chatRoomsTitle}&chatRoomUid=${item.chatRoomUid}`,
                     );
                   }}
                 >
@@ -518,7 +556,12 @@ function ChatList() {
                   <ChatRoomInfo>
                     <ChatRoomTitleAndTime>
                       <span className='title'>{item?.chatRoomsTitle}</span>
-                      <span className='timeStamp'>{item.createdSecondsAt}</span>
+                      {item.createdSecondsAt !== 0 &&
+                        item.createdSecondsAt !== undefined && (
+                          <span className='timeStamp'>
+                            {convertDate(item.createdSecondsAt)}
+                          </span>
+                        )}
                     </ChatRoomTitleAndTime>
                     <ChatRoomLastMessage>
                       <div>{item.lastMessage}</div>
@@ -536,7 +579,7 @@ function ChatList() {
                   key={item.chatRoomUid}
                   onClick={() => {
                     router.push(
-                      `/chat/${item?.opponentName}?chatRoomUid=${item?.chatRoomUid}&opponentUid=${item?.opponentUid}`,
+                      `/chatRooms/oneToOne?displayName=${item?.opponentName}&chatRoomUid=${item?.chatRoomUid}&opponentUid=${item?.opponentUid}`,
                     );
                   }}
                 >
@@ -546,7 +589,12 @@ function ChatList() {
                   <ChatRoomInfo>
                     <ChatRoomTitleAndTime>
                       <span className='title'> {item?.opponentName}</span>
-                      <span className='timeStamp'>{item.createdSecondsAt}</span>
+                      {item.createdSecondsAt !== 0 &&
+                        item.createdSecondsAt !== undefined && (
+                          <span className='timeStamp'>
+                            {convertDate(item.createdSecondsAt)}
+                          </span>
+                        )}
                     </ChatRoomTitleAndTime>
                     <ChatRoomLastMessage>
                       <div>{item.lastMessage}</div>
@@ -564,6 +612,9 @@ function ChatList() {
         </ChatListWrap>
       ) : (
         <LoadingSpinner />
+      )}
+      {showAddGroupChat && (
+        <CreateGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />
       )}
     </Wrap>
   );
