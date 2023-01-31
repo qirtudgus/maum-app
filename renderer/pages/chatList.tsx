@@ -95,14 +95,41 @@ const ChatListWrap = styled.div`
   }
 `;
 
+/**
+ * 채팅의 uid와 종류를 넘겨주면 메시지가 있을때 마지막 메시지를, 없으면 null을 반환합니다.
+ * @param chatRoomUid : 채팅방의 고유 uid
+ * @param chatRoomType : 채팅방이 그룹인지 일대일인지 구분할 값
+ * @returns Promise<ChatDataNew | null>
+ */
+const getChatRoomLastMessage = async (
+  chatRoomUid: string,
+  chatRoomType: 'oneToOne' | 'group',
+): Promise<ChatDataNew | null> => {
+  let resultLastMessage = null;
+  //들어온값에 따라서 적절한 ref를 할당시킨다.
+  const chatRef =
+    chatRoomType === 'oneToOne'
+      ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
+      : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
+
+  //메시지를 가져온다. 해당 채팅방에 메시지가 없으면 null이 나온다.
+  const queryLastMessage = await (
+    await get(query(chatRef, limitToLast(1)))
+  ).val();
+
+  if (queryLastMessage) {
+    //메시지가 있으면 values로 풀어준다
+    resultLastMessage = Object.values(queryLastMessage)[0];
+  }
+  return resultLastMessage;
+};
+
 function ChatList() {
   const [myChatList, setMyChatList] = useState<oneToOneChatList[]>([]);
   const [myChatLastMessage, setMyChatLastMessage] = useState<
     oneToOneChatList[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
-  // const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
-
   const [groupChatList, setGroupChatList] = useState<GroupChatList[]>([]);
   const [groupChatList2, setGroupChatList2] = useState<GroupChatList[]>([]);
 
@@ -114,36 +141,6 @@ function ChatList() {
       `/groupchat/${item.chatRoomsTitle}?chatRoomUid=${item.chatRoomUid}`,
     );
   };
-
-  // //유저의 그룹채팅 리스트를 가져와 state에 넣어주는 함수
-  // useEffect(() => {
-  //   //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
-  //   if (authService.currentUser) {
-  //     const myGroupChatListPath = ref(
-  //       realtimeDbService,
-  //       `userList/${authService.currentUser.uid}/myGroupChatList`,
-  //     );
-  //     console.log('그룹채팅 온밸류 호출');
-  //     onValue(myGroupChatListPath, async (snapshot) => {
-  //       //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
-  //       if (snapshot.val()) {
-  //         let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
-  //         let groupChatUidList = groupChatListSnapshot.groupChatUid;
-  //         getGroupChatRoomsUidToTitleFunc(groupChatUidList).then(
-  //           (groupChatTitleList) => {
-  //             // console.log(groupChatTitleList);
-  //             // let mergeGroupChatList = groupChatUidList.map((item, index) => {
-  //             //   return { chatUid: item, chatTitle: groupChatTitleList[index] };
-  //             // });
-  //             //   console.log('그룹채팅배열');
-  //             //   console.log(mergeGroupChatList);
-  //             // setGroupChatAllList(mergeGroupChatList);
-  //           },
-  //         );
-  //       }
-  //     });
-  //   }
-  // }, []);
 
   //이제 그룹 채팅 리스트에 각 마지막 메세지와, 안읽은 메세지 갯수를 만들어주자.
   //렌더링할 때 필요한것 그룹채팅uid, 채팅마지막메시지, 안읽음갯수, 그룹채팅title
@@ -173,7 +170,7 @@ function ChatList() {
           lastMessage: '',
           notReadCount: 0,
           createdSecondsAt: 0,
-          readUsers: {},
+          // readUsers: {},
         };
 
         const groupChatRoomTitle = ref(
@@ -193,22 +190,14 @@ function ChatList() {
           `groupChatRooms/${i}/chat`,
         );
 
-        const queryLastMessage = await get(
-          query(groupChatRoomPath, limitToLast(1)),
-        );
-        if (queryLastMessage.val()) {
-          const 마지막메시지: ChatDataNew[] = Object.values(
-            await queryLastMessage.val(),
-          );
-          // console.log(마지막메시지);
-          // console.log(마지막메시지[0].message);
-          // 결과객체 = {
-          //   ...결과객체,
-          //   lastMessage: 마지막메시지[0].message,
-          //   createdSecondsAt: 마지막메시지[0].createdSecondsAt,
-          // };
-          결과객체['lastMessage'] = 마지막메시지[0].message;
-          결과객체['createdSecondsAt'] = 마지막메시지[0].createdSecondsAt;
+        // const queryLastMessage = await get(
+        //   query(groupChatRoomPath, limitToLast(1)),
+        // );
+
+        const newLastMessage = await getChatRoomLastMessage(i, 'group');
+        if (newLastMessage) {
+          결과객체['lastMessage'] = newLastMessage.message;
+          결과객체['createdSecondsAt'] = newLastMessage.createdSecondsAt;
 
           //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
           const 메시지들: ChatDataNew[] = Object.values(
@@ -225,7 +214,6 @@ function ChatList() {
             let 안읽은메시지갯수 = 메시지길이 - 안읽은메시지인덱스;
             결과객체['notReadCount'] = 안읽은메시지갯수;
           }
-
           //안읽음 카운트 넣기 끝
         } else {
         }
@@ -286,23 +274,15 @@ function ChatList() {
           // result2['timeStamp'] = 0;
           // console.log(result2);
 
-          const queryLastMessage = await get(
-            query(oneToOneChatRoomPath, limitToLast(1)),
+          const newLastMessage = await getChatRoomLastMessage(
+            i.chatRoomUid.chatRoomUid,
+            'oneToOne',
           );
-          const lastMessageBefore = queryLastMessage.val();
-          if (lastMessageBefore) {
-            const lastMessageAfter: ChatDataNew[] =
-              Object.values(lastMessageBefore);
-            const lastMessage = lastMessageAfter[0].message;
-            // resultMessage = { ...i, lastMessage };
-
-            console.log('lastMessageAfter');
-            console.log(lastMessageAfter);
-
+          if (newLastMessage) {
             //시간 잘들어간다 굿.
-            const createdSecondsAt = lastMessageAfter[0].createdSecondsAt;
+            const createdSecondsAt = newLastMessage.createdSecondsAt;
             result2['createdSecondsAt'] = createdSecondsAt;
-            result2['lastMessage'] = lastMessage;
+            result2['lastMessage'] = newLastMessage.message;
             console.log('시간 넣은것');
             console.log(result2);
             //   {
@@ -364,23 +344,16 @@ function ChatList() {
         console.log(typeof snapshot.val());
         if (typeof snapshot.val() === 'object') {
           //마지막 메시지넣기 시작
-          const queryLastMessage = await get(query(refs, limitToLast(1)));
-          const lastMessageBefore = queryLastMessage.val();
-          // console.log('ChatdataNew');
-          // console.log(lastMessageBefore);
-          // console.log(lastMessageBefore.createdAt);
-          //메시지가 있을때 작동
-          if (lastMessageBefore) {
-            const lastMessageAfter: ChatDataNew[] =
-              Object.values(lastMessageBefore);
 
-            console.log('메시지 벨류');
-            console.log(lastMessageAfter);
-
-            const lastMessage = lastMessageAfter[0].message;
-            const createdSecondsAt = lastMessageAfter[0].createdSecondsAt;
+          const newLastMessage = await getChatRoomLastMessage(
+            chatUid,
+            'oneToOne',
+          );
+          if (newLastMessage) {
+            const lastMessage = newLastMessage.message;
+            const createdSecondsAt = newLastMessage.createdSecondsAt;
             const isLastMessageLead =
-              lastMessageAfter[0].readUsers[authService.currentUser?.uid];
+              newLastMessage.readUsers[authService.currentUser?.uid];
 
             //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
 
@@ -434,19 +407,12 @@ function ChatList() {
         console.log(typeof snapshot.val());
         if (typeof snapshot.val() === 'object') {
           //마지막 메시지넣기 시작
-          const queryLastMessage = await get(query(refs, limitToLast(1)));
-          const lastMessageBefore: ChatDataNew = queryLastMessage.val();
-          //메시지가 있을때 작동
-          if (lastMessageBefore) {
-            const lastMessageAfter = Object.values(lastMessageBefore);
-
-            // console.log('메시지 벨류');
-            // console.log(lastMessageAfter);
-
-            const lastMessage = lastMessageAfter[0].message;
-            const createdSecondsAt = lastMessageAfter[0].createdSecondsAt;
+          const newLastMessage = await getChatRoomLastMessage(chatUid, 'group');
+          if (newLastMessage) {
+            console.log('라스트메시지 함수로 만든 것');
+            console.log(newLastMessage);
             const isLastMessageLead =
-              lastMessageAfter[0].readUsers[authService.currentUser?.uid];
+              newLastMessage.readUsers[authService.currentUser?.uid];
 
             //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
 
@@ -455,8 +421,8 @@ function ChatList() {
                 //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
                 let updateChatList = prev.map((i, index) => {
                   if (i.chatRoomUid === chatUid) {
-                    i.lastMessage = lastMessage;
-                    i.createdSecondsAt = createdSecondsAt;
+                    i.lastMessage = newLastMessage.message;
+                    i.createdSecondsAt = newLastMessage.createdSecondsAt;
                     i.notReadCount++;
                     //   if(i[0].readUsers[authService.currentUser?.uid]){}
                   }
