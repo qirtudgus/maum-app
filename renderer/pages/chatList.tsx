@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import styled from 'styled-components';
-import { authService, realtimeDbService } from '../firebaseConfig';
+import {
+  authService,
+  getGroupChatRoomsUidToTitleFunc,
+  realtimeDbService,
+} from '../firebaseConfig';
 import {
   get,
   query,
@@ -69,14 +73,53 @@ export interface ChatDataNew {
   };
   uid: string;
 }
+interface groupChatList {
+  chatUid: string;
+  chatTitle: string;
+}
+interface GroupChatListSnapshot {
+  groupChatUid: string[];
+}
 
 function ChatList() {
   const [myChatList, setMyChatList] = useState([]);
-
   const [myChatLastMessage, setMyChatLastMessage] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [start, setStart] = useState(false);
+  const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
   const router = useRouter();
+  const enterGroupChatRoom = (item: groupChatList) => {
+    router.push(`/groupchat/${item.chatTitle}?chatRoomUid=${item.chatUid}`);
+  };
+
+  useEffect(() => {
+    //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
+    if (authService.currentUser) {
+      const myGroupChatListPath = ref(
+        realtimeDbService,
+        `userList/${authService.currentUser.uid}/myGroupChatList`,
+      );
+      console.log('그룹채팅 온밸류 호출');
+      onValue(myGroupChatListPath, async (snapshot) => {
+        //그룹생성이 아예 처음이라면 해당 값이 null이다. 이에 대한 예외 처리를 했다.
+        if (snapshot.val()) {
+          let groupChatListSnapshot: GroupChatListSnapshot = snapshot.val();
+          let groupChatUidList = groupChatListSnapshot.groupChatUid;
+          getGroupChatRoomsUidToTitleFunc(groupChatUidList).then(
+            (groupChatTitleList) => {
+              console.log(groupChatTitleList);
+              let mergeGroupChatList = groupChatUidList.map((item, index) => {
+                return { chatUid: item, chatTitle: groupChatTitleList[index] };
+              });
+              //   console.log('그룹채팅배열');
+              //   console.log(mergeGroupChatList);
+              setGroupChatAllList(mergeGroupChatList);
+            },
+          );
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const getMyChatListRef = ref(
       realtimeDbService,
@@ -102,7 +145,6 @@ function ChatList() {
             realtimeDbService,
             `oneToOneChatRooms/${i.chatRoomUid.chatRoomUid}/chat`,
           );
-
           const queryLastMessage = await get(
             query(oneToOneChatRoomPath, limitToLast(1)),
           );
@@ -110,28 +152,6 @@ function ChatList() {
           const lastMessageAfter = Object.values(lastMessageBefore);
           const lastMessage = lastMessageAfter[0].message;
           const resultInsertMessage: ResultMessage = { ...i, lastMessage };
-          //resultInsertMessage에 마지막 메시지까지는 넣었다. 이제 채팅창별로 false값을 구해와서 count해주자.
-          // //안읽은 메시지 구하기 시작 준비물 : 채팅uid = i.chatRoomUid.chatRoomUid
-          // let notReadCount = 0;
-          // const refs = ref(
-          //   realtimeDbService,
-          //   `oneToOneChatRooms/${i.chatRoomUid.chatRoomUid}/chat`,
-          // );
-          // const gets = (await get(refs)).val();
-          // const values = Object.values(gets);
-          // // console.log(values);
-          // values.forEach((i, index) => {
-          //   if (i.readUsers) {
-          //     // console.log(i.readUsers[authService.currentUser?.uid]);
-          //     i.readUsers[authService.currentUser?.uid] ? null : notReadCount++;
-          //   }
-          // });
-          // // console.log('안읽은 갯수');
-          // // console.log(notReadCount);
-          // //리절트에 안읽은 메시지 갯수 추가하기
-          // const notReadCountMessage = { ...resultInsertMessage, notReadCount };
-          // //안읽은 메시지 구하기 끝
-
           return resultInsertMessage;
         },
       );
@@ -151,55 +171,10 @@ function ChatList() {
       } else {
         setIsLoading(true);
       }
-
-      //여기서 각 채팅방 리스너 달아주기
-      // const getMyChatListRef = (chatRoomUid: string) => {
-      //   let 각메시지리스너 = ref(
-      //     realtimeDbService,
-      //     `oneToOneChatRooms/${chatRoomUid}/chat`,
-      //   );
-      //   onChildAdded(각메시지리스너, (data) => {
-      //     console.log('내 채팅방에서 메시지가 추가되었다.');
-      //     let 변경 = data.val();
-      //     //최근에 수신된 메시지
-      //     console.log(변경.message);
-      //     console.log(변경);
-
-      //     //
-      //     setMyChatList((prev) => {
-      //       // let a = [...myChatList[0], (myChatList[0].lastMessage = 'zz')];
-      //       // console.log('변경 후 배열');
-      //       // console.log(a);
-
-      //       let a = prev.map((i, index) => {
-      //         console.log('돌고있는 맵 요소');
-      //         console.log(i);
-      //         if (
-      //           i.chatRoomUid.chatRoomUid === res[index].chatRoomUid.chatRoomUid
-      //         ) {
-      //           i.lastMessage = 변경.message;
-      //           i.notReadCount++;
-      //         }
-      //         return i;
-      //       });
-      //       console.log(a);
-      //       return a;
-      //     });
-      //     // off()
-      //   });
-
-      //   return;
-      // };
-      // console.log('각채팅방결과');
-      // console.log(res);
-
-      // res.forEach((i) => {
-      //   getMyChatListRef(i.chatRoomUid.chatRoomUid);
-      //   console.log(i.chatRoomUid.chatRoomUid);
-      // });
     });
   }, []);
 
+  //마지막메시지를 불러온다.
   useEffect(() => {
     const 관찰할채팅방 = (chatUid: string) => {
       const refs = ref(
@@ -258,27 +233,6 @@ function ChatList() {
   //chat을 뒤집어서 최신순으로 정렬한 뒤에 readUsers.uid가 currentUesr.uid와 같은 값을 체크하면서
   //카운트에 ++해주고, 콜백함수를 중지시키고 카운트를 set
   useEffect(() => {
-    // //안읽은 메시지 구하기 시작 준비물 : 채팅uid = i.chatRoomUid.chatRoomUid
-    // let notReadCount = 0;
-    // const refs = ref(
-    //   realtimeDbService,
-    //   `oneToOneChatRooms/${i.chatRoomUid.chatRoomUid}/chat`,
-    // );
-    // const gets = (await get(refs)).val();
-    // const values = Object.values(gets);
-    // // console.log(values);
-    // values.forEach((i, index) => {
-    //   if (i.readUsers) {
-    //     // console.log(i.readUsers[authService.currentUser?.uid]);
-    //     i.readUsers[authService.currentUser?.uid] ? null : notReadCount++;
-    //   }
-    // });
-    // // console.log('안읽은 갯수');
-    // // console.log(notReadCount);
-    // //리절트에 안읽은 메시지 갯수 추가하기
-    // const notReadCountMessage = { ...resultInsertMessage, notReadCount };
-    // //안읽은 메시지 구하기 끝
-
     const 안읽은메시지관찰할채팅방옵저버 = (chatUid: string) => {
       console.log(`${chatUid}방 옵저버 실행`);
       const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
@@ -420,6 +374,19 @@ function ChatList() {
         ) : (
           <LoadingSpinner />
         )}
+        {groupChatAllList.map((item, index) => {
+          return item.chatTitle !== null ? (
+            <li
+              key={index}
+              onDoubleClick={() => {
+                // setCurrentGroupChat(item);
+                enterGroupChatRoom(item);
+              }}
+            >
+              {item.chatTitle}
+            </li>
+          ) : null;
+        })}
       </>
     </Wrap>
   );
