@@ -48,7 +48,7 @@ const Footer = styled.div`
   background-color: #fff;
 `;
 
-interface ConnectedUser {
+export interface ConnectedUser {
   displayName: string;
   isOn: boolean;
   lastConnectTimeStamp: number;
@@ -57,15 +57,11 @@ interface ConnectedUser {
 
 //읽음표시해야하는 유저의 uid를 받아와야할듯하다.
 const SendMessageInput = ({
-  displayName,
   chatRoomUid,
-  opponentUid,
   isOneToOneOrGroup,
   connectedUsers,
 }: {
-  displayName: string;
   chatRoomUid: string;
-  opponentUid?: string;
   isOneToOneOrGroup: 'oneToOne' | 'group';
   connectedUsers: ConnectedUser[];
 }) => {
@@ -94,6 +90,11 @@ const SendMessageInput = ({
         ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
         : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
 
+    // const 라스트메시지 = ref(
+    //   realtimeDbService,
+    //   `oneToOneChatRooms/${chatRoomUid}`,
+    // );
+
     await push(채팅저장경로분기, {
       displayName: authService.currentUser.displayName,
       uid: authService.currentUser.uid,
@@ -105,12 +106,14 @@ const SendMessageInput = ({
       // [authService.currentUser.uid]: true,
       // [opponentUid]: false,
     });
+
     //마지막메시지 따로 저장해주기 이는 채팅목록의 메시지에 뜬다.
-    const 라스트메시지 = ref(
-      realtimeDbService,
-      `oneToOneChatRooms/${chatRoomUid}`,
-    );
-    update(라스트메시지, { lastMessage: messageInputRef.current.value });
+    //로직변경으로 인해 update해줄 필요 없어졌다.
+    // const 라스트메시지분기 =
+    // isOneToOneOrGroup === 'oneToOne'
+    //   ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}`)
+    //   : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
+    // update(라스트메시지분기, { lastMessage: messageInputRef.current.value });
 
     //메시지 작성 후 비워주기
     messageInputRef.current.focus();
