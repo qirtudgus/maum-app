@@ -303,7 +303,6 @@ function ChatList() {
       realtimeDbService,
       `oneToOneChatRooms/${authService.currentUser?.uid}`,
     );
-
     const 채팅리스트가져오기2 = async () => {
       let hasUserGroupChatRooms = await (await get(getMyChatListRef)).val();
       //아직 채팅방이 0개일 때 예외처리 이러면 res에 undifined가 할당된다.
@@ -519,6 +518,28 @@ function ChatList() {
       .sort((a, b) => b.createdSecondsAt - a.createdSecondsAt);
     setSortChatList([...sortChatList2]);
   }, [myChatList, groupChatList, combineChatList]);
+
+  //새로운 채팅이 생기면 갱신해줘야하는데..........
+
+  // //실시간으로 그룹 및 일대일채팅 생성 시 추가
+  // useEffect(() => {
+  //   const 그룹채팅ref = ref(
+  //     realtimeDbService,
+  //     `userList/${authService.currentUser?.uid}/myGroupChatList/groupChatUid`,
+  //   );
+
+  //   onValue(그룹채팅ref, async (snapshot) => {
+  //     const 그룹채팅목록 = await snapshot.val();
+  //     if (그룹채팅목록) {
+  //       console.log(그룹채팅목록);
+  //       setIsNewGroupChatRoom((prev) => !prev);
+  //     }
+  //   });
+
+  //   return () => {
+  //     off(그룹채팅ref);
+  //   };
+  // }, []);
 
   return (
     <Wrap>
