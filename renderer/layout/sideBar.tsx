@@ -112,14 +112,6 @@ const PeopleButton = styled.div`
 
 const SideBar = () => {
   const router = useRouter();
-  const [currentPage, setCurrentPage] = useState('/userList');
-
-  useEffect(() => {
-    console.log('현재주소');
-    console.log(router.pathname);
-    setCurrentPage(router.pathname);
-  }, [router.pathname]);
-
   const uid = authService.currentUser?.uid;
   const userSignOut = async () => {
     try {
@@ -142,7 +134,9 @@ const SideBar = () => {
         <HeaderButtonWrap>
           <PeopleButton
             title='유저 목록'
-            className={currentPage === '/userList' && 'active'}
+            //중첩 경로에 대한 액티브 해결책
+            //https://stackoverflow.com/questions/53262263/target-active-link-when-the-route-is-active-in-next-js
+            className={router.pathname.startsWith('/userList') && 'active'}
             onClick={() => {
               router.push('/userList');
             }}
@@ -151,7 +145,7 @@ const SideBar = () => {
           </PeopleButton>
           <SettingButton
             title='채팅 목록'
-            className={currentPage === '/chatRooms' && 'active'}
+            className={router.pathname.startsWith('/chatRooms') && 'active'}
             onClick={() => {
               router.push('/chatRooms');
             }}
@@ -160,7 +154,7 @@ const SideBar = () => {
           </SettingButton>
           <SettingButton
             title='설정'
-            className={currentPage === '/settings' && 'active'}
+            className={router.pathname.startsWith('/settings') && 'active'}
             onClick={() => {
               router.push('/settings');
             }}
