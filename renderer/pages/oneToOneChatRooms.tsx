@@ -14,21 +14,11 @@ import PeopleSvg from '../components/svg/peopleSvg';
 import AddSvg from '../components/svg/addSvg';
 import { convertDate } from '../utils/convertDate';
 import {
+  ChatDataNew,
   createOneToOneChatRooms,
   getMyChatRoomsRef,
   getNotReadMessageCount,
 } from '../utils/makeChatRooms';
-
-export interface ChatDataNew {
-  createdAt: string;
-  createdSecondsAt: number;
-  displayName: string;
-  message: string;
-  readUsers: {
-    [key: string]: boolean;
-  };
-  uid: string;
-}
 
 interface ResultMessage {
   chatRoomUid: {
@@ -68,7 +58,7 @@ export const Wrap = styled.div`
   overflow-y: auto;
 `;
 
-const ChatListHeader = styled.div`
+export const ChatListHeader = styled.div`
   width: 100%;
   display: flex;
 
@@ -79,13 +69,6 @@ export const PageTitle = styled.div`
   font-size: 20px;
   font-weight: bold;
   color: #444;
-`;
-
-const ChatListWrap = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 `;
 
 export const ChatRoomList = styled.li`
@@ -103,12 +86,12 @@ export const ChatRoomInfo = styled.div`
   width: 100%;
 `;
 
-const ChatRoomLastMessage = styled.div`
+export const ChatRoomLastMessage = styled.div`
   display: flex;
   justify-content: space-between;
   color: #444;
 `;
-const ChatRoomNotReadCount = styled.div`
+export const ChatRoomNotReadCount = styled.div`
   padding: 3px 5px;
   text-align: center;
   color: #fff;
@@ -117,7 +100,7 @@ const ChatRoomNotReadCount = styled.div`
   border-radius: 10px;
   background: #d61818;
 `;
-const ChatRoomTitleAndTime = styled.div`
+export const ChatRoomTitleAndTime = styled.div`
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
@@ -149,7 +132,7 @@ export const ChatIcon = styled.div`
   }
 `;
 
-const ZeroChatRoom = styled.div`
+export const ZeroChatRoom = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
@@ -161,7 +144,7 @@ const ZeroChatRoom = styled.div`
   color: #555;
 `;
 
-const CreateGroupChatButton = styled.div`
+export const CreateGroupChatButton = styled.div`
   width: 20px;
   height: 20px;
   border-radius: 50%;
