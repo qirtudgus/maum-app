@@ -29,13 +29,14 @@ const MessageComponent = styled.li`
 
 const ReadCount = styled.div`
   font-size: 14px;
-  padding: 0 20px;
+  padding: 0px 5px;
   font-weight: bold;
   color: ${({ theme }) => theme.colors.main};
 `;
 
 const TimeStamp = styled.span`
   font-size: 12px;
+  padding: 0px 5px;
   color: #494949;
 `;
 
