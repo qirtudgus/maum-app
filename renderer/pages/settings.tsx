@@ -4,10 +4,12 @@ import styled from 'styled-components';
 const Wrap = styled.div`
   width: 100%;
   height: 100%;
+  padding: 20px 20px 20px 40px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: scroll;
 `;
 
 const Title = styled.div`
@@ -28,6 +30,7 @@ const SubTitle = styled.div`
 const CheckWrap = styled.div`
   width: 500px;
   height: 300px;
+
   background: #eee;
 
   margin-bottom: 50px;
@@ -39,7 +42,6 @@ const CheckWrap = styled.div`
 
 const CheckZone = styled.div`
   cursor: pointer;
-
   width: 200px;
   height: 250px;
   background: #fff;
