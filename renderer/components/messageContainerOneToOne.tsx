@@ -71,7 +71,7 @@ const MessageWrap = styled.div<MessageSendData>`
   }
 
   & .messageWrite {
-    margin-bottom: 5px;
+    margin-bottom: 9px;
   }
 `;
 
@@ -117,7 +117,9 @@ const MessageContainerOneToOne = ({
               'myMessage'
             }
           >
-            <span className='messageWrite'>{i.displayName}</span>
+            {i.displayName !== authService.currentUser.displayName && (
+              <span className='messageWrite'>{i.displayName}</span>
+            )}
             <span>{i.readUsers.length}</span>
             <OneToOneMessage message={i} />
             {/* <Message>{i.message}</Message> */}

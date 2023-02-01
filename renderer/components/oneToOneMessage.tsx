@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { ChatDataNew } from '../pages/chatList';
+import { convertDate } from '../utils/convertDate';
 
 const MessageWrap = styled.div`
   min-height: 30px;
@@ -33,6 +34,11 @@ const ReadCount = styled.div`
   color: ${({ theme }) => theme.colors.main};
 `;
 
+const TimeStamp = styled.span`
+  font-size: 12px;
+  color: #494949;
+`;
+
 const OneToOneMessage = ({ message }: { message: ChatDataNew }) => {
   const [readCount, setReadCount] = useState(null);
 
@@ -55,6 +61,7 @@ const OneToOneMessage = ({ message }: { message: ChatDataNew }) => {
 
   return (
     <MessageWrap>
+      <TimeStamp>{convertDate(message.createdSecondsAt)}</TimeStamp>
       {readCount !== 0 && <ReadCount>{readCount}</ReadCount>}
       <MessageComponent>{message.message}</MessageComponent>
     </MessageWrap>
