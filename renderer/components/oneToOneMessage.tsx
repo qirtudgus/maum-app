@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ChatDataNew } from '../pages/chatRooms';
 import { convertDate } from '../utils/convertDate';
+import { ChatDataNew } from '../utils/makeChatRooms';
 
 const MessageWrap = styled.div`
   min-height: 30px;
