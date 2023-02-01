@@ -221,7 +221,6 @@ function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
   const [myChatList, setMyChatList] = useState<oneToOneChatList[]>([]);
   const [groupChatList, setGroupChatList] = useState<GroupChatList[]>([]);
-  const [groupChatList2, setGroupChatList2] = useState<GroupChatList[]>([]);
   const [combineChatList, setCombineChatList] = useState([]);
   const [sortChatList, setSortChatList] = useState([]);
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
@@ -292,7 +291,7 @@ function ChatList() {
       //res 결과값 undifined 예외처리
       if (res) {
         setGroupChatList(res);
-        setGroupChatList2(res);
+        // setGroupChatList2(res);
         setCombineChatList((prev) => [...prev, ...res]);
       }
     });
@@ -438,7 +437,7 @@ function ChatList() {
         채팅갯수옵저버끄기(i.chatRoomUid);
       });
     };
-  }, [isLoading]);
+  }, [myChatList]);
 
   //그룹챗 마지막메세지 옵저버 설정
   useEffect(() => {
@@ -509,7 +508,7 @@ function ChatList() {
         그룹채팅갯수옵저버끄기(i.chatRoomUid);
       });
     };
-  }, [isLoading]);
+  }, [groupChatList]);
 
   //통합배열을 정렬시켜주어 정렬된 채팅방을 렌더링시켜준다.
   useEffect(() => {
