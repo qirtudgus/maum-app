@@ -180,7 +180,7 @@ const Login = () => {
           //로그인 시점에 onDisconnect를 설정하여 앱을 바로 종료하여도 종료 업데이트가 되도록 오류 수정
           onDisconnect(connectedRef).update({ isOn: false });
 
-          router.replace('/main');
+          router.replace('/userList');
         }
       },
     );
@@ -214,7 +214,7 @@ const Login = () => {
           <RegisterLink>
             아직 회원이 아니시라면?...
             <span>
-              <Link href={'/__register'}> 회원가입</Link>
+              <Link href={'/register'}> 회원가입</Link>
             </span>
           </RegisterLink>
           <div>

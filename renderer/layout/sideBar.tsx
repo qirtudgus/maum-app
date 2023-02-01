@@ -1,10 +1,8 @@
 import { signOut } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
 import router from 'next/router';
-import { useState } from 'react';
 import styled from 'styled-components';
 import ChatListSvg from '../components/svg/chatListSvg';
-import HomeSvg from '../components/svg/homeSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
 import PeopleSvg from '../components/svg/peopleSvg';
 import SettingSvg from '../components/svg/settingSvg';
@@ -114,14 +112,6 @@ const SideBar = () => {
     <SideBarContainer>
       <SideBarWrap>
         <HeaderButtonWrap>
-          {/* <SettingButton
-            title='홈으로'
-            onClick={() => {
-              router.push('/main');
-            }}
-          >
-            <HomeSvg />
-          </SettingButton> */}
           <PeopleButton
             title='유저 목록'
             onClick={() => {
