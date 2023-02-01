@@ -1,5 +1,5 @@
 import { ref, set, get, update } from '@firebase/database';
-import { off, onValue } from 'firebase/database';
+import { off, onValue, push } from 'firebase/database';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,8 @@ import {
   ChatRoomInfo,
 } from './chatRooms';
 import PersonSvg from '../components/svg/personSvg';
+import { convertDate } from '../utils/convertDate';
+import { Timestamp } from 'firebase/firestore';
 
 const ChatRoomInfoWithUserList = styled(ChatRoomList)`
   align-items: center;
@@ -123,7 +125,7 @@ const UserList = () => {
       //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
       console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
       router.push(
-        `/chatRooms/oneToOne?displayName=${i.displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}&opponentUid=${opponentUid}`,
+        `/oneToOneChatRooms/oneToOne?displayName=${i.displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`,
       );
     } else {
       //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
@@ -159,8 +161,45 @@ const UserList = () => {
           lastConnectTimeStamp: 0,
         },
       });
+
+      // const 내채팅방리스트에추가 = ref(
+      //   realtimeDbService,
+      //   `userList/${authService.currentUser?.uid}/myOneToOneChatList/${chatRoomRandomString}/`,
+      // );
+      // const 상대채팅방리스트에추가 = ref(
+      //   realtimeDbService,
+      //   `userList/${opponentUid}/myOneToOneChatList/${chatRoomRandomString}/`,
+      // );
+
+      // update(내채팅방리스트에추가, {
+      //   displayName: opponentDisplayName,
+      //   opponentUid: opponentUid,
+      //   chatRoomUid: chatRoomRandomString,
+      // });
+      // update(상대채팅방리스트에추가, {
+      //   displayName: currentUserDisplayName,
+      //   opponentUid: currentUserUid,
+      //   chatRoomUid: chatRoomRandomString,
+      // });
+
+      // 초기 메시지 삽입
+      push(
+        ref(
+          realtimeDbService,
+          `oneToOneChatRooms/${chatRoomRandomString}/chat`,
+        ),
+        {
+          displayName: authService.currentUser.displayName,
+          uid: authService.currentUser.uid,
+          message: `일대일 대화방이 생성되었습니다.`,
+          createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+          createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
+          readUsers: { [currentUserUid]: true, [opponentUid]: false },
+        },
+      );
+
       router.push(
-        `/chatRooms/oneToOne?displayName=${i.displayName}&chatRoomUid=${chatRoomRandomString}&opponentUid=${opponentUid}`,
+        `/oneToOneChatRooms/oneToOne?displayName=${i.displayName}&chatRoomUid=${chatRoomRandomString}`,
       );
     }
   };
