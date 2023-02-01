@@ -152,7 +152,7 @@ const Settings = () => {
 
   return (
     <Wrap>
-      <Title>일대일 채팅 레이아웃 선택</Title>
+      <Title>일대일 대화 레이아웃 선택</Title>
       <CheckWrap>
         <CheckZone
           onClick={() => {
@@ -201,7 +201,7 @@ const Settings = () => {
           </BarWrap>
         </CheckZone>
       </CheckWrap>
-      <Title>그룹 채팅 레이아웃 선택</Title>
+      <Title>그룹 대화 레이아웃 선택</Title>
       <CheckWrap>
         <CheckZone
           onClick={() => {
