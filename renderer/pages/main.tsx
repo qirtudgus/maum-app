@@ -47,6 +47,18 @@ const OffUserLight = styled(OnUserLight)`
   background: #8b8b8b;
 `;
 
+const ZeroChatUser = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+`;
+
 const UserList = () => {
   const userListRef = ref(realtimeDbService, 'userList');
   const router = useRouter();
@@ -195,6 +207,9 @@ const UserList = () => {
           )
         );
       })}
+      {userList.length === 1 && (
+        <ZeroChatUser>우리말고 가입한 사람이 없네요...</ZeroChatUser>
+      )}
     </Wrap>
   );
 };
