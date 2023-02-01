@@ -21,7 +21,7 @@ export default function Layout({ children }) {
   const router = useRouter();
   const checkNotLayoutPathname = (): boolean => {
     let isLayoutRendering = false;
-    const notLayout = ['/home', '/register'];
+    const notLayout = ['/login', '/register'];
     if (notLayout.includes(router.pathname)) {
       isLayoutRendering = true;
     }
@@ -30,7 +30,7 @@ export default function Layout({ children }) {
 
   useEffect(() => {
     //로그인정보가 없을경우 로그인창으로 이동
-    if (authService.currentUser === null) router.push('/home');
+    if (authService.currentUser === null) router.push('/login');
   }, []);
 
   return (

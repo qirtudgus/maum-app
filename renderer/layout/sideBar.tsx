@@ -120,7 +120,7 @@ const SideBar = () => {
           const myConnectionsRef = ref(realtimeDbService, `userList/${uid}`);
           //유저구조중에 isOn값만 false로 만들기, 아래처럼 update 함수를 호출 // 정상작동
           update(myConnectionsRef, { isOn: false });
-          router.push('/home');
+          router.push('/login');
         }
       });
     } catch (error) {
