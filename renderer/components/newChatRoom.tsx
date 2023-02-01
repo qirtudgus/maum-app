@@ -67,61 +67,114 @@ const ChatRoom = () => {
   }, []);
 
   //메시지 처음 세팅
+  // useEffect(() => {
+  //   레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
+  //   const 채팅목록세팅 = async () => {
+  //     let messageObj = await (await get(getChatListPath)).val();
+  //     //채팅이 있을경우
+  //     if (messageObj) {
+  //       console.log('채팅목록');
+  //       console.log(messageObj);
+  //       const messageArr = Object.values(messageObj);
+  //       //요소를 반복하며 ?..
+  //       for (let property in messageObj) {
+  //         let 내가읽었는지결과 =
+  //           messageObj[property].readUsers[authService.currentUser.uid];
+  //         if (내가읽었는지결과 === false) {
+  //           const 업데이트할메시지 = ref(
+  //             realtimeDbService,
+  //             `oneToOneChatRooms/${chatRoomUid2}/chat/${property}/readUsers`,
+  //           );
+  //           update(업데이트할메시지, { [authService.currentUser.uid]: true });
+  //         }
+  //       }
+  //       return messageArr;
+  //     }
+  //     //채팅이 없을경우 null 반환
+  //     else {
+  //       return null;
+  //     }
+  //   };
+
+  //   채팅목록세팅().then((res) => {
+  //     console.log('res');
+  //     console.log(res);
+  //     if (res) {
+  //       setChatList(res);
+  //       setIsChatLoading(true);
+  //     } else {
+  //       setIsChatLoading(true);
+  //     }
+  //   });
+  // }, []);
+
+  // //마지막 메세지 붙혀오기
+  // useEffect(() => {
+  //   onValue(getChatListPath, async (snapshot) => {
+  //     if (snapshot.val()) {
+  //       let b = await getChatRoomLastMessage(chatRoomUid2, 'oneToOne');
+  //       console.log('마지막메시지');
+  //       console.log(b);
+
+  //       setChatList((prev) => [...prev, b]);
+  //     }
+  //   });
+
+  //   return () => {
+  //     off(getChatListPath);
+  //   };
+  // }, [chatRoomUid2]);
+
+  //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
-    const 채팅목록세팅 = async () => {
-      let messageObj = await (await get(getChatListPath)).val();
-      //채팅이 있을경우
-      if (messageObj) {
-        console.log('채팅목록');
-        console.log(messageObj);
-        const messageArr = Object.values(messageObj);
+    onValue(getChatListPath, async (snapshot) => {
+      console.log(`채팅이 갱신되었습니다`);
+      // console.log(snapshot.val());
+      //최신메시지 하나만 가져와서 이어붙이면 좋을거같은데...
+      //메시지가 0개일때 예외처리
+      if (snapshot.val()) {
+        let messageList: ChatDataNew[] = Object.values(await snapshot.val());
+        // let lastMessage = await getChatRoomLastMessage(chatRoomUid2, 'oneToOne');
+        // console.log('messageList');
+        // console.log(messageList);
+        // console.log('마지막메시지');
+        // console.log(lastMessage);
+
+        let messageObj = snapshot.val();
         //요소를 반복하며 ?..
         for (let property in messageObj) {
+          // console.log(`${property}: ${messageObj[property]}`);
+          // console.log(messageObj[property]);
+          // console.log(messageObj[property].readUsers);
           let 내가읽었는지결과 =
             messageObj[property].readUsers[authService.currentUser.uid];
+          //값이 true면 패스, false면 true로 업데이트하는 함수 호출
+          // console.log(내가읽었는지결과);
+
           if (내가읽었는지결과 === false) {
             const 업데이트할메시지 = ref(
               realtimeDbService,
               `oneToOneChatRooms/${chatRoomUid2}/chat/${property}/readUsers`,
             );
+
             update(업데이트할메시지, { [authService.currentUser.uid]: true });
           }
         }
-        return messageArr;
-      }
-      //채팅이 없을경우 null 반환
-      else {
-        return null;
-      }
-    };
 
-    채팅목록세팅().then((res) => {
-      console.log('res');
-      console.log(res);
-      if (res) {
-        setChatList(res);
+        console.log('로딩완료');
         setIsChatLoading(true);
+        setChatList(messageList);
       } else {
         setIsChatLoading(true);
       }
     });
-  }, []);
-
-  //마지막 메세지 붙혀오기
-  useEffect(() => {
-    onValue(getChatListPath, async (snapshot) => {
-      if (snapshot.val()) {
-        let b = await getChatRoomLastMessage(chatRoomUid2, 'oneToOne');
-        console.log('마지막메시지');
-        console.log(b);
-
-        setChatList((prev) => [...prev, b]);
-      }
-    });
 
     return () => {
+      //언마운트시 해당 경로에 대한 관찰자를 off해주면 왔다갔다해도 onValue가 한번씩만 호출됨 (onValue가 쌓이는걸 방지)
       off(getChatListPath);
+      setIsChatLoading(false);
+      console.log('채팅방을 나갔습니다.');
     };
   }, [chatRoomUid2]);
 
@@ -172,6 +225,11 @@ const ChatRoom = () => {
         chatRoomUid={chatRoomUid2}
         isOneToOneOrGroup='oneToOne'
       />
+      {/* {ConnectedUsers.map((i) => {
+        // console.log(i);
+        // 채팅방에 접속한 유저들만 렌더링 시켜줄 수 있다.
+        return <div key={i.uid}>{i.isOn ? i.displayName : null}</div>;
+      })} */}
     </>
   );
 };

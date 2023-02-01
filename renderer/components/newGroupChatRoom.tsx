@@ -18,6 +18,7 @@ import {
   exitUserCleanUpMyGroupChatList,
   exitUserCleanUpThisGroupChatList,
   realtimeDbService,
+  getChatRoomLastMessage,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
@@ -107,6 +108,66 @@ const NewGroupChatRoom = () => {
     };
   }, [chatRoomUid]);
 
+  // //마지막 메세지 붙혀오기
+  // useEffect(() => {
+  //   onValue(groupChatListPath, async (snapshot) => {
+  //     if (snapshot.val()) {
+  //       let b = await getChatRoomLastMessage(chatRoomUid, 'group');
+  //       console.log('마지막메시지');
+  //       console.log(b);
+  //       setChatList((prev) => [...prev, b]);
+  //     }
+  //   });
+
+  //   return () => {
+  //     off(groupChatListPath);
+  //   };
+  // }, [chatRoomUid]);
+
+  // //메시지 처음 세팅
+  // useEffect(() => {
+  //   레이아웃설정(localStorage.getItem('groupChatLayout'));
+  //   const 채팅목록세팅 = async () => {
+  //     let messageObj = await (await get(groupChatListPath)).val();
+  //     //채팅이 있을경우
+  //     if (messageObj) {
+  //       console.log('채팅목록');
+  //       console.log(messageObj);
+  //       const messageArr = Object.values(messageObj);
+  //       //요소를 반복하며 ?..
+  //       //읽음 처리해주기
+  //       for (let property in messageObj) {
+  //         let 내가읽었는지결과 =
+  //           messageObj[property].readUsers[authService.currentUser?.uid];
+  //         if (내가읽었는지결과 === false) {
+  //           const 업데이트할메시지 = ref(
+  //             realtimeDbService,
+  //             `groupChatRooms/${chatRoomUid}/chat/${property}/readUsers`,
+  //           );
+
+  //           update(업데이트할메시지, { [authService.currentUser?.uid]: true });
+  //         }
+  //       }
+  //       return messageArr;
+  //     }
+  //     //채팅이 없을경우 null 반환
+  //     else {
+  //       return null;
+  //     }
+  //   };
+
+  //   채팅목록세팅().then((res) => {
+  //     console.log('res');
+  //     console.log(res);
+  //     if (res) {
+  //       setChatList(res);
+  //       setIsChatLoading(true);
+  //     } else {
+  //       setIsChatLoading(true);
+  //     }
+  //   });
+  // }, [chatRoomUid]);
+
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     레이아웃설정(localStorage.getItem('groupChatLayout'));
@@ -154,7 +215,7 @@ const NewGroupChatRoom = () => {
         if (res.val()) {
           const 메시지배열: ChatDataNew[] = Object.values(res.val());
           console.log(메시지배열);
-          setChatList(메시지배열);
+          setChatList([...메시지배열]);
         }
       });
     });
