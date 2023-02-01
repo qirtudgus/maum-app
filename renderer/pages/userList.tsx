@@ -148,7 +148,22 @@ const UserList = () => {
     <Wrap>
       <PageTitle>대화 상대</PageTitle>
       {userList.map((item, index) => {
-        return (
+        return item.uid === authService.currentUser?.uid ? (
+          <ChatRoomInfoWithUserList
+            key={item.uid}
+            onClick={() => {
+              enterOneToOneChatRooms(item);
+            }}
+          >
+            <ChatIcon>
+              <PersonSvg />
+              {item.isOn ? <OnUserLight /> : <OffUserLight />}
+            </ChatIcon>
+            <ChatRoomInfo>
+              <span className='displayName'>나 : {item?.displayName}</span>
+            </ChatRoomInfo>
+          </ChatRoomInfoWithUserList>
+        ) : (
           <ChatRoomInfoWithUserList
             key={item.uid}
             onClick={() => {
