@@ -332,7 +332,7 @@ const NewGroupChatRoom = () => {
       </button>
       */}
 
-      {router.pathname.startsWith('/chatRooms/group') && (
+      {router.pathname.startsWith('/groupChatRooms') && (
         <LeftButtonGroup>
           <LeftButton
             title='채팅방 나가기'
@@ -352,7 +352,7 @@ const NewGroupChatRoom = () => {
                     }
                   });
 
-                  await router.push('/chatRooms');
+                  await router.back();
                   console.log('onUserObj');
                   console.log(onUserObj);
 
