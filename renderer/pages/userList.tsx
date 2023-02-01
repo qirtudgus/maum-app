@@ -1,5 +1,5 @@
 import { ref, set, get, update } from '@firebase/database';
-import { off, onValue } from 'firebase/database';
+import { onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
@@ -46,6 +46,18 @@ const OffUserLight = styled(OnUserLight)`
   background: #8b8b8b;
 `;
 
+const ZeroChatUser = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+`;
+
 const UserList = () => {
   const userListRef = ref(realtimeDbService, 'userList');
   const router = useRouter();
@@ -76,10 +88,6 @@ const UserList = () => {
         setUserList(userListObj);
       }
     });
-
-    return () => {
-      off(userListRef);
-    };
   }, []);
 
   const enterOneToOneChatRooms = async (i: {
@@ -156,7 +164,6 @@ const UserList = () => {
   return (
     <Wrap>
       <PageTitle>유저 목록</PageTitle>
-
       {userList.map((item, index) => {
         return (
           item.uid === authService.currentUser?.uid && (
@@ -199,6 +206,9 @@ const UserList = () => {
           )
         );
       })}
+      {userList.length === 1 && (
+        <ZeroChatUser>우리말고 가입한 사람이 없네요...</ZeroChatUser>
+      )}
     </Wrap>
   );
 };
