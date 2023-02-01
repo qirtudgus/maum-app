@@ -12,16 +12,17 @@ import {
   createOneToOneChatRoomsRefForOpponent,
   realtimeDbService,
 } from '../firebaseConfig';
-import {
-  ChatIcon,
-  PageTitle,
-  Wrap,
-  ChatRoomList,
-  ChatRoomInfo,
-} from './chatRooms';
+
 import PersonSvg from '../components/svg/personSvg';
 import { convertDate } from '../utils/convertDate';
 import { Timestamp } from 'firebase/firestore';
+import {
+  ChatRoomList,
+  Wrap,
+  PageTitle,
+  ChatIcon,
+  ChatRoomInfo,
+} from './oneToOneChatRooms';
 
 const ChatRoomInfoWithUserList = styled(ChatRoomList)`
   align-items: center;
