@@ -1,5 +1,5 @@
 import { ref, set, get, update } from '@firebase/database';
-import { onValue } from 'firebase/database';
+import { off, onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
@@ -12,7 +12,6 @@ import {
   createOneToOneChatRoomsRefForOpponent,
   realtimeDbService,
 } from '../firebaseConfig';
-import { convertDate } from '../utils/convertDate';
 import {
   ChatIcon,
   PageTitle,
@@ -77,6 +76,10 @@ const UserList = () => {
         setUserList(userListObj);
       }
     });
+
+    return () => {
+      off(userListRef);
+    };
   }, []);
 
   const enterOneToOneChatRooms = async (i: {
@@ -153,6 +156,7 @@ const UserList = () => {
   return (
     <Wrap>
       <PageTitle>유저 목록</PageTitle>
+
       {userList.map((item, index) => {
         return (
           item.uid === authService.currentUser?.uid && (
