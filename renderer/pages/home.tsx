@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import BasicInput from '../components/BasicInput';
 import { SolidButton } from '../components/ButtonGroup';
@@ -76,7 +76,7 @@ const Login = () => {
     }
   };
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     //로컬스토리지 mail 체크 후 input에 저장
     //저장은 해놨고, 방금 가입을 했으면 방금 가입한 메일을 인풋에
     //저장만 해놨으면 인풋에
