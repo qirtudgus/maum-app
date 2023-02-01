@@ -95,8 +95,7 @@ const ChatRoomHeaderTitle = ({
         title='닫기'
         className='closeBtn'
         onClick={() => {
-          router.push('/main');
-          // ChatStatesetState(false);
+          router.push('/userList');
         }}
       >
         <CloseSvg />
