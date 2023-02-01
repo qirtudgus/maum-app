@@ -218,7 +218,7 @@ const CreateGroupChatModal = ({
     setShowAddGroupChat(false);
     //바로 입장?
     router.push(
-      `/chatRooms/group?chatRoomsTitle=${chatRoomsTitleInputRef.current.value}&chatRoomUid=${chatRoomUid}`,
+      `/groupChatRooms/group?chatRoomsTitle=${chatRoomsTitleInputRef.current.value}&chatRoomUid=${chatRoomUid}`,
     );
   };
 
