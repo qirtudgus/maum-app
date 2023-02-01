@@ -26,7 +26,7 @@ import MessageContainerGroup from './messageContainerGroup';
 import MessageContainerOneToOne from './messageContainerOneToOne';
 import SendMessageInput from './SendMessageInput';
 
-const ChatRoom = () => {
+const OneToOneChatRoom = () => {
   const router = useRouter();
   const displayName2 = router.query.displayName as string;
   const chatRoomUid2 = router.query.chatRoomUid as string;
@@ -265,4 +265,4 @@ const ChatRoom = () => {
   );
 };
 
-export default React.memo(ChatRoom);
+export default React.memo(OneToOneChatRoom);

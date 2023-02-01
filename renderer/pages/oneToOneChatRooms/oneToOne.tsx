@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import ChatRoom from '../../components/newChatRoom';
+import OneToOneChatRoom from '../../components/oneToOneChatRoom';
 
 const ChatWrap = styled.div`
   width: 100%;
@@ -13,7 +13,7 @@ const User = () => {
   return (
     <>
       <ChatWrap>
-        <ChatRoom />
+        <OneToOneChatRoom />
       </ChatWrap>
     </>
   );
