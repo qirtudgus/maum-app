@@ -273,9 +273,6 @@ function ChatList() {
           );
           let 메시지길이 = 메시지들.length;
           let 안읽은메시지인덱스 = 메시지들.findIndex((i) => {
-            // console.log('안읽은메시디지인덱스');
-            // console.log(i);
-
             return i?.readUsers[authService.currentUser?.uid] === false;
           });
           if (안읽은메시지인덱스 !== -1) {
@@ -332,6 +329,9 @@ function ChatList() {
             'oneToOne',
           );
           if (newLastMessage) {
+            console.log('newLastMessage');
+            console.log(newLastMessage);
+
             //시간 잘들어간다 굿.
             const createdSecondsAt = newLastMessage.createdSecondsAt;
             result2['createdSecondsAt'] = createdSecondsAt;
@@ -340,15 +340,13 @@ function ChatList() {
             let 메시지들: ChatDataNew[] = Object.values(
               (await get(oneToOneChatRoomPath)).val(),
             );
+
             let 메시지길이 = 메시지들.length;
             let 안읽은메시지인덱스 = 메시지들.findIndex((i) => {
-              return i?.readUsers[authService.currentUser?.uid] === false;
+              return i.readUsers[authService.currentUser?.uid] === false;
             });
-            if (안읽은메시지인덱스 === -1) {
-              // resultMessage['notReadCount'] = 0;
-            } else {
+            if (안읽은메시지인덱스 !== -1) {
               let 안읽은메시지갯수 = 메시지길이 - 안읽은메시지인덱스;
-              // resultMessage['notReadCount'] = 안읽은메시지갯수;
               result2['notReadCount'] = 안읽은메시지갯수;
             }
             //안읽은 갯수 넣기 끝
@@ -363,8 +361,8 @@ function ChatList() {
     채팅리스트가져오기2().then((res) => {
       //결과가 언디파인드일때의 분기처리
       if (res) {
-        console.log('일대일 결과');
-        console.log(res);
+        // console.log('일대일 결과');
+        // console.log(res);
         setMyChatList(res);
         setCombineChatList((prev) => [...prev.flat(), ...res]);
         setIsLoading(true);
@@ -382,7 +380,6 @@ function ChatList() {
       onValue(refs, async (snapshot) => {
         //라스트인덱스오브를 통해 뒤에서부터 true를 찾은 뒤 그 인덱스 = 마지막으로 읽은 메시지 index
         //스냅샷의 사이즈를 가져와서, 스냅샷 - index = 안읽은 메시지 갯수
-        console.log(typeof snapshot.val());
         const newLastMessage = await getChatRoomLastMessage(
           chatUid,
           'oneToOne',
@@ -393,13 +390,28 @@ function ChatList() {
             newLastMessage.readUsers[authService.currentUser?.uid];
           //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
           if (!isLastMessageLead) {
+            //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
+            const 메시지들: ChatDataNew[] = Object.values(
+              (await get(refs)).val(),
+            );
+            let 안읽은메시지갯수 = 0;
+            let 메시지길이 = 메시지들.length;
+            let 안읽은메시지인덱스 = 메시지들.findIndex((i) => {
+              console.log('안읽은메시디지인덱스');
+              console.log(i);
+              return i?.readUsers[authService.currentUser?.uid] === false;
+            });
+            if (안읽은메시지인덱스 !== -1) {
+              안읽은메시지갯수 = 메시지길이 - 안읽은메시지인덱스;
+            }
             setCombineChatList((prev) => {
               //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
               let updateChatList = prev.map((i, index) => {
                 if (i.chatRoomUid === chatUid) {
                   i.lastMessage = newLastMessage.message;
                   i.createdSecondsAt = newLastMessage.createdSecondsAt;
-                  i.notReadCount++;
+                  i.notReadCount = 안읽은메시지갯수;
+                  // i.notReadCount++;
                   //   if(i[0].readUsers[authService.currentUser?.uid]){}
                 }
                 return i;
@@ -410,13 +422,11 @@ function ChatList() {
         }
       });
     };
-
     const 채팅갯수옵저버끄기 = (chatUid: string) => {
       const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
       console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
       off(refs);
     };
-
     if (myChatList) {
       myChatList.forEach((i, index) => {
         채팅갯수옵저버(i.chatRoomUid);
@@ -428,15 +438,7 @@ function ChatList() {
         채팅갯수옵저버끄기(i.chatRoomUid);
       });
     };
-  }, [myChatList]);
-
-  //통합배열을 정렬시켜주어 정렬된 채팅방을 렌더링시켜준다.
-  useEffect(() => {
-    let sortChatList = combineChatList.sort((a, b) => {
-      return b.createdSecondsAt - a.createdSecondsAt;
-    });
-    setSortChatList([...sortChatList]);
-  }, [myChatList, groupChatList, combineChatList]);
+  }, [isLoading]);
 
   //그룹챗 마지막메세지 옵저버 설정
   useEffect(() => {
@@ -451,20 +453,34 @@ function ChatList() {
           //마지막 메시지넣기 시작
           const newLastMessage = await getChatRoomLastMessage(chatUid, 'group');
           if (newLastMessage) {
-            console.log('라스트메시지 함수로 만든 것');
-            console.log(newLastMessage);
             const isLastMessageLead =
               newLastMessage.readUsers[authService.currentUser?.uid];
-
             //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
             if (!isLastMessageLead) {
+              let 안읽은메시지갯수 = 0;
+              //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
+              const 메시지들: ChatDataNew[] = Object.values(
+                (await get(refs)).val(),
+              );
+              let 메시지길이 = 메시지들.length;
+              let 안읽은메시지인덱스 = 메시지들.findIndex((i) => {
+                // console.log('안읽은메시디지인덱스');
+                // console.log(i);
+                return i?.readUsers[authService.currentUser?.uid] === false;
+              });
+              if (안읽은메시지인덱스 !== -1) {
+                안읽은메시지갯수 = 메시지길이 - 안읽은메시지인덱스;
+              }
+              //안읽음 카운트 넣기 끝
+
               setCombineChatList((prev) => {
                 //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
                 let updateChatList = prev.map((i, index) => {
                   if (i.chatRoomUid === chatUid) {
                     i.lastMessage = newLastMessage.message;
                     i.createdSecondsAt = newLastMessage.createdSecondsAt;
-                    i.notReadCount++;
+                    i.notReadCount = 안읽은메시지갯수;
+                    // i.notReadCount++;
                   }
                   return i;
                 });
@@ -493,7 +509,17 @@ function ChatList() {
         그룹채팅갯수옵저버끄기(i.chatRoomUid);
       });
     };
-  }, [groupChatList2]);
+  }, [isLoading]);
+
+  //통합배열을 정렬시켜주어 정렬된 채팅방을 렌더링시켜준다.
+  useEffect(() => {
+    let sortChatList2 = combineChatList
+      .filter((i) => {
+        return i.createdSecondsAt !== undefined && i;
+      })
+      .sort((a, b) => b.createdSecondsAt - a.createdSecondsAt);
+    setSortChatList([...sortChatList2]);
+  }, [myChatList, groupChatList, combineChatList]);
 
   return (
     <Wrap>
@@ -515,74 +541,74 @@ function ChatList() {
             <ZeroChatRoom>대화가 존재하지않아요!</ZeroChatRoom>
           ) : (
             sortChatList.map((item, index) => {
-              console.log(item.createdSecondsAt);
+              return item && item.chatRoomsTitle
+                ? item.lastMessage !== '' && (
+                    <ChatRoomList
+                      key={item.chatRoomUid}
+                      onClick={() => {
+                        router.push(
+                          `/chatRooms/group?chatRoomsTitle=${item.chatRoomsTitle}&chatRoomUid=${item.chatRoomUid}`,
+                        );
+                      }}
+                    >
+                      <ChatIcon>
+                        <PeopleSvg />
+                      </ChatIcon>
+                      <ChatRoomInfo>
+                        <ChatRoomTitleAndTime>
+                          <span className='title'>{item?.chatRoomsTitle}</span>
+                          {item.createdSecondsAt !== 0 &&
+                            item.createdSecondsAt !== undefined && (
+                              <span className='timeStamp'>
+                                {convertDate(item.createdSecondsAt)}
+                              </span>
+                            )}
+                        </ChatRoomTitleAndTime>
+                        <ChatRoomLastMessage>
+                          <div>{item.lastMessage}</div>
 
-              return item && item.chatRoomsTitle ? (
-                <ChatRoomList
-                  key={item.chatRoomUid}
-                  onClick={() => {
-                    router.push(
-                      `/chatRooms/group?chatRoomsTitle=${item.chatRoomsTitle}&chatRoomUid=${item.chatRoomUid}`,
-                    );
-                  }}
-                >
-                  <ChatIcon>
-                    <PeopleSvg />
-                  </ChatIcon>
-                  <ChatRoomInfo>
-                    <ChatRoomTitleAndTime>
-                      <span className='title'>{item?.chatRoomsTitle}</span>
-                      {item.createdSecondsAt !== 0 &&
-                        item.createdSecondsAt !== undefined && (
-                          <span className='timeStamp'>
-                            {convertDate(item.createdSecondsAt)}
-                          </span>
-                        )}
-                    </ChatRoomTitleAndTime>
-                    <ChatRoomLastMessage>
-                      <div>{item.lastMessage}</div>
-
-                      {item.notReadCount !== 0 && (
-                        <ChatRoomNotReadCount>
-                          {item.notReadCount}
-                        </ChatRoomNotReadCount>
-                      )}
-                    </ChatRoomLastMessage>
-                  </ChatRoomInfo>
-                </ChatRoomList>
-              ) : (
-                <ChatRoomList
-                  key={item.chatRoomUid}
-                  onClick={() => {
-                    router.push(
-                      `/chatRooms/oneToOne?displayName=${item?.opponentName}&chatRoomUid=${item?.chatRoomUid}&opponentUid=${item?.opponentUid}`,
-                    );
-                  }}
-                >
-                  <ChatIcon>
-                    <PersonSvg />
-                  </ChatIcon>
-                  <ChatRoomInfo>
-                    <ChatRoomTitleAndTime>
-                      <span className='title'> {item?.opponentName}</span>
-                      {item.createdSecondsAt !== 0 &&
-                        item.createdSecondsAt !== undefined && (
-                          <span className='timeStamp'>
-                            {convertDate(item.createdSecondsAt)}
-                          </span>
-                        )}
-                    </ChatRoomTitleAndTime>
-                    <ChatRoomLastMessage>
-                      <div>{item.lastMessage}</div>
-                      {item.notReadCount !== 0 && (
-                        <ChatRoomNotReadCount>
-                          {item.notReadCount}
-                        </ChatRoomNotReadCount>
-                      )}
-                    </ChatRoomLastMessage>
-                  </ChatRoomInfo>
-                </ChatRoomList>
-              );
+                          {item.notReadCount !== 0 && (
+                            <ChatRoomNotReadCount>
+                              {item.notReadCount}
+                            </ChatRoomNotReadCount>
+                          )}
+                        </ChatRoomLastMessage>
+                      </ChatRoomInfo>
+                    </ChatRoomList>
+                  )
+                : item.lastMessage !== '' && (
+                    <ChatRoomList
+                      key={item.chatRoomUid}
+                      onClick={() => {
+                        router.push(
+                          `/chatRooms/oneToOne?displayName=${item?.opponentName}&chatRoomUid=${item?.chatRoomUid}&opponentUid=${item?.opponentUid}`,
+                        );
+                      }}
+                    >
+                      <ChatIcon>
+                        <PersonSvg />
+                      </ChatIcon>
+                      <ChatRoomInfo>
+                        <ChatRoomTitleAndTime>
+                          <span className='title'> {item?.opponentName}</span>
+                          {item.createdSecondsAt !== 0 &&
+                            item.createdSecondsAt !== undefined && (
+                              <span className='timeStamp'>
+                                {convertDate(item.createdSecondsAt)}
+                              </span>
+                            )}
+                        </ChatRoomTitleAndTime>
+                        <ChatRoomLastMessage>
+                          <div>{item.lastMessage}</div>
+                          {item.notReadCount !== 0 && (
+                            <ChatRoomNotReadCount>
+                              {item.notReadCount}
+                            </ChatRoomNotReadCount>
+                          )}
+                        </ChatRoomLastMessage>
+                      </ChatRoomInfo>
+                    </ChatRoomList>
+                  );
             })
           )}
         </ChatListWrap>
