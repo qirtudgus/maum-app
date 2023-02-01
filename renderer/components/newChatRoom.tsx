@@ -159,11 +159,11 @@ const ChatRoom = () => {
         chatRoomUid={chatRoomUid2}
         isOneToOneOrGroup='oneToOne'
       />
-      {ConnectedUsers.map((i) => {
+      {/* {ConnectedUsers.map((i) => {
         // console.log(i);
         // 채팅방에 접속한 유저들만 렌더링 시켜줄 수 있다.
         return <div key={i.uid}>{i.isOn ? i.displayName : null}</div>;
-      })}
+      })} */}
     </>
   );
 };
