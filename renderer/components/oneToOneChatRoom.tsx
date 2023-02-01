@@ -239,7 +239,7 @@ const OneToOneChatRoom = () => {
   return (
     <>
       <Head>
-        <title>maumTalk - {displayName2}</title>
+        <title>똑똑 - {displayName2}</title>
       </Head>
       <ChatRoomHeader title={displayName2} />
       {isChatLoading ? (

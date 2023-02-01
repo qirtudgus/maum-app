@@ -1,6 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
-import Head from 'next/head';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
 import {
   authService,
   realtimeDbService,
@@ -265,9 +263,6 @@ function ChatList() {
 
   return (
     <Wrap>
-      <Head>
-        <title>maumTalk</title>
-      </Head>
       <ChatListHeader>
         <PageTitle>대화 목록</PageTitle>
         <CreateGroupChatButton

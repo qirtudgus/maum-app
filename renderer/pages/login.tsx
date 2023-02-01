@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import BasicInput from '../components/BasicInput';
 import { SolidButton } from '../components/ButtonGroup';
 import { authService, realtimeDbService } from '../firebaseConfig';
-import logo from '../image/maumTalkLogo.webp';
+import logo from '../image/ddokddok.webp';
 
 const Box = styled.div`
   width: 100%;
@@ -45,9 +45,12 @@ text-align: left;
 }
 `;
 
-const Logo = styled.div`
+export const Logo = styled.div`
   margin-bottom: 15px;
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   & p {
     margin-top: 5px;
     text-align: center;
@@ -189,13 +192,13 @@ const Login = () => {
   return (
     <>
       <Head>
-        <title>maumTalk - 로그인</title>
+        <title>똑똑 - 로그인</title>
       </Head>
       <Box>
         <Wrap>
           <Logo>
             <Image src={logo} />
-            <p>마음톡에 오신걸 환영해요!</p>
+            <p>똑똑에 오신걸 환영해요!</p>
           </Logo>
           <BasicInput
             ref={emailRef}

@@ -254,7 +254,7 @@ const GroupChatRoom = () => {
   return (
     <>
       <Head>
-        <title>maumTalk - {displayName}</title>
+        <title>똑똑 - {displayName}</title>
       </Head>
       <ChatRoomHeader title={displayName} userList={ConnectedUsers} />
       {isChatLoading ? (

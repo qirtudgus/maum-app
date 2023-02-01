@@ -13,7 +13,8 @@ import styled from 'styled-components';
 import BasicInput from '../components/BasicInput';
 import { SolidButton } from '../components/ButtonGroup';
 import { authService, realtimeDbService } from '../firebaseConfig';
-import logo from '../image/maumTalkLogo.webp';
+import logo from '../image/ddokddok.webp';
+import { Logo } from './login';
 
 const Box = styled.div`
   width: 100%;
@@ -36,23 +37,6 @@ const Wrap = styled.div`
   border-radius: 10px;
   box-shadow: ${({ theme }) => theme.boxShadow};
   background: #fff;
-`;
-
-const Logo = styled.div`
-  margin-bottom: 15px;
-
-  & p {
-    margin-top: 5px;
-    text-align: center;
-    font-size: 14px;
-    color: #555;
-  }
-  & a {
-    font-size: 14px;
-    margin-top: 5px;
-    display: block;
-    text-align: center;
-  }
 `;
 
 const Register = () => {
@@ -166,13 +150,13 @@ const Register = () => {
   return (
     <>
       <Head>
-        <title>maumTalk - 회원가입</title>
+        <title>똑똑 - 회원가입</title>
       </Head>
       <Box>
         <Wrap>
           <Logo>
             <Image src={logo} />
-            <p>마음톡에 오신걸 환영해요!</p>
+            {/* <p>똑똑에 오신걸 환영해요!</p> */}
             <Link href={'/home'}>로그인 창으로</Link>
           </Logo>
           <BasicInput
