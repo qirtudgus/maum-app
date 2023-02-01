@@ -18,10 +18,9 @@ import {
   exitUserCleanUpMyGroupChatList,
   exitUserCleanUpThisGroupChatList,
   realtimeDbService,
-  getChatRoomLastMessage,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
-import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
+import ChatRoomHeader from './ChatRoomHeader';
 import MessageContainerGroup from './messageContainerGroup';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SendMessageInput, {
@@ -29,11 +28,11 @@ import SendMessageInput, {
 } from '../components/SendMessageInput';
 import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
-import { ChatDataNew } from '../pages/chatRooms';
 import styled from 'styled-components';
 import LogoutSvg from './svg/logoutSvg';
 import PersonAddSvg from './svg/personAddSvg';
 import InviteGroupChatModal from './inviteGroupChatModal';
+import { ChatDataNew } from '../utils/makeChatRooms';
 
 const LeftButtonGroup = styled.div`
   height: 30px;
@@ -259,7 +258,7 @@ const NewGroupChatRoom = () => {
       <Head>
         <title>maumTalk - {displayName}</title>
       </Head>
-      <ChatRoomHeaderTitle title={displayName} userList={ConnectedUsers} />
+      <ChatRoomHeader title={displayName} userList={ConnectedUsers} />
       {isChatLoading ? (
         레이아웃 === 'group' ? (
           <MessageContainerGroup chatList={chatList} />

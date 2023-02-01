@@ -19,8 +19,8 @@ import {
   getOneToOneChatListPath,
   realtimeDbService,
 } from '../firebaseConfig';
-import { ChatDataNew } from '../pages/chatRooms';
-import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
+import { ChatDataNew } from '../utils/makeChatRooms';
+import ChatRoomHeader from './ChatRoomHeader';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerGroup from './messageContainerGroup';
 import MessageContainerOneToOne from './messageContainerOneToOne';
@@ -134,7 +134,6 @@ const ChatRoom = () => {
       async (snap) => {
         console.log('채팅갱신');
         console.log(snap.val().chat);
-
         let messageList: ChatDataNew[] = Object.values(await snap.val().chat);
         let messageObj = snap.val().chat;
         //요소를 반복하며 ?..
@@ -242,7 +241,7 @@ const ChatRoom = () => {
       <Head>
         <title>maumTalk - {displayName2}</title>
       </Head>
-      <ChatRoomHeaderTitle title={displayName2} />
+      <ChatRoomHeader title={displayName2} />
       {isChatLoading ? (
         레이아웃 === 'oneToOne' ? (
           <MessageContainerOneToOne chatList={chatList} />
