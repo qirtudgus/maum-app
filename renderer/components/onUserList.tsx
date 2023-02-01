@@ -169,6 +169,7 @@ const OnUserList = () => {
         [currentUserUid]: {
           uid: currentUserUid,
           displayName: currentUserDisplayName,
+          isOn: true,
           lastConnectTimeStamp: 0,
         },
       });
@@ -176,6 +177,7 @@ const OnUserList = () => {
         [opponentUid]: {
           uid: opponentUid,
           displayName: opponentDisplayName,
+          isOn: false,
           lastConnectTimeStamp: 0,
         },
       });
