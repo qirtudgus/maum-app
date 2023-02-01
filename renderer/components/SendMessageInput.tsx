@@ -90,11 +90,6 @@ const SendMessageInput = ({
         ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
         : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
 
-    // const 라스트메시지 = ref(
-    //   realtimeDbService,
-    //   `oneToOneChatRooms/${chatRoomUid}`,
-    // );
-
     await push(채팅저장경로분기, {
       displayName: authService.currentUser.displayName,
       uid: authService.currentUser.uid,
@@ -102,18 +97,7 @@ const SendMessageInput = ({
       createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
       createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
       readUsers: onUserObj,
-      //이러면 일대일만 되고 그룹채팅에서 사용할 수가 없다...
-      // [authService.currentUser.uid]: true,
-      // [opponentUid]: false,
     });
-
-    //마지막메시지 따로 저장해주기 이는 채팅목록의 메시지에 뜬다.
-    //로직변경으로 인해 update해줄 필요 없어졌다.
-    // const 라스트메시지분기 =
-    // isOneToOneOrGroup === 'oneToOne'
-    //   ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}`)
-    //   : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
-    // update(라스트메시지분기, { lastMessage: messageInputRef.current.value });
 
     //메시지 작성 후 비워주기
     messageInputRef.current.focus();
