@@ -1,10 +1,10 @@
 import { signOut } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
-import router, { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import ChatListSvg from '../components/svg/chatListSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
+import OneToOneSvg from '../components/svg/oneToOneSvg';
 import PeopleSvg from '../components/svg/peopleSvg';
 import SettingSvg from '../components/svg/settingSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
@@ -144,10 +144,23 @@ const SideBar = () => {
             <PeopleSvg />
           </PeopleButton>
           <SettingButton
-            title='채팅 목록'
-            className={router.pathname.startsWith('/chatRooms') && 'active'}
+            title='일대일 대화 목록'
+            className={
+              router.pathname.startsWith('/oneToOneChatRooms') && 'active'
+            }
             onClick={() => {
-              router.push('/chatRooms');
+              router.push('/oneToOneChatRooms');
+            }}
+          >
+            <OneToOneSvg />
+          </SettingButton>{' '}
+          <SettingButton
+            title='단체 대화 목록'
+            className={
+              router.pathname.startsWith('/groupChatRooms') && 'active'
+            }
+            onClick={() => {
+              router.push('/groupChatRooms');
             }}
           >
             <ChatListSvg />
