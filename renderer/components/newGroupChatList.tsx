@@ -78,11 +78,11 @@ const GroupChatList = () => {
     chatUid: string;
     chatTitle: string;
   }
-  const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
-
   interface GroupChatListSnapshot {
     groupChatUid: string[];
   }
+
+  const [groupChatAllList, setGroupChatAllList] = useState<groupChatList[]>([]);
 
   useEffect(() => {
     //그룹채팅 리스트의 uid와 그룹채팅방의 uid가 같은 title을 가져와서 list에 넣어주자
@@ -120,7 +120,7 @@ const GroupChatList = () => {
   const router = useRouter();
 
   const enterGroupChatRoom = (item: groupChatList) => {
-    router.push(`/groupchat/${item.chatTitle}?uid=${item.chatUid}`);
+    router.push(`/groupchat/${item.chatTitle}?chatRoomUid=${item.chatUid}`);
   };
 
   return (
@@ -132,7 +132,7 @@ const GroupChatList = () => {
         </span>
       </GroupListTitle>
       <GroupListWrap>
-        {groupChatAllList.map((item, index) => {
+        {/* {groupChatAllList.map((item, index) => {
           return (
             <GroupListLi
               key={index}
@@ -149,6 +149,25 @@ const GroupChatList = () => {
               {item.chatTitle}
             </GroupListLi>
           );
+        })} */}
+
+        {groupChatAllList.map((item, index) => {
+          return item.chatTitle !== null ? (
+            <GroupListLi
+              key={index}
+              id={
+                item.chatUid === currentGroupChat.chatUid
+                  ? 'groupChatActive'
+                  : ''
+              }
+              onDoubleClick={() => {
+                setCurrentGroupChat(item);
+                enterGroupChatRoom(item);
+              }}
+            >
+              {item.chatTitle}
+            </GroupListLi>
+          ) : null;
         })}
       </GroupListWrap>
       {showAddGroupChat && (
