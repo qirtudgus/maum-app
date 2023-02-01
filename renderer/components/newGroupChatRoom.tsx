@@ -32,6 +32,7 @@ import { ChatDataNew } from '../pages/chatRooms';
 import styled from 'styled-components';
 import LogoutSvg from './svg/logoutSvg';
 import PersonAddSvg from './svg/personAddSvg';
+import InviteGroupChatModal from './inviteGroupChatModal';
 
 const LeftButtonGroup = styled.div`
   height: 30px;
@@ -238,13 +239,7 @@ const NewGroupChatRoom = () => {
       >
         초대하기
       </button>
-      {showAddGroupChat && (
-        <InviteGroupChatModal
-          chatRoomUid={chatRoomUid}
-          connectedUserList={connectedUserList}
-          setShowAddGroupChat={setShowAddGroupChat}
-        />
-      )} */}
+      */}
 
       {router.pathname.startsWith('/chatRooms/group') && (
         <LeftButtonGroup>
@@ -308,6 +303,14 @@ const NewGroupChatRoom = () => {
             <PersonAddSvg />
           </LeftButton>
         </LeftButtonGroup>
+      )}
+
+      {showAddGroupChat && (
+        <InviteGroupChatModal
+          chatRoomUid={chatRoomUid}
+          connectedUserList={connectedUserList}
+          setShowAddGroupChat={setShowAddGroupChat}
+        />
       )}
     </>
   );
