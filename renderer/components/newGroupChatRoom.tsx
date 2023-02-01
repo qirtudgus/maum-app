@@ -28,8 +28,31 @@ import SendMessageInput, {
 } from '../components/SendMessageInput';
 import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
-import InviteGroupChatModal from './inviteGroupChatModal';
 import { ChatDataNew } from '../pages/chatRooms';
+import styled from 'styled-components';
+import LogoutSvg from './svg/logoutSvg';
+import PersonAddSvg from './svg/personAddSvg';
+
+const LeftButtonGroup = styled.div`
+  height: 30px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 5px;
+  left: 10px;
+`;
+const LeftButton = styled.div`
+  cursor: pointer;
+  margin-right: 10px;
+  & svg {
+    fill: #000;
+    width: 20px;
+    height: 20px;
+  }
+  &:hover svg {
+    fill: ${({ theme }) => theme.colors.main};
+  }
+`;
 
 const NewGroupChatRoom = () => {
   const [chatList, setChatList] = useState([]);
@@ -160,7 +183,7 @@ const NewGroupChatRoom = () => {
         chatRoomUid={chatRoomUid}
         isOneToOneOrGroup='group'
       />
-      <button
+      {/* <button
         onClick={async () => {
           if (confirm(`${chatRoomUid} 방에서 나가시겠습니까?`)) {
             //먼저 옵저버를 종료시킨다.
@@ -221,6 +244,70 @@ const NewGroupChatRoom = () => {
           connectedUserList={connectedUserList}
           setShowAddGroupChat={setShowAddGroupChat}
         />
+      )} */}
+
+      {router.pathname.startsWith('/chatRooms/group') && (
+        <LeftButtonGroup>
+          <LeftButton
+            title='채팅방 나가기'
+            onClick={async () => {
+              if (confirm(`${chatRoomUid} 방에서 나가시겠습니까?`)) {
+                //먼저 옵저버를 종료시킨다.
+                off(접속유저경로);
+                const 삭제및퇴장 = async () => {
+                  let onUserObj = new Object();
+
+                  ConnectedUsers.forEach((i) => {
+                    // isOn true일때만
+                    if (i.isOn === true) {
+                      onUserObj[`${i.uid}`] = true;
+                    } else {
+                      onUserObj[`${i.uid}`] = false;
+                    }
+                  });
+
+                  await router.push('/chatRooms');
+                  console.log('onUserObj');
+                  console.log(onUserObj);
+
+                  await push(groupChatListPath, {
+                    displayName: authService.currentUser?.displayName,
+                    uid: authService.currentUser?.uid,
+                    message: `${authService.currentUser?.displayName}님이 채팅방에서 나가셨습니다..`,
+                    createdAt: convertDate(
+                      Timestamp.fromDate(new Date()).seconds,
+                    ),
+                    createdAtSeconds: Timestamp.fromDate(new Date()).seconds,
+                    readUsers: onUserObj,
+                  });
+
+                  //내 채팅리스트에서 삭제
+                  await exitUserCleanUpMyGroupChatList(
+                    authService.currentUser?.uid,
+                    chatRoomUid,
+                  );
+                  //채팅리스트에서 나를 삭제
+                  await exitUserCleanUpThisGroupChatList(
+                    authService.currentUser?.uid,
+                    chatRoomUid,
+                  );
+                };
+
+                삭제및퇴장();
+              }
+            }}
+          >
+            <LogoutSvg />
+          </LeftButton>
+          <LeftButton
+            title='초대하기'
+            onClick={() => {
+              setShowAddGroupChat(true);
+            }}
+          >
+            <PersonAddSvg />
+          </LeftButton>
+        </LeftButtonGroup>
       )}
     </>
   );
