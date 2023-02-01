@@ -30,13 +30,15 @@ const ChatRoom = () => {
   const router = useRouter();
   const displayName2 = router.query.displayName as string;
   const chatRoomUid2 = router.query.chatRoomUid as string;
-  const opponentUid2 = router.query.opponentUid as string;
   const [chatList, setChatList] = useState([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [ConnectedUsers, setConnectedUsers] = useState([]);
   const getChatListPath = getOneToOneChatListPath(chatRoomUid2);
   // const 레이아웃 = localStorage.getItem('oneToOneChatLayout');
   const [레이아웃, 레이아웃설정] = useState('');
+
+  console.log(router.query);
+  console.log(router);
 
   //첫 입장 시, 퇴장 시  접속시간 기록
   //잘 기록된다.
@@ -64,7 +66,7 @@ const ChatRoom = () => {
         isOn: false,
       });
     };
-  }, []);
+  }, [chatRoomUid2]);
 
   //메시지 처음 세팅
   // useEffect(() => {
@@ -125,33 +127,22 @@ const ChatRoom = () => {
   //   };
   // }, [chatRoomUid2]);
 
-  //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
-    onValue(getChatListPath, async (snapshot) => {
-      console.log(`채팅이 갱신되었습니다`);
-      // console.log(snapshot.val());
-      //최신메시지 하나만 가져와서 이어붙이면 좋을거같은데...
-      //메시지가 0개일때 예외처리
-      if (snapshot.val()) {
-        let messageList: ChatDataNew[] = Object.values(await snapshot.val());
-        // let lastMessage = await getChatRoomLastMessage(chatRoomUid2, 'oneToOne');
-        // console.log('messageList');
-        // console.log(messageList);
-        // console.log('마지막메시지');
-        // console.log(lastMessage);
+    onValue(
+      ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}`),
+      async (snap) => {
+        console.log('채팅갱신');
+        console.log(snap.val().chat);
 
-        let messageObj = snapshot.val();
+        let messageList: ChatDataNew[] = Object.values(await snap.val().chat);
+        let messageObj = snap.val().chat;
         //요소를 반복하며 ?..
         for (let property in messageObj) {
-          // console.log(`${property}: ${messageObj[property]}`);
-          // console.log(messageObj[property]);
-          // console.log(messageObj[property].readUsers);
           let 내가읽었는지결과 =
             messageObj[property].readUsers[authService.currentUser.uid];
           //값이 true면 패스, false면 true로 업데이트하는 함수 호출
           // console.log(내가읽었는지결과);
-
           if (내가읽었는지결과 === false) {
             const 업데이트할메시지 = ref(
               realtimeDbService,
@@ -163,20 +154,62 @@ const ChatRoom = () => {
         }
 
         console.log('로딩완료');
-        setIsChatLoading(true);
         setChatList(messageList);
-      } else {
         setIsChatLoading(true);
-      }
-    });
+      },
+    );
 
     return () => {
-      //언마운트시 해당 경로에 대한 관찰자를 off해주면 왔다갔다해도 onValue가 한번씩만 호출됨 (onValue가 쌓이는걸 방지)
-      off(getChatListPath);
+      off(ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}`));
       setIsChatLoading(false);
-      console.log('채팅방을 나갔습니다.');
     };
   }, [chatRoomUid2]);
+
+  //useEffect onValue로 채팅을 계속 가져와야함
+  // useEffect(() => {
+  //   레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
+  //   onValue(
+  //     ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}/chat`),
+  //     async (snapshot) => {
+  //       console.log(`채팅이 갱신되었습니다`);
+  //       // console.log(snapshot.val());
+  //       //최신메시지 하나만 가져와서 이어붙이면 좋을거같은데...
+  //       //메시지가 0개일때 예외처리
+  //       if (snapshot.val()) {
+  //         let messageList: ChatDataNew[] = Object.values(await snapshot.val());
+  //         let messageObj = snapshot.val();
+  //         //요소를 반복하며 ?..
+  //         for (let property in messageObj) {
+  //           let 내가읽었는지결과 =
+  //             messageObj[property].readUsers[authService.currentUser.uid];
+  //           //값이 true면 패스, false면 true로 업데이트하는 함수 호출
+  //           // console.log(내가읽었는지결과);
+  //           if (내가읽었는지결과 === false) {
+  //             const 업데이트할메시지 = ref(
+  //               realtimeDbService,
+  //               `oneToOneChatRooms/${chatRoomUid2}/chat/${property}/readUsers`,
+  //             );
+
+  //             update(업데이트할메시지, { [authService.currentUser.uid]: true });
+  //           }
+  //         }
+
+  //         console.log('로딩완료');
+  //         setChatList(messageList);
+  //         setIsChatLoading(true);
+  //       } else {
+  //         setIsChatLoading(true);
+  //       }
+  //     },
+  //   );
+
+  //   return () => {
+  //     //언마운트시 해당 경로에 대한 관찰자를 off해주면 왔다갔다해도 onValue가 한번씩만 호출됨 (onValue가 쌓이는걸 방지)
+  //     off(getChatListPath);
+  //     setIsChatLoading(false);
+  //     console.log('채팅방을 나갔습니다.');
+  //   };
+  // }, []);
 
   //현재 채팅 connectedUser를 onValue하면서 그 결과를 SendInput에 전달해준다.
   //SendInput은 그 값에 따라서 전송 시 메시지에 true처리할 사람을 결정한다.
@@ -185,7 +218,6 @@ const ChatRoom = () => {
       realtimeDbService,
       `oneToOneChatRooms/${chatRoomUid2}/connectedUser`,
     );
-
     onValue(접속유저경로, (snapshot) => {
       console.log('방에 접속했다');
       const 밸류스 = Object.values(snapshot.val());
@@ -203,7 +235,7 @@ const ChatRoom = () => {
     return () => {
       off(접속유저경로);
     };
-  }, []);
+  }, [chatRoomUid2]);
 
   return (
     <>
