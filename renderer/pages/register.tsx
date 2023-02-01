@@ -107,7 +107,8 @@ const Register = () => {
     if (
       nicknameInput.value === ' ' ||
       nicknameInput.value.length === 0 ||
-      blank_pattern.test(nicknameInput.value)
+      blank_pattern.test(nicknameInput.value) ||
+      nicknameInput.value.length > 10
     ) {
       setIsNicknameError(true);
       setIsNicknameText('닉네임을 확인해주세요!');
@@ -157,7 +158,7 @@ const Register = () => {
           }
         }
       } else {
-        router.push(`/home?email=${email}`, { query: email });
+        router.push(`/login?email=${email}`, { query: email });
       }
     });
   };
@@ -176,7 +177,7 @@ const Register = () => {
           </Logo>
           <BasicInput
             ref={nicknameRef}
-            placeholderValue='닉네임'
+            placeholderValue='닉네임(최대 10자)'
             isError={isNicknameError}
             statusText={isNicknameText}
           ></BasicInput>
