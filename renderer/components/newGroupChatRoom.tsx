@@ -1,57 +1,87 @@
-import { off, onValue, push } from 'firebase/database';
+import {
+  get,
+  off,
+  onDisconnect,
+  onValue,
+  push,
+  ref,
+  update,
+} from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import Head from 'next/head';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useState } from 'react';
 import {
   authService,
   getGroupChatListPath,
   getGroupUserListPath,
-  getUserList,
   UserList,
   exitUserCleanUpMyGroupChatList,
   exitUserCleanUpThisGroupChatList,
+  realtimeDbService,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeaderTitle from '../components/ChatRoomHeaderTitle';
 import MessageContainerGroup from './messageContainerGroup';
 import LoadingSpinner from '../components/LoadingSpinner';
-import SendMessageInput from '../components/SendMessageInput';
+import SendMessageInput, {
+  ConnectedUser,
+} from '../components/SendMessageInput';
 import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
 import InviteGroupChatModal from './inviteGroupChatModal';
+import { ChatDataNew } from '../pages/chatList';
 
-const NewGroupChatRoom = ({
-  displayName,
-  chatRoomUid,
-}: {
-  displayName: string;
-  chatRoomUid: string;
-}) => {
+const NewGroupChatRoom = () => {
   const [chatList, setChatList] = useState([]);
   const [connectedUserList, setConnectedUserList] = useState<UserList[]>([]);
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
-  const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
+  // const [groupChatUserList, setGroupChatUserList] = useState<UserList[]>([]);
+
+  //SendInput에 보낼 객체값
+  const [ConnectedUsers, setConnectedUsers] = useState<ConnectedUser[]>([]);
+
   const [isChatLoading, setIsChatLoading] = useState(false);
   const router = useRouter();
+  const displayName = router.query.chatRoomsTitle as string;
+  const chatRoomUid = router.query.chatRoomUid as string;
+
   const groupChatListPath = getGroupChatListPath(chatRoomUid);
   const groupUserListPath = getGroupUserListPath(chatRoomUid);
 
   const [레이아웃, 레이아웃설정] = useState('');
 
-  const showUserList = () => {
-    getUserList().then((userList) => {
-      setShowAddGroupChat(true);
-      //이미 방에 연결된 유저는 제외한 리스트를 보여준다.
-      const duplicateDeleteArr = userList.filter((dataItem) => {
-        return !connectedUserList.some(
-          (paramsItem) => paramsItem.uid === dataItem.uid,
-        );
-      });
-      console.log(duplicateDeleteArr);
-      setGroupChatUserList(duplicateDeleteArr);
+  const 접속유저경로 = ref(
+    realtimeDbService,
+    `groupChatRooms/${chatRoomUid}/connectedUser`,
+  );
+
+  //첫 입장 시, 퇴장 시  접속시간 기록
+  //잘 기록된다.
+  //각 ui에 isOn값도 추가해주자 이는 SendInput에서 쓰기위함이다.
+  useEffect(() => {
+    const 경로 = ref(
+      realtimeDbService,
+      `groupChatRooms/${chatRoomUid}/connectedUser/${authService.currentUser?.uid}`,
+    );
+    update(경로, {
+      displayName: authService.currentUser.displayName,
+      uid: authService.currentUser.uid,
+      lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
+      isOn: true,
     });
-  };
+    //앱 강종시에도 채팅접속상태 Off 해주기
+    onDisconnect(경로).update({
+      isOn: false,
+      lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
+    });
+    //채팅방 나갈 시에 접속상태 off해주기
+    return () => {
+      update(경로, {
+        lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
+        isOn: false,
+      });
+    };
+  }, [chatRoomUid]);
 
   //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
@@ -59,8 +89,26 @@ const NewGroupChatRoom = ({
     //채팅 onValue
     onValue(groupChatListPath, (snapshot) => {
       console.log('채팅이 갱신되었습니다');
-      let messageList = Object.values(snapshot.val());
-      setChatList(messageList);
+      //0개일때 예외처리
+      if (snapshot.val()) {
+        let messageList = Object.values(snapshot.val());
+        setChatList(messageList);
+        let messageObj = snapshot.val();
+        //읽음 처리해주기
+        for (let property in messageObj) {
+          let 내가읽었는지결과 =
+            messageObj[property].readUsers[authService.currentUser?.uid];
+          if (내가읽었는지결과 === false) {
+            const 업데이트할메시지 = ref(
+              realtimeDbService,
+              `groupChatRooms/${chatRoomUid}/chat/${property}/readUsers`,
+            );
+
+            update(업데이트할메시지, { [authService.currentUser?.uid]: true });
+          }
+        }
+      } else {
+      }
     });
     setIsChatLoading(true);
     return () => {
@@ -74,30 +122,29 @@ const NewGroupChatRoom = ({
     //현재채팅방 사용유저 onValue
     onValue(groupUserListPath, async (snapshot) => {
       console.log('사용자가 갱신되었습니다.');
-      let inviteUserList = await snapshot.val();
-      setConnectedUserList(inviteUserList);
+      let inviteUserList: ConnectedUser[] = await snapshot.val();
+      console.log(inviteUserList);
+      setConnectedUserList(Object.values(inviteUserList));
+      setConnectedUsers(Object.values(inviteUserList));
+      get(groupChatListPath).then((res) => {
+        if (res.val()) {
+          const 메시지배열: ChatDataNew[] = Object.values(res.val());
+          console.log(메시지배열);
+          setChatList(메시지배열);
+        }
+      });
     });
     return () => {
       off(groupUserListPath);
     };
   }, [chatRoomUid]);
 
-  //화면에 들어오면 기존
-
-  useLayoutEffect(() => {
-    return () => {
-      if (document.getElementById('groupChatActive')) {
-        document.getElementById('groupChatActive').id = '';
-      }
-    };
-  }, []);
-
   return (
     <>
       <Head>
         <title>maumTalk - {displayName}</title>
       </Head>
-      <ChatRoomHeaderTitle title={displayName} userList={connectedUserList} />
+      <ChatRoomHeaderTitle title={displayName} userList={ConnectedUsers} />
       {isChatLoading ? (
         레이아웃 === 'group' ? (
           <MessageContainerGroup chatList={chatList} />
@@ -109,35 +156,53 @@ const NewGroupChatRoom = ({
       )}
 
       <SendMessageInput
-        displayName={displayName}
+        connectedUsers={ConnectedUsers}
         chatRoomUid={chatRoomUid}
         isOneToOneOrGroup='group'
       />
       <button
         onClick={async () => {
           if (confirm(`${chatRoomUid} 방에서 나가시겠습니까?`)) {
-            //퇴장했다는 메시지를 생성하고,
+            //먼저 옵저버를 종료시킨다.
+            off(접속유저경로);
+            const 삭제및퇴장 = async () => {
+              let onUserObj = new Object();
 
-            await push(groupChatListPath, {
-              displayName: authService.currentUser.displayName,
-              uid: authService.currentUser.uid,
-              message: `${authService.currentUser.displayName}님이 채팅방에서 나가셨습니다..`,
-              createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-            });
+              ConnectedUsers.forEach((i) => {
+                // isOn true일때만
+                if (i.isOn === true) {
+                  onUserObj[`${i.uid}`] = true;
+                } else {
+                  onUserObj[`${i.uid}`] = false;
+                }
+              });
 
-            //내 채팅리스트에서 삭제
-            await exitUserCleanUpMyGroupChatList(
-              authService.currentUser.uid,
-              chatRoomUid,
-            );
-            //채팅리스트에서 나를 삭제
-            await exitUserCleanUpThisGroupChatList(
-              authService.currentUser.uid,
-              chatRoomUid,
-            );
+              await router.push('/main');
+              console.log('onUserObj');
+              console.log(onUserObj);
 
-            //삭제 후 퇴장
-            router.push('/main');
+              await push(groupChatListPath, {
+                displayName: authService.currentUser?.displayName,
+                uid: authService.currentUser?.uid,
+                message: `${authService.currentUser?.displayName}님이 채팅방에서 나가셨습니다..`,
+                createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+                createdAtSeconds: Timestamp.fromDate(new Date()).seconds,
+                readUsers: onUserObj,
+              });
+
+              //내 채팅리스트에서 삭제
+              await exitUserCleanUpMyGroupChatList(
+                authService.currentUser?.uid,
+                chatRoomUid,
+              );
+              //채팅리스트에서 나를 삭제
+              await exitUserCleanUpThisGroupChatList(
+                authService.currentUser?.uid,
+                chatRoomUid,
+              );
+            };
+
+            삭제및퇴장();
           }
         }}
       >
@@ -145,8 +210,7 @@ const NewGroupChatRoom = ({
       </button>
       <button
         onClick={() => {
-          console.log('누굴 초대하시겠습니까');
-          showUserList();
+          setShowAddGroupChat(true);
         }}
       >
         초대하기
