@@ -167,7 +167,7 @@ const FixedModalBg = styled.div`
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 11;
+  z-index: 100;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -218,7 +218,7 @@ const CreateGroupChatModal = ({
     setShowAddGroupChat(false);
     //바로 입장?
     router.push(
-      `/groupchat/${chatRoomsTitleInputRef.current.value}?uid=${chatRoomUid}`,
+      `/chatRooms/group?chatRoomsTitle=${chatRoomsTitleInputRef.current.value}&chatRoomUid=${chatRoomUid}`,
     );
   };
 
