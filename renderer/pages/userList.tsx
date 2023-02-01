@@ -1,5 +1,5 @@
 import { ref, set, get, update } from '@firebase/database';
-import { onValue } from 'firebase/database';
+import { off, onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useEffect, useState } from 'react';
@@ -88,6 +88,10 @@ const UserList = () => {
         setUserList(userListObj);
       }
     });
+
+    return () => {
+      off(userListRef);
+    };
   }, []);
 
   const enterOneToOneChatRooms = async (i: {
