@@ -1,9 +1,8 @@
 import React from 'react';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { authService } from '../firebaseConfig';
-import { ChatDataNew } from '../pages/chatRooms';
-import Message from './GroupMessage';
+import { ChatDataNew } from '../utils/makeChatRooms';
 import OneToOneMessage from './oneToOneMessage';
 
 const MessageContainers = styled.div`
