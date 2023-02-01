@@ -1,8 +1,7 @@
-import { Timestamp } from 'firebase/firestore';
 import React from 'react';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { ChatDataNew } from '../pages/chatRooms';
+import { ChatDataNew } from '../utils/makeChatRooms';
 import Message from './GroupMessage';
 
 const MessageContainers = styled.div`
