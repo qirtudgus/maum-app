@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ChatDataNew } from '../pages/chatRooms';
+import { ChatDataNew } from '../utils/makeChatRooms';
 
 const MessageComponent = styled.li`
   width: fit-content;
