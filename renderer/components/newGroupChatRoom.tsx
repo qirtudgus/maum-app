@@ -168,39 +168,69 @@ const NewGroupChatRoom = () => {
   //   });
   // }, [chatRoomUid]);
 
-  //useEffect onValue로 채팅을 계속 가져와야함
   useEffect(() => {
     레이아웃설정(localStorage.getItem('groupChatLayout'));
-    //채팅 onValue
-    onValue(groupChatListPath, (snapshot) => {
-      console.log('채팅이 갱신되었습니다');
-      //0개일때 예외처리
-      if (snapshot.val()) {
-        let messageList = Object.values(snapshot.val());
-        setChatList(messageList);
-        let messageObj = snapshot.val();
-        //읽음 처리해주기
-        for (let property in messageObj) {
-          let 내가읽었는지결과 =
-            messageObj[property].readUsers[authService.currentUser?.uid];
-          if (내가읽었는지결과 === false) {
-            const 업데이트할메시지 = ref(
-              realtimeDbService,
-              `groupChatRooms/${chatRoomUid}/chat/${property}/readUsers`,
-            );
-
-            update(업데이트할메시지, { [authService.currentUser?.uid]: true });
-          }
+    onValue(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`), (snap) => {
+      console.log('그룹채팅이 갱신');
+      console.log(snap);
+      let messageList = Object.values(snap.val().chat);
+      let messageObj = snap.val().chat;
+      for (let property in messageObj) {
+        let 내가읽었는지결과 =
+          messageObj[property].readUsers[authService.currentUser?.uid];
+        if (내가읽었는지결과 === false) {
+          const 업데이트할메시지 = ref(
+            realtimeDbService,
+            `groupChatRooms/${chatRoomUid}/chat/${property}/readUsers`,
+          );
+          update(업데이트할메시지, { [authService.currentUser?.uid]: true });
         }
-      } else {
       }
+
+      console.log(messageList);
+      setChatList(messageList);
+      setIsChatLoading(true);
     });
-    setIsChatLoading(true);
+
     return () => {
-      off(groupChatListPath);
-      console.log('채팅방을 나갔습니다.');
+      off(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`));
+      setIsChatLoading(false);
     };
   }, [chatRoomUid]);
+
+  // //useEffect onValue로 채팅을 계속 가져와야함
+  // useEffect(() => {
+  //   레이아웃설정(localStorage.getItem('groupChatLayout'));
+  //   //채팅 onValue
+  //   onValue(groupChatListPath, (snapshot) => {
+  //     console.log('채팅이 갱신되었습니다');
+  //     //0개일때 예외처리
+  //     if (snapshot.val()) {
+  //       let messageList = Object.values(snapshot.val());
+  //       setChatList(messageList);
+  //       let messageObj = snapshot.val();
+  //       //읽음 처리해주기
+  //       for (let property in messageObj) {
+  //         let 내가읽었는지결과 =
+  //           messageObj[property].readUsers[authService.currentUser?.uid];
+  //         if (내가읽었는지결과 === false) {
+  //           const 업데이트할메시지 = ref(
+  //             realtimeDbService,
+  //             `groupChatRooms/${chatRoomUid}/chat/${property}/readUsers`,
+  //           );
+
+  //           update(업데이트할메시지, { [authService.currentUser?.uid]: true });
+  //         }
+  //       }
+  //     } else {
+  //     }
+  //   });
+  //   setIsChatLoading(true);
+  //   return () => {
+  //     off(groupChatListPath);
+  //     console.log('채팅방을 나갔습니다.');
+  //   };
+  // }, [chatRoomUid]);
 
   //채팅방 인원 옵저버
   useEffect(() => {
