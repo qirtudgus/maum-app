@@ -1,6 +1,7 @@
 import { signOut } from 'firebase/auth';
 import { ref, update } from 'firebase/database';
-import router from 'next/router';
+import router, { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ChatListSvg from '../components/svg/chatListSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
@@ -70,6 +71,14 @@ const SettingButton = styled.div`
   &:hover svg {
     fill: #000;
   }
+  &.active {
+    border-radius: 15px;
+    width: 40px;
+    background: #fff;
+  }
+  &.active svg {
+    fill: ${({ theme }) => theme.colors.main};
+  }
 `;
 
 const PeopleButton = styled.div`
@@ -86,12 +95,31 @@ const PeopleButton = styled.div`
     fill: white;
     height: 30px;
   }
+
   &:hover svg {
     fill: #000;
+  }
+
+  &.active {
+    border-radius: 15px;
+    width: 40px;
+    background: #fff;
+  }
+  &.active svg {
+    fill: ${({ theme }) => theme.colors.main};
   }
 `;
 
 const SideBar = () => {
+  const router = useRouter();
+  const [currentPage, setCurrentPage] = useState('/userList');
+
+  useEffect(() => {
+    console.log('현재주소');
+    console.log(router.pathname);
+    setCurrentPage(router.pathname);
+  }, [router.pathname]);
+
   const uid = authService.currentUser?.uid;
   const userSignOut = async () => {
     try {
@@ -114,6 +142,7 @@ const SideBar = () => {
         <HeaderButtonWrap>
           <PeopleButton
             title='유저 목록'
+            className={currentPage === '/userList' && 'active'}
             onClick={() => {
               router.push('/userList');
             }}
@@ -122,14 +151,16 @@ const SideBar = () => {
           </PeopleButton>
           <SettingButton
             title='채팅 목록'
+            className={currentPage === '/chatRooms' && 'active'}
             onClick={() => {
-              router.push('/chatList');
+              router.push('/chatRooms');
             }}
           >
             <ChatListSvg />
           </SettingButton>
           <SettingButton
             title='설정'
+            className={currentPage === '/settings' && 'active'}
             onClick={() => {
               router.push('/settings');
             }}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ChatDataNew } from '../pages/chatList';
+import { ChatDataNew } from '../pages/chatRooms';
 import { convertDate } from '../utils/convertDate';
 
 const MessageWrap = styled.div`

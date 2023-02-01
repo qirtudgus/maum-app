@@ -13,7 +13,7 @@ import {
   update,
 } from 'firebase/database';
 import { convertDate } from './utils/convertDate';
-import { ChatDataNew } from './pages/chatList';
+import { ChatDataNew } from './pages/chatRooms';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,

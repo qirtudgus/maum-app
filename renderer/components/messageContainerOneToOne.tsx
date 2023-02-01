@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { authService } from '../firebaseConfig';
-import { ChatDataNew } from '../pages/chatList';
+import { ChatDataNew } from '../pages/chatRooms';
 import Message from './GroupMessage';
 import OneToOneMessage from './oneToOneMessage';
 

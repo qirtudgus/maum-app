@@ -18,7 +18,7 @@ import {
   Wrap,
   ChatRoomList,
   ChatRoomInfo,
-} from './chatList';
+} from './chatRooms';
 import PersonSvg from '../components/svg/personSvg';
 
 const ChatRoomInfoWithUserList = styled(ChatRoomList)`

@@ -29,7 +29,7 @@ import SendMessageInput, {
 import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
 import InviteGroupChatModal from './inviteGroupChatModal';
-import { ChatDataNew } from '../pages/chatList';
+import { ChatDataNew } from '../pages/chatRooms';
 
 const NewGroupChatRoom = () => {
   const [chatList, setChatList] = useState([]);

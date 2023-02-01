@@ -18,7 +18,7 @@ import {
   getOneToOneChatListPath,
   realtimeDbService,
 } from '../firebaseConfig';
-import { ChatDataNew } from '../pages/chatList';
+import { ChatDataNew } from '../pages/chatRooms';
 import ChatRoomHeaderTitle from './ChatRoomHeaderTitle';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerGroup from './messageContainerGroup';
