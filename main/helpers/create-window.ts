@@ -74,9 +74,8 @@ export default (
     const browserOptions: BrowserWindowConstructorOptions = {
       ...state,
       ...options,
-      minWidth: 1000, // 최소 너비
-      minHeight: 800, // 최소 높이
-
+      minWidth: 500, // 최소 너비
+      minHeight: 500, // 최소 높이
       autoHideMenuBar: true, // 기본 메뉴바 숨기기
       webPreferences: {
         nodeIntegration: true,
@@ -90,8 +89,8 @@ export default (
     const browserOptions: BrowserWindowConstructorOptions = {
       ...state,
       ...options,
-      minWidth: 1000, // 최소 너비
-      minHeight: 800, // 최소 높이
+      minWidth: 500, // 최소 너비
+      minHeight: 500, // 최소 높이
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
