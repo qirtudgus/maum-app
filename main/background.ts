@@ -12,20 +12,19 @@ if (isProd) {
 
 (async () => {
   await app.whenReady();
-
   const mainWindow = createWindow('main', {
     width: 1000,
     height: 800,
-  });
-  const mainWindow2 = createWindow('main2', {
-    width: 1000,
-    height: 600,
   });
 
   if (isProd) {
     await mainWindow.loadURL('app://./login.html');
   } else {
     const port = process.argv[2];
+    const mainWindow2 = createWindow('main2', {
+      width: 1000,
+      height: 600,
+    });
     await mainWindow.loadURL(`http://localhost:${port}/login`);
     await mainWindow2.loadURL(`http://localhost:${port}/login`);
     mainWindow.webContents.openDevTools();
