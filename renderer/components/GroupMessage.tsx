@@ -6,16 +6,18 @@ const MessageComponent = styled.li`
   width: fit-content;
   position: relative;
   max-width: 60%;
-  /* height: 30px; */
   min-height: 30px;
   max-height: fit-content;
-  /* padding: 13px 10px; */
   display: flex;
   align-items: center;
-  /* border-radius: 7px; */
-  /* box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.2); */
-  /* background: #fff; */
   color: #000;
+`;
+
+const ReadCount = styled.div`
+  font-size: 14px;
+  padding: 0 20px;
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.main};
 `;
 
 const Message = ({ message }: { message: ChatDataNew }) => {
@@ -40,8 +42,7 @@ const Message = ({ message }: { message: ChatDataNew }) => {
 
   return (
     <MessageComponent>
-      {message.message}
-      <span>안읽은사람 : {readCount}</span>
+      {message.message} {readCount !== 0 && <ReadCount>{readCount}</ReadCount>}
     </MessageComponent>
   );
 };

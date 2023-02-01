@@ -3,7 +3,8 @@ import { useEffect, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { authService } from '../firebaseConfig';
 import { ChatDataNew } from '../pages/chatList';
-import Message from './Message';
+import Message from './GroupMessage';
+import OneToOneMessage from './oneToOneMessage';
 
 const MessageContainers = styled.div`
   position: relative;
@@ -34,7 +35,15 @@ const MessageWrap = styled.div<MessageSendData>`
     align-items: flex-end;
   }
 
-  &.myMessage > li {
+  &.myMessage > div {
+    min-height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  &.myMessage > div > li {
     color: #fff;
     background: ${({ theme }) => theme.colors.main};
   }
@@ -110,8 +119,7 @@ const MessageContainerOneToOne = ({
           >
             <span className='messageWrite'>{i.displayName}</span>
             <span>{i.readUsers.length}</span>
-
-            <Message message={i} />
+            <OneToOneMessage message={i} />
             {/* <Message>{i.message}</Message> */}
           </MessageWrap>
         );
