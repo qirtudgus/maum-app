@@ -3,8 +3,6 @@ import { ref, update } from 'firebase/database';
 import router from 'next/router';
 import { useState } from 'react';
 import styled from 'styled-components';
-import GroupChatList from '../components/newGroupChatList';
-import OnUserList from '../components/onUserList';
 import ChatListSvg from '../components/svg/chatListSvg';
 import HomeSvg from '../components/svg/homeSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
@@ -38,7 +36,7 @@ const HeaderButtonWrap = styled.div`
   height: fit-content;
 
   & > div {
-    margin: 5px 0;
+    margin: 10px 0;
   }
 `;
 
@@ -60,24 +58,8 @@ const LogoutButton = styled.div`
   }
 `;
 
-const FooterButtonWrap = styled.div`
-  width: 100%;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  bottom: 5px;
-  height: fit-content;
-
-  & > div {
-    margin: 5px 0;
-  }
-`;
-
 const SettingButton = styled.div`
   cursor: pointer;
-  /* position: absolute; */
-
   width: fit-content;
   height: 35px;
   display: flex;
@@ -90,25 +72,6 @@ const SettingButton = styled.div`
   &:hover svg {
     fill: #000;
   }
-`;
-
-const MenuWrap = styled.div`
-  max-width: 300px;
-  min-width: 150px;
-  position: relative;
-  height: 100%;
-  border-right: 1px solid ${({ theme }) => theme.colors.borderColor};
-  display: flex;
-  flex-direction: column;
-`;
-
-const MyDisplayName = styled.div`
-  font-size: 15px;
-  font-weight: bold;
-  height: 40px;
-  text-align: center;
-  line-height: 40px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
 `;
 
 const PeopleButton = styled.div`
@@ -151,14 +114,14 @@ const SideBar = () => {
     <SideBarContainer>
       <SideBarWrap>
         <HeaderButtonWrap>
-          <SettingButton
+          {/* <SettingButton
             title='홈으로'
             onClick={() => {
               router.push('/main');
             }}
           >
             <HomeSvg />
-          </SettingButton>
+          </SettingButton> */}
           <PeopleButton
             title='유저 목록'
             onClick={() => {
@@ -175,8 +138,6 @@ const SideBar = () => {
           >
             <ChatListSvg />
           </SettingButton>
-        </HeaderButtonWrap>
-        <FooterButtonWrap>
           <SettingButton
             title='설정'
             onClick={() => {
@@ -188,16 +149,8 @@ const SideBar = () => {
           <LogoutButton title='로그아웃' onClick={userSignOut}>
             <LogoutSvg />
           </LogoutButton>
-        </FooterButtonWrap>
+        </HeaderButtonWrap>
       </SideBarWrap>
-      {/* 구조변경으로 인해 기존 메뉴레이아웃 주석처리 */}
-      {/* <MenuWrap>
-        <>
-          <MyDisplayName>{authService.currentUser?.displayName}</MyDisplayName>
-          <OnUserList />
-          <GroupChatList />
-        </>
-      </MenuWrap> */}
     </SideBarContainer>
   );
 };
