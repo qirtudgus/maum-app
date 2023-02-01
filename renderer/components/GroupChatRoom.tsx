@@ -22,10 +22,8 @@ import {
 import { convertDate } from '../utils/convertDate';
 import ChatRoomHeader from './ChatRoomHeader';
 import MessageContainerGroup from './messageContainerGroup';
-import LoadingSpinner from '../components/LoadingSpinner';
-import SendMessageInput, {
-  ConnectedUser,
-} from '../components/SendMessageInput';
+import LoadingSpinner from './LoadingSpinner';
+import SendMessageInput, { ConnectedUser } from './SendMessageInput';
 import { useRouter } from 'next/router';
 import MessageContainerOneToOne from './messageContainerOneToOne';
 import styled from 'styled-components';
@@ -55,7 +53,7 @@ const LeftButton = styled.div`
   }
 `;
 
-const NewGroupChatRoom = () => {
+const GroupChatRoom = () => {
   const [chatList, setChatList] = useState([]);
   const [connectedUserList, setConnectedUserList] = useState<UserList[]>([]);
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
@@ -406,4 +404,4 @@ const NewGroupChatRoom = () => {
   );
 };
 
-export default NewGroupChatRoom;
+export default GroupChatRoom;

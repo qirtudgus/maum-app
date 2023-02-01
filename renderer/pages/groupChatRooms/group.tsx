@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import NewGroupChatRoom from '../../components/newGroupChatRoom';
+import GroupChatRoom from '../../components/GroupChatRoom';
 
 const ChatWrap = styled.div`
   width: 100%;
@@ -13,7 +13,7 @@ const User = () => {
   return (
     <>
       <ChatWrap>
-        <NewGroupChatRoom />
+        <GroupChatRoom />
       </ChatWrap>
     </>
   );
