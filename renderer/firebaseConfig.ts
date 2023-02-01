@@ -223,14 +223,15 @@ export const createGroupChat = (
   chatRoomTitle: string,
 ) => {
   let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
-
+  let groupChatMessagePath = getGroupChatListPath(chatRoomUid);
   console.log(inviteUserList);
   let 초대할유저접속상태객체 = {};
+  let readUserCounts = {};
   inviteUserList.forEach((i, index) => {
     // 초대할유저접속상태객체[i.uid] = {  };
     // 초대할유저접속상태객체[i.uid] = {};
     // 초대할유저접속상태객체[i.uid] = {
-
+    readUserCounts[i.uid] = false;
     // };
     초대할유저접속상태객체[i.uid] = {
       displayName: i.displayName,
@@ -248,12 +249,14 @@ export const createGroupChat = (
     connectedUser: 초대할유저접속상태객체,
   });
   // 초기 메시지 삭제
-  // push(groupChatMessagePath, {
-  //   displayName: authService.currentUser.displayName,
-  //   uid: authService.currentUser.uid,
-  //   message: `그룹채팅이 시작되었습니다.`,
-  //   createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-  // });
+  push(groupChatMessagePath, {
+    displayName: authService.currentUser.displayName,
+    uid: authService.currentUser.uid,
+    message: `그룹채팅이 시작되었습니다.`,
+    createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+    createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
+    readUsers: readUserCounts,
+  });
 };
 
 /**
