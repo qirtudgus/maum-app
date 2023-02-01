@@ -156,7 +156,7 @@ const UserList = () => {
       {userList.map((item, index) => {
         return (
           item.uid === authService.currentUser?.uid && (
-            <MyselfLi>
+            <MyselfLi key={item.uid}>
               <ChatRoomInfoWithUserList
                 key={item.uid}
                 onClick={() => {

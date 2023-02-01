@@ -27,6 +27,12 @@ const ChatRoomInfoWithUserList = styled(ChatRoomList)`
   font-weight: bold;
 `;
 
+const MyselfLi = styled.div`
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.borderColor};
+`;
+
 const OnUserLight = styled.div`
   position: absolute;
   bottom: 0px;
@@ -146,38 +152,47 @@ const UserList = () => {
 
   return (
     <Wrap>
-      <PageTitle>대화 상대</PageTitle>
+      <PageTitle>유저 목록</PageTitle>
       {userList.map((item, index) => {
-        return item.uid === authService.currentUser?.uid ? (
-          <ChatRoomInfoWithUserList
-            key={item.uid}
-            onClick={() => {
-              enterOneToOneChatRooms(item);
-            }}
-          >
-            <ChatIcon>
-              <PersonSvg />
-              {item.isOn ? <OnUserLight /> : <OffUserLight />}
-            </ChatIcon>
-            <ChatRoomInfo>
-              <span className='displayName'>나 : {item?.displayName}</span>
-            </ChatRoomInfo>
-          </ChatRoomInfoWithUserList>
-        ) : (
-          <ChatRoomInfoWithUserList
-            key={item.uid}
-            onClick={() => {
-              enterOneToOneChatRooms(item);
-            }}
-          >
-            <ChatIcon>
-              <PersonSvg />
-              {item.isOn ? <OnUserLight /> : <OffUserLight />}
-            </ChatIcon>
-            <ChatRoomInfo>
-              <span className='displayName'> {item?.displayName}</span>
-            </ChatRoomInfo>
-          </ChatRoomInfoWithUserList>
+        return (
+          item.uid === authService.currentUser?.uid && (
+            <MyselfLi key={item.uid}>
+              <ChatRoomInfoWithUserList
+                key={item.uid}
+                onClick={() => {
+                  enterOneToOneChatRooms(item);
+                }}
+              >
+                <ChatIcon>
+                  <PersonSvg />
+                  {item.isOn ? <OnUserLight /> : <OffUserLight />}
+                </ChatIcon>
+                <ChatRoomInfo>
+                  <span className='displayName'>{item?.displayName}</span>
+                </ChatRoomInfo>
+              </ChatRoomInfoWithUserList>
+            </MyselfLi>
+          )
+        );
+      })}
+      {userList.map((item, index) => {
+        return (
+          item.uid !== authService.currentUser?.uid && (
+            <ChatRoomInfoWithUserList
+              key={item.uid}
+              onClick={() => {
+                enterOneToOneChatRooms(item);
+              }}
+            >
+              <ChatIcon>
+                <PersonSvg />
+                {item.isOn ? <OnUserLight /> : <OffUserLight />}
+              </ChatIcon>
+              <ChatRoomInfo>
+                <span className='displayName'> {item?.displayName}</span>
+              </ChatRoomInfo>
+            </ChatRoomInfoWithUserList>
+          )
         );
       })}
     </Wrap>
