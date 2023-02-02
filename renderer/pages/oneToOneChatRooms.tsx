@@ -17,34 +17,8 @@ import {
   createOneToOneChatRooms,
   getMyChatRoomsRef,
   getNotReadMessageCount,
+  ResultOneToOneRoom,
 } from '../utils/makeChatRooms';
-
-interface ResultMessage {
-  chatRoomUid: {
-    chatRoomUid: string;
-    opponentName: string;
-    opponentUid: string;
-  };
-  lastMessage?: string;
-  notReadCount?: number;
-}
-
-interface GroupChatList {
-  chatRoomUid: string;
-  chatRoomsTitle: string;
-  lastMessage: string;
-  notReadCount: number;
-  createdSecondsAt: number;
-}
-
-interface oneToOneChatList {
-  chatRoomUid: string;
-  opponentName: string;
-  opponentUid: string;
-  lastMessage?: string;
-  notReadCount?: number;
-  createdSecondsAt: number;
-}
 
 export const Wrap = styled.div`
   width: 100%;
@@ -163,9 +137,13 @@ export const CreateGroupChatButton = styled.div`
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
-  const [groupChatList2, setGroupChatList2] = useState([]);
-  const [combineChatList, setCombineChatList] = useState([]);
-  const [sortChatList, setSortChatList] = useState([]);
+  const [groupChatList2, setGroupChatList2] = useState<ResultOneToOneRoom[]>(
+    [],
+  );
+  const [combineChatList, setCombineChatList] = useState<ResultOneToOneRoom[]>(
+    [],
+  );
+  const [sortChatList, setSortChatList] = useState<ResultOneToOneRoom[]>([]);
   const router = useRouter();
   const uid = authService.currentUser?.uid;
 
@@ -218,6 +196,7 @@ function ChatList() {
       }
     });
     //현재 유저의 새로운 그룹채팅이 생김을 감지하는 옵저버
+    //새로 감지가 되면 방을 다시 렌더링하여 순차정렬해준다.
     onValue(ref(realtimeDbService, `oneToOneChatRooms/${uid}`), (snap) => {
       console.log('새로운 채팅 수신');
       console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']

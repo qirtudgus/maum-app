@@ -110,6 +110,7 @@ function ChatList() {
       }
     });
     //현재 유저의 새로운 그룹채팅이 생김을 감지하는 옵저버
+    //새로 감지가 되면 방을 다시 렌더링하여 순차정렬해준다.
     onValue(
       ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
       (snap) => {

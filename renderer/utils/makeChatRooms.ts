@@ -31,7 +31,7 @@ interface pureMessage {
   notReadCount?: number;
 }
 
-interface ResultMessage {
+export interface ResultOneToOneRoom {
   chatRoomUid: string;
   opponentName: string;
   opponentUid: string;
@@ -71,8 +71,8 @@ export const createOneToOneChatRooms = async (uid: string) => {
   const getMyChatListArray: pureMessage[] = Object.values(listObj);
   console.log('getMyChatListArray');
   console.log(getMyChatListArray);
-  const resultGroupChatRooms: Promise<ResultMessage>[] = getMyChatListArray.map(
-    async (i) => {
+  const resultGroupChatRooms: Promise<ResultOneToOneRoom>[] =
+    getMyChatListArray.map(async (i) => {
       const lastMessage = await getChatRoomLastMessage(
         i.chatRoomUid.chatRoomUid,
         'oneToOne',
@@ -90,8 +90,7 @@ export const createOneToOneChatRooms = async (uid: string) => {
       result2['notReadCount'] = notReadCount;
       result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
       return result2;
-    },
-  );
+    });
   return await Promise.all(resultGroupChatRooms);
 };
 
