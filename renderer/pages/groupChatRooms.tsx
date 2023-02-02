@@ -1,23 +1,24 @@
-import { get, off, onValue, ref } from "firebase/database";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import CreateGroupChatModal from "../components/createGroupChatModal";
-import LoadingSpinner from "../components/LoadingSpinner";
-import AddSvg from "../components/svg/addSvg";
-import PeopleSvg from "../components/svg/peopleSvg";
+import { get, off, onValue, ref } from 'firebase/database';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import CreateGroupChatModal from '../components/createGroupChatModal';
+import LoadingSpinner from '../components/LoadingSpinner';
+import AddSvg from '../components/svg/addSvg';
+import PeopleSvg from '../components/svg/peopleSvg';
 import {
   authService,
   getChatRoomLastMessage,
   realtimeDbService,
-} from "../firebaseConfig";
-import { convertDate } from "../utils/convertDate";
+} from '../firebaseConfig';
+import { convertDate } from '../utils/convertDate';
 import {
   ChatDataNew,
   ChatRoomType,
   createGroupChatRooms,
   getNotReadMessageCount,
+  groupChatRoomUidArr,
   ResultGroupRoom,
-} from "../utils/makeChatRooms";
+} from '../utils/makeChatRooms';
 import {
   ChatIcon,
   ChatListHeader,
@@ -30,7 +31,7 @@ import {
   PageTitle,
   Wrap,
   ZeroChatRoom,
-} from "./oneToOneChatRooms";
+} from './oneToOneChatRooms';
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,60 +42,44 @@ function ChatList() {
   const router = useRouter();
   const uid = authService.currentUser?.uid;
 
-  const getMyChatRoomsRef = async (uid: string, chatRoomType: ChatRoomType) => {
-    if (chatRoomType === "group") {
-      return await (
-        await get(
-          ref(
-            realtimeDbService,
-            `userList/${uid}/myGroupChatList/groupChatUid`,
-          ),
-        )
-      ).val();
-    } else {
-      return await (
-        await get(ref(realtimeDbService, `oneToOneChatRooms/${uid}`))
-      ).val();
-    }
-  };
-
-  const startGroupChatObserver = async (chatUid: string) => {
-    console.log(`${chatUid}방 옵저버 실행`);
-    const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
-    onValue(refs, async (snapshot) => {
-      //라스트인덱스오브를 통해 뒤에서부터 true를 찾은 뒤 그 인덱스 = 마지막으로 읽은 메시지 index
-      //스냅샷의 사이즈를 가져와서, 스냅샷 - index = 안읽은 메시지 갯수
-      //마지막 메시지넣기 시작
-      const newLastMessage = await getChatRoomLastMessage(chatUid, "group");
-      // console.log(newLastMessage);
-      const isLastMessageLead =
-        newLastMessage.readUsers[authService.currentUser?.uid];
-      // console.log('newLastMessage');
-      //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
-      if (!isLastMessageLead) {
-        //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
-        const 메시지들: ChatDataNew[] = Object.values((await get(refs)).val());
-        const notReadCount = await getNotReadMessageCount(메시지들, uid);
-        setCombineChatList((prev) => {
-          //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
-          let updateChatList = prev.map((i, index) => {
-            if (i.chatRoomUid === chatUid) {
-              i.lastMessage = newLastMessage.message;
-              i.createdSecondsAt = newLastMessage.createdSecondsAt;
-              i.notReadCount = notReadCount;
-              // i.notReadCount++;
-            }
-            return i;
-          });
-          return updateChatList;
+  const startGroupChatRoomsObserver = async (uid: string) => {
+    await groupChatRoomUidArr(uid).then((res) => {
+      res.forEach((chatUid) => {
+        console.log(`${chatUid}방 옵저버 실행`);
+        const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
+        onValue(refs, async (snapshot) => {
+          console.log('snapshot.val()');
+          console.log(snapshot.val());
+          const lastMessage = await getChatRoomLastMessage(chatUid, 'group');
+          //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
+          if (lastMessage.readUsers[authService.currentUser?.uid] === false) {
+            //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
+            const 메시지들: ChatDataNew[] = Object.values(snapshot.val());
+            const notReadCount = getNotReadMessageCount(메시지들, uid);
+            setCombineChatList((prev) => {
+              //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
+              let updateChatList = prev.map((i, index) => {
+                if (i.chatRoomUid === chatUid) {
+                  i.lastMessage = lastMessage.message;
+                  i.createdSecondsAt = lastMessage.createdSecondsAt;
+                  i.notReadCount = notReadCount;
+                  // i.notReadCount++;
+                }
+                return i;
+              });
+              return updateChatList;
+            });
+          }
         });
-      }
+      });
     });
   };
-  const exitGroupChatObserver = (chatUid: string) => {
-    const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
-    console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
-    off(refs);
+  const exitGroupChatRoomsObserver = async (uid: string) => {
+    await groupChatRoomUidArr(uid).then((chatUid) => {
+      const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
+      console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
+      off(refs);
+    });
   };
 
   useEffect(() => {
@@ -112,13 +97,13 @@ function ChatList() {
     //현재 유저의 새로운 그룹채팅이 생김을 감지하는 옵저버
     //새로 감지가 되면 방을 다시 렌더링하여 순차정렬해준다.
     onValue(
-      ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
+      ref(realtimeDbService, `userList/${uid}/group_chat_rooms`),
       (snap) => {
         // console.log('새로운 그룹 채팅 수신');
         // console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
         setTimeout(() => {
           createGroupChatRooms(uid).then((res) => {
-            console.log("그룹 수신 후res");
+            console.log('그룹 수신 후res');
             console.log(res);
             if (res) {
               setGroupChatList2(res);
@@ -129,36 +114,14 @@ function ChatList() {
       },
     );
     return () => {
-      off(
-        ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
-      );
+      off(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`));
     };
   }, []);
 
   useEffect(() => {
-    if (groupChatList2.length === 0) return;
-    const groupChatRoomUidArr = async () => {
-      const 그룹채팅배열 = await getMyChatRoomsRef(uid, "group");
-      //   console.log(그룹채팅배열);
-      return 그룹채팅배열;
-    };
-
-    groupChatRoomUidArr().then((res) => {
-      if (res) {
-        res.forEach((i) => {
-          startGroupChatObserver(i);
-        });
-      }
-    });
-
+    startGroupChatRoomsObserver(uid);
     return () => {
-      groupChatRoomUidArr().then((res) => {
-        if (res) {
-          res.forEach((i) => {
-            exitGroupChatObserver(i);
-          });
-        }
-      });
+      exitGroupChatRoomsObserver(uid);
     };
   }, [groupChatList2]);
 
@@ -183,7 +146,7 @@ function ChatList() {
       <ChatListHeader>
         <PageTitle>대화 목록</PageTitle>
         <CreateGroupChatButton
-          className="addGroupChatButton"
+          className='addGroupChatButton'
           onClick={() => setShowAddGroupChat((prev) => !prev)}
         >
           <AddSvg />
@@ -210,10 +173,10 @@ function ChatList() {
                   </ChatIcon>
                   <ChatRoomInfo>
                     <ChatRoomTitleAndTime>
-                      <span className="title">{item?.displayName}</span>
+                      <span className='title'>{item?.displayName}</span>
                       {item.createdSecondsAt !== 0 &&
                         item.createdSecondsAt !== undefined && (
-                          <span className="timeStamp">
+                          <span className='timeStamp'>
                             {convertDate(item.createdSecondsAt)}
                           </span>
                         )}
