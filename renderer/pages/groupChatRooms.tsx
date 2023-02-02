@@ -11,7 +11,12 @@ import PeopleSvg from '../components/svg/peopleSvg';
 import CreateGroupChatModal from '../components/createGroupChatModal';
 import AddSvg from '../components/svg/addSvg';
 import { convertDate } from '../utils/convertDate';
-import { ChatDataNew, ChatRoomType } from '../utils/makeChatRooms';
+import {
+  ChatDataNew,
+  ChatRoomType,
+  createGroupChatRooms,
+  getNotReadMessageCount,
+} from '../utils/makeChatRooms';
 import {
   ChatIcon,
   ChatListHeader,
@@ -79,46 +84,6 @@ function ChatList() {
     }
   };
 
-  //특정 그룹채팅uid의 제목을 리턴
-  const getMyGroupChatRoomsTitle = async (chatRoomUid: string) => {
-    const titleList = (
-      await get(
-        ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chatRoomsTitle`),
-      )
-    ).val();
-
-    return titleList;
-  };
-
-  //특정 그룹채팅uid의 chatList을 리턴
-  const getMyGroupChatRoomChatList = async (
-    chatRoomUid: string,
-  ): Promise<ChatDataNew[] | null> => {
-    const chatList = (
-      await get(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`))
-    ).val();
-
-    if (!chatList) return null;
-    return chatList ? (Object.values(chatList) as ChatDataNew[]) : null;
-  };
-
-  //chatList와 uid를 넘기면 안읽은 메시지 개수를 반환
-  const getNotReadMessageCount = async (
-    chatList: ChatDataNew[],
-    uid: string,
-  ) => {
-    if (!chatList) return 0;
-    let chatListLength = chatList.length;
-    // console.log(chatList);
-    let 안읽은메시지인덱스 = chatList.findIndex((i) => {
-      //   console.log('i');
-      //   console.log(i);
-      return i!.readUsers[uid] === false;
-    });
-    let 안읽은메시지갯수 = chatListLength - 안읽은메시지인덱스;
-    return 안읽은메시지인덱스 === -1 ? 0 : 안읽은메시지갯수;
-  };
-
   const 그룹채팅옵저버 = async (chatUid: string) => {
     console.log(`${chatUid}방 옵저버 실행`);
     const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
@@ -151,35 +116,6 @@ function ChatList() {
         });
       }
     });
-  };
-
-  //그룹채팅리스트를 적절히 렌더링할 배열로 변환
-  const createGroupChatRooms = async (uid: string) => {
-    //   const listObj = await getMyGroupChatRoomsRef(uid);
-    const listObj = await getMyChatRoomsRef(uid, 'group');
-    // console.log('listObj');
-    // console.log(listObj);
-    if (!listObj) return; //채팅방이 존재할 때 함수 진행
-    const listValues: string[] = Object.values(listObj); // 그룹채팅 uid가 들어있다
-    // console.log('listValues');
-    // console.log(listValues);
-    // setGroupChatList2(listValues);
-
-    const resultGroupChatRooms = listValues.map(async (i) => {
-      const title = await getMyGroupChatRoomsTitle(i);
-      const lastMessage = await getChatRoomLastMessage(i, 'group');
-      const chatList = await getMyGroupChatRoomChatList(i);
-      const notReadCount = await getNotReadMessageCount(chatList, uid);
-      let 결과객체 = {
-        chatRoomUid: i,
-        displayName: title,
-        lastMessage: lastMessage.message,
-        notReadCount: notReadCount,
-        createdSecondsAt: lastMessage.createdSecondsAt,
-      };
-      return 결과객체;
-    });
-    return await Promise.all(resultGroupChatRooms);
   };
 
   useEffect(() => {
