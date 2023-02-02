@@ -1,16 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import {
-  get,
-  getDatabase,
-  limitToLast,
-  push,
-  query,
-  ref,
-  set,
-  update,
-} from 'firebase/database';
+import { get, getDatabase, limitToLast, push, query, ref, set, update } from 'firebase/database';
 import { getFirestore, Timestamp } from 'firebase/firestore';
 import { convertDate } from './utils/convertDate';
 import { ChatDataNew } from './utils/makeChatRooms';
@@ -45,31 +36,17 @@ export interface UserList {
  * ex) [{displayName:'1',uid:'1',},{displayName:'2',uid:'2',}]
  */
 export const getUserList = async () => {
-  const userList: UserList[] = Object.values(
-    await (await get(userListRef)).val(),
-  );
+  const userList: UserList[] = Object.values(await (await get(userListRef)).val());
   return userList;
 };
 
 //내 채팅방 db경로 설정
-export const createOneToOneChatRoomsRef = (
-  uid: string,
-  opponentUid: string,
-) => {
-  return ref(
-    realtimeDbService,
-    `oneToOneChatRooms/${uid}/${opponentUid}/chatRoomUid`,
-  );
+export const createOneToOneChatRoomsRef = (uid: string, opponentUid: string) => {
+  return ref(realtimeDbService, `oneToOneChatRooms/${uid}/${opponentUid}/chatRoomUid`);
 };
 //상대 채팅방 db경로 설정
-export const createOneToOneChatRoomsRefForOpponent = (
-  opponentUid: string,
-  uid: string,
-) => {
-  return ref(
-    realtimeDbService,
-    `oneToOneChatRooms/${opponentUid}/${uid}/chatRoomUid`,
-  );
+export const createOneToOneChatRoomsRefForOpponent = (opponentUid: string, uid: string) => {
+  return ref(realtimeDbService, `oneToOneChatRooms/${opponentUid}/${uid}/chatRoomUid`);
 };
 //새로운 채팅방 db경로 설정
 export const createOneToOneChatRoom = (chatUid: string) => {
@@ -85,20 +62,14 @@ export const getGroupChatRoomsUidToTitleFunc = async (roomUid: string[]) => {
 
     let groupChatTitleArr = Promise.all(
       roomUid.map(async (i, index) => {
-        let result = (
-          await get(
-            ref(realtimeDbService, `groupChatRooms/${i}/chatRoomsTitle`),
-          )
-        ).val();
+        let result = (await get(ref(realtimeDbService, `groupChatRooms/${i}/chatRoomsTitle`))).val();
 
         return result;
       }),
     );
     return groupChatTitleArr;
   };
-  return getGroupChatRoomsUidToTitle().then(
-    (groupChatTitleArr) => groupChatTitleArr,
-  );
+  return getGroupChatRoomsUidToTitle().then((groupChatTitleArr) => groupChatTitleArr);
 };
 
 //채팅방 고유번호용 랜덤 스트링 생성
@@ -127,10 +98,7 @@ export const getUserConnectedGroupChatList = (uid: string) => {
 };
 
 //특정 유저의 그룹채팅리스트에 그룹채팅을 추가하는 함수
-export const updateUserGroupChatList = async (
-  uid: string,
-  chatRoomUid: string,
-) => {
+export const updateUserGroupChatList = async (uid: string, chatRoomUid: string) => {
   const group_chat_roomsPath = getUserConnectedGroupChatList(uid);
   const 데이터사이즈 = (await get(group_chat_roomsPath)).size;
   update(group_chat_roomsPath, {
@@ -139,10 +107,7 @@ export const updateUserGroupChatList = async (
 };
 
 //유저배열과 그룹채팅uid를 받아와 받아와 각 유저들의 그룹채팅리스트에 그룹채팅을 추가하는 함수
-export const updateUsersGroupChatList = async (
-  userList: UserList[],
-  chatRoomUid: string,
-) => {
+export const updateUsersGroupChatList = async (userList: UserList[], chatRoomUid: string) => {
   userList.forEach(async (i, index) => {
     // // const group_chat_roomsPath = getUserConnectedGroupChatList(i.uid);
     // const 데이터사이즈 = (await get(그룹채팅ref)).size;
@@ -153,10 +118,7 @@ export const updateUsersGroupChatList = async (
 };
 
 //유저배열과 그룹채팅uid를 받아와 그룹채팅의 유저리스트에 추가해준다. (초대 시 사용)
-export const updateGroupChatConnectedUsers = async (
-  userList: UserList[],
-  groupChatRoomUid: string,
-) => {
+export const updateGroupChatConnectedUsers = async (userList: UserList[], groupChatRoomUid: string) => {
   const 데이터사이즈 = (await get(getGroupUserListPath(groupChatRoomUid))).size; //두명이면 2겠지
   //들어온 배열을 순회하며, 채팅방에 유저 업데이트.
   userList.forEach(async (i, index) => {
@@ -167,13 +129,8 @@ export const updateGroupChatConnectedUsers = async (
 };
 
 //특정유저가 그룹채팅방에서 퇴장 시 자신의 채팅리스트에서 삭제해주는 함수
-export const exitUserCleanUpGroupChatRooms = async (
-  uid: string,
-  chatRoomUid: string,
-) => {
-  let 내그룹채팅리스트 = [
-    ...(await (await get(getUserConnectedGroupChatList(uid))).val()),
-  ];
+export const exitUserCleanUpGroupChatRooms = async (uid: string, chatRoomUid: string) => {
+  let 내그룹채팅리스트 = [...(await (await get(getUserConnectedGroupChatList(uid))).val())];
   //삭제해야하는 채팅방의 인덱스를 구한다.
   let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
   console.log('내그룹채팅리스트');
@@ -197,23 +154,13 @@ export const exitUserCleanUpGroupChatRooms = async (
 };
 
 //그룹채팅에서 특정 유저를 삭제하는 것
-export const exitUserCleanUpThisGroupChatList = async (
-  uid: string,
-  chatRoomUid: string,
-) => {
+export const exitUserCleanUpThisGroupChatList = async (uid: string, chatRoomUid: string) => {
   //공식 문서에 안내대로, 객체의 값을 null로 update하여 값을 삭제한다.
-  update(
-    ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`),
-    { [uid]: null },
-  );
+  update(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`), { [uid]: null });
 };
 
 //그룹 채팅 생성 시 방을 생성하고, 유저목록 set 후, 시작메시지를 작성해주는 함수
-export const createGroupChat = (
-  inviteUserList: UserList[],
-  chatRoomUid: string,
-  chatRoomTitle: string,
-) => {
+export const createGroupChat = (inviteUserList: UserList[], chatRoomUid: string, chatRoomTitle: string) => {
   let groupChatPath = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`);
   let groupChatMessagePath = getGroupChatListPath(chatRoomUid);
   console.log(inviteUserList);
@@ -249,33 +196,4 @@ export const createGroupChat = (
     createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
     readUsers: readUserCounts,
   });
-};
-
-/**
- * 채팅의 uid와 종류를 넘겨주면 메시지가 있을때 마지막 메시지를, 없으면 null을 반환합니다.
- * @param chatRoomUid : 채팅방의 고유 uid
- * @param chatRoomType : 채팅방이 그룹인지 일대일인지 구분할 값
- * @returns Promise<ChatDataNew | null>
- */
-export const getChatRoomLastMessage = async (
-  chatRoomUid: string,
-  chatRoomType: 'oneToOne' | 'group',
-): Promise<ChatDataNew | null> => {
-  let resultLastMessage = null;
-  //들어온값에 따라서 적절한 ref를 할당시킨다.
-  const chatRef =
-    chatRoomType === 'oneToOne'
-      ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
-      : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
-
-  //메시지를 가져온다. 해당 채팅방에 메시지가 없으면 null이 나온다.
-  const queryLastMessage = await (
-    await get(query(chatRef, limitToLast(1)))
-  ).val();
-
-  if (queryLastMessage) {
-    //메시지가 있으면 values로 풀어준다
-    resultLastMessage = Object.values(queryLastMessage)[0];
-  }
-  return resultLastMessage;
 };
