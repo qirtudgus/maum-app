@@ -102,9 +102,7 @@ const SideBar = () => {
           </SettingButton>
           <SettingButton
             title='일대일 대화 목록'
-            className={
-              router.pathname.startsWith('/oneToOneChatRooms') && 'active'
-            }
+            className={router.pathname.startsWith('/oneToOneChatRooms') && 'active'}
             onClick={() => {
               router.push('/oneToOneChatRooms');
             }}
@@ -113,9 +111,7 @@ const SideBar = () => {
           </SettingButton>{' '}
           <SettingButton
             title='단체 대화 목록'
-            className={
-              router.pathname.startsWith('/groupChatRooms') && 'active'
-            }
+            className={router.pathname.startsWith('/groupChatRooms') && 'active'}
             onClick={() => {
               router.push('/groupChatRooms');
             }}
@@ -131,7 +127,10 @@ const SideBar = () => {
           >
             <SettingSvg /> 설정
           </SettingButton>
-          <SettingButton title='로그아웃' onClick={userSignOut}>
+          <SettingButton
+            title='로그아웃'
+            onClick={userSignOut}
+          >
             <LogoutSvg /> 로그아웃
           </SettingButton>
         </HeaderButtonWrap>

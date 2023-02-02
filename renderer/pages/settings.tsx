@@ -130,9 +130,7 @@ const Settings = () => {
     }
   }, []);
 
-  const oneToOneSettings = (
-    e: React.ChangeEvent<HTMLInputElement> | string,
-  ) => {
+  const oneToOneSettings = (e: React.ChangeEvent<HTMLInputElement> | string) => {
     if (typeof e === 'string') {
       localStorage.setItem('oneToOneChatLayout', `${e}`);
     } else {

@@ -5,11 +5,7 @@ import ChatRoom from '../components/ChatRoom';
 import CreateGroupChatModal from '../components/createGroupChatModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import AddSvg from '../components/svg/addSvg';
-import {
-  authService,
-  getChatRoomLastMessage,
-  realtimeDbService,
-} from '../firebaseConfig';
+import { authService, getChatRoomLastMessage, realtimeDbService } from '../firebaseConfig';
 import {
   ChatDataNew,
   createGroupChatRooms,
@@ -17,13 +13,7 @@ import {
   groupChatRoomUidArr,
   ResultGroupRoom,
 } from '../utils/makeChatRooms';
-import {
-  ChatListHeader,
-  CreateGroupChatButton,
-  PageTitle,
-  Wrap,
-  ZeroChatRoom,
-} from './oneToOneChatRooms';
+import { ChatListHeader, CreateGroupChatButton, PageTitle, Wrap, ZeroChatRoom } from './oneToOneChatRooms';
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
@@ -88,23 +78,20 @@ function ChatList() {
   useEffect(() => {
     //현재 유저의 새로운 그룹채팅이 생김을 감지하는 옵저버
     //새로 감지가 되면 방을 다시 렌더링하여 순차정렬해준다.
-    onValue(
-      ref(realtimeDbService, `userList/${uid}/group_chat_rooms`),
-      (snap) => {
-        // console.log('새로운 그룹 채팅 수신');
-        // console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
-        setTimeout(() => {
-          createGroupChatRooms(uid).then((res) => {
-            console.log('그룹 수신 후res');
-            console.log(res);
-            if (res) {
-              setGroupChatList2(res);
-              setCombineChatList(res);
-            }
-          });
-        }, 50);
-      },
-    );
+    onValue(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`), (snap) => {
+      // console.log('새로운 그룹 채팅 수신');
+      // console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
+      setTimeout(() => {
+        createGroupChatRooms(uid).then((res) => {
+          console.log('그룹 수신 후res');
+          console.log(res);
+          if (res) {
+            setGroupChatList2(res);
+            setCombineChatList(res);
+          }
+        });
+      }, 50);
+    });
     return () => {
       off(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`));
     };
@@ -151,16 +138,19 @@ function ChatList() {
         ) : (
           <>
             {sortChatList.map((item) => {
-              return <ChatRoom chatRoom={item} chatRoomType='group' />;
+              return (
+                <ChatRoom
+                  chatRoom={item}
+                  chatRoomType='group'
+                />
+              );
             })}
           </>
         )
       ) : (
         <LoadingSpinner />
       )}
-      {showAddGroupChat && (
-        <CreateGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />
-      )}
+      {showAddGroupChat && <CreateGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />}
     </Wrap>
   );
 }

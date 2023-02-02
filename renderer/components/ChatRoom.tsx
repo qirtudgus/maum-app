@@ -1,11 +1,7 @@
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import { convertDate } from '../utils/convertDate';
-import {
-  ChatRoomType,
-  ResultGroupRoom,
-  ResultOneToOneRoom,
-} from '../utils/makeChatRooms';
+import { ChatRoomType, ResultGroupRoom, ResultOneToOneRoom } from '../utils/makeChatRooms';
 import PeopleSvg from './svg/peopleSvg';
 const ChatRoomList = styled.li`
   cursor: pointer;
@@ -92,8 +88,6 @@ const ChatRoom = ({
             chatRoomType === 'oneToOne'
               ? `/oneToOneChatRooms/oneToOne?displayName=${chatRoom.displayName}&chatRoomUid=${chatRoom.chatRoomUid}`
               : `/groupChatRooms/group?chatRoomsTitle=${chatRoom.displayName}&chatRoomUid=${chatRoom.chatRoomUid}`,
-
-            //   `/chatRooms/oneToOne?displayName=${item?.opponentName}&chatRoomUid=${item?.chatRoomUid}`,
           );
         }}
       >
@@ -103,17 +97,11 @@ const ChatRoom = ({
         <ChatRoomInfo>
           <ChatRoomTitleAndTime>
             <span className='title'>{chatRoom?.displayName}</span>
-            <span className='timeStamp'>
-              {convertDate(chatRoom.createdSecondsAt)}
-            </span>
+            <span className='timeStamp'>{convertDate(chatRoom.createdSecondsAt)}</span>
           </ChatRoomTitleAndTime>
           <ChatRoomLastMessage>
             <div className='message'>{chatRoom.lastMessage}</div>
-            {chatRoom.notReadCount !== 0 && (
-              <ChatRoomNotReadCount>
-                {chatRoom.notReadCount}
-              </ChatRoomNotReadCount>
-            )}
+            {chatRoom.notReadCount !== 0 && <ChatRoomNotReadCount>{chatRoom.notReadCount}</ChatRoomNotReadCount>}
           </ChatRoomLastMessage>
         </ChatRoomInfo>
       </ChatRoomList>

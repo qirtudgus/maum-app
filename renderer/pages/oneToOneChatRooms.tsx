@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import {
-  authService,
-  realtimeDbService,
-  getChatRoomLastMessage,
-} from '../firebaseConfig';
+import { authService, realtimeDbService, getChatRoomLastMessage } from '../firebaseConfig';
 import { get, ref, off, onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import LoadingSpinner from '../components/LoadingSpinner';
 import AddSvg from '../components/svg/addSvg';
-import { convertDate } from '../utils/convertDate';
 import {
   ChatDataNew,
   createOneToOneChatRooms,
@@ -75,12 +70,8 @@ export const CreateGroupChatButton = styled.div`
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
-  const [groupChatList2, setGroupChatList2] = useState<ResultOneToOneRoom[]>(
-    [],
-  );
-  const [combineChatList, setCombineChatList] = useState<ResultOneToOneRoom[]>(
-    [],
-  );
+  const [groupChatList2, setGroupChatList2] = useState<ResultOneToOneRoom[]>([]);
+  const [combineChatList, setCombineChatList] = useState<ResultOneToOneRoom[]>([]);
   const [sortChatList, setSortChatList] = useState<ResultOneToOneRoom[]>([]);
   const router = useRouter();
   const uid = authService.currentUser?.uid;
@@ -96,8 +87,7 @@ function ChatList() {
       // console.log('newLastMessage');
 
       // console.log(newLastMessage);
-      const isLastMessageLead =
-        newLastMessage.readUsers[authService.currentUser?.uid];
+      const isLastMessageLead = newLastMessage.readUsers[authService.currentUser?.uid];
       // console.log('chatUid');
       // console.log(chatUid);
       //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
@@ -216,7 +206,12 @@ function ChatList() {
         ) : (
           <>
             {sortChatList.map((item) => {
-              return <ChatRoom chatRoom={item} chatRoomType='oneToOne' />;
+              return (
+                <ChatRoom
+                  chatRoom={item}
+                  chatRoomType='oneToOne'
+                />
+              );
             })}
           </>
         )

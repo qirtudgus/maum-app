@@ -91,51 +91,48 @@ const StatusText = styled.p`
   color: red;
 `;
 
-export const BasicInput = forwardRef<HTMLDivElement, BasicInputInterface>(
-  (props, ref) => {
-    const [focus, setFocus] = useState(false);
-    const inputRef = useRef() as RefObject<HTMLInputElement>;
-    const setFocusFalse = () => {
-      //input에 value 유무에 따라 라벨이 위치로 돌아옴
-      if (inputRef.current?.value) {
-        //props로 OnBlur를 받았으면 실행
-        if (props.PropsOnBlurFunc) {
-          props.PropsOnBlurFunc();
-        }
-        //input에 value 유무에 따라 라벨이 위치로 돌아옴 #2
-        return;
-      }
-      setFocus(false);
-    };
-    const setFocusTrue = () => {
+export const BasicInput = forwardRef<HTMLDivElement, BasicInputInterface>((props, ref) => {
+  const [focus, setFocus] = useState(false);
+  const inputRef = useRef() as RefObject<HTMLInputElement>;
+  const setFocusFalse = () => {
+    //input에 value 유무에 따라 라벨이 위치로 돌아옴
+    if (inputRef.current?.value) {
       //props로 OnBlur를 받았으면 실행
-      if (props.PropsOnFocusFunc) {
-        props.PropsOnFocusFunc();
+      if (props.PropsOnBlurFunc) {
+        props.PropsOnBlurFunc();
       }
-      setFocus(true);
-    };
+      //input에 value 유무에 따라 라벨이 위치로 돌아옴 #2
+      return;
+    }
+    setFocus(false);
+  };
+  const setFocusTrue = () => {
+    //props로 OnBlur를 받았으면 실행
+    if (props.PropsOnFocusFunc) {
+      props.PropsOnFocusFunc();
+    }
+    setFocus(true);
+  };
 
-    return (
-      <InputWrap>
-        <WrapDiv ref={ref} isError={props.isError}>
-          <Input
-            className='basicInput'
-            type={props.type}
-            ref={inputRef}
-            onFocus={setFocusTrue}
-            onBlur={setFocusFalse}
-            defaultValue={props.defaultValue}
-          ></Input>
-          {props.placeholderValue && (
-            <label className={focus ? 'active' : ''}>
-              {props.placeholderValue}
-            </label>
-          )}
-          {props.isError && <StatusText>{props.statusText}</StatusText>}
-        </WrapDiv>
-      </InputWrap>
-    );
-  },
-);
+  return (
+    <InputWrap>
+      <WrapDiv
+        ref={ref}
+        isError={props.isError}
+      >
+        <Input
+          className='basicInput'
+          type={props.type}
+          ref={inputRef}
+          onFocus={setFocusTrue}
+          onBlur={setFocusFalse}
+          defaultValue={props.defaultValue}
+        ></Input>
+        {props.placeholderValue && <label className={focus ? 'active' : ''}>{props.placeholderValue}</label>}
+        {props.isError && <StatusText>{props.statusText}</StatusText>}
+      </WrapDiv>
+    </InputWrap>
+  );
+});
 
 export default BasicInput;

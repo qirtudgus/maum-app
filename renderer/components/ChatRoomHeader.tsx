@@ -73,13 +73,7 @@ const UserListButton = styled.div`
   }
 `;
 
-const ChatRoomHeader = ({
-  title,
-  userList,
-}: {
-  title: string;
-  userList?: UserList[];
-}) => {
+const ChatRoomHeader = ({ title, userList }: { title: string; userList?: UserList[] }) => {
   const router = useRouter();
   const [isOpenUserList, setIsOpenUserList] = useState(false);
   useEffect(() => {

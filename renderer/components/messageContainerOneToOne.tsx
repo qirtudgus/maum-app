@@ -90,31 +90,26 @@ const MessageWrap = styled.div<MessageSendData>`
 //   color: #000;
 // `;
 
-const MessageContainerOneToOne = ({
-  chatList,
-}: {
-  chatList: ChatDataNew[];
-}) => {
+const MessageContainerOneToOne = ({ chatList }: { chatList: ChatDataNew[] }) => {
   const messageContainerScrollHandler = useRef<HTMLDivElement>();
 
   //메시지dom이 그려진 후 스크롤 맨 아래로 이동
   useLayoutEffect(() => {
-    messageContainerScrollHandler.current.scrollTop =
-      messageContainerScrollHandler.current.scrollHeight;
+    messageContainerScrollHandler.current.scrollTop = messageContainerScrollHandler.current.scrollHeight;
   }, [chatList]);
 
   return (
-    <MessageContainers id='msgWrap' ref={messageContainerScrollHandler}>
+    <MessageContainers
+      id='msgWrap'
+      ref={messageContainerScrollHandler}
+    >
       {chatList.map((i, index) => {
         return (
           <MessageWrap
             createdAt={i.createdAt}
             key={index}
             //본인 메시지일 경우에 대한 스타일링용 className
-            className={
-              i.displayName === authService.currentUser.displayName &&
-              'myMessage'
-            }
+            className={i.displayName === authService.currentUser.displayName && 'myMessage'}
           >
             {i.displayName !== authService.currentUser.displayName && (
               <span className='messageWrite'>{i.displayName}</span>

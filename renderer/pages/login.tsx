@@ -121,72 +121,67 @@ const Login = () => {
       window.localStorage.removeItem('mail');
     }
 
-    signInWithEmail(emailInput.value, passwordInput.value).then(
-      (loginResult) => {
-        //로그인 결과가 성공적일경우와 에러일 경우 분기
-        // 성공이면 loginResult에 undifined가, 실패면 error 객체가 들어있다
-        if (loginResult !== undefined) {
-          let errorCode = loginResult.code;
-          console.log(errorCode);
-          switch (errorCode) {
-            case 'auth/user-not-found': {
-              setIsLoginError(true);
-              setIsLoginText('존재하지않는 사용자입니다.');
-              emailInput.focus();
-              break;
-            }
-
-            case 'auth/invalid-email': {
-              setIsLoginError(true);
-              setIsLoginText('이메일 양식을 확인해주세요!');
-              emailInput.focus();
-              break;
-            }
-            case 'auth/wrong-password': {
-              setIsLoginError(false);
-              setIsLoginText('');
-              setIsPasswordError(true);
-              setIsPasswordText('비밀번호를 확인해주세요!');
-              passwordInput.focus();
-              break;
-            }
-            case 'auth/internal-error': {
-              setIsLoginError(false);
-              setIsLoginText('');
-              setIsPasswordError(true);
-              setIsPasswordText('비밀번호를 확인해주세요!');
-              passwordInput.focus();
-              break;
-            }
-            default: {
-              setIsLoginError(true);
-              setIsPasswordError(false);
-              setIsLoginText('이메일 혹은 비밀번호를 확인해주세요!');
-              emailInput.focus();
-              break;
-            }
+    signInWithEmail(emailInput.value, passwordInput.value).then((loginResult) => {
+      //로그인 결과가 성공적일경우와 에러일 경우 분기
+      // 성공이면 loginResult에 undifined가, 실패면 error 객체가 들어있다
+      if (loginResult !== undefined) {
+        let errorCode = loginResult.code;
+        console.log(errorCode);
+        switch (errorCode) {
+          case 'auth/user-not-found': {
+            setIsLoginError(true);
+            setIsLoginText('존재하지않는 사용자입니다.');
+            emailInput.focus();
+            break;
           }
 
-          return;
-        } else {
-          const connectedRef = ref(
-            realtimeDbService,
-            `userList/${authService.currentUser.uid}`,
-          );
-          update(connectedRef, { isOn: true });
-          //로컬스토리지에서 채팅방 레이아웃 확인 후 없으면 초기값 세팅
-          if (!window.localStorage.getItem('oneToOneChatLayout')) {
-            console.log('채팅레이아웃 설정값없어서 세팅!');
-            window.localStorage.setItem('oneToOneChatLayout', 'oneToOne');
-            window.localStorage.setItem('groupChatLayout', 'group');
+          case 'auth/invalid-email': {
+            setIsLoginError(true);
+            setIsLoginText('이메일 양식을 확인해주세요!');
+            emailInput.focus();
+            break;
           }
-          //로그인 시점에 onDisconnect를 설정하여 앱을 바로 종료하여도 종료 업데이트가 되도록 오류 수정
-          onDisconnect(connectedRef).update({ isOn: false });
-
-          router.replace('/userList');
+          case 'auth/wrong-password': {
+            setIsLoginError(false);
+            setIsLoginText('');
+            setIsPasswordError(true);
+            setIsPasswordText('비밀번호를 확인해주세요!');
+            passwordInput.focus();
+            break;
+          }
+          case 'auth/internal-error': {
+            setIsLoginError(false);
+            setIsLoginText('');
+            setIsPasswordError(true);
+            setIsPasswordText('비밀번호를 확인해주세요!');
+            passwordInput.focus();
+            break;
+          }
+          default: {
+            setIsLoginError(true);
+            setIsPasswordError(false);
+            setIsLoginText('이메일 혹은 비밀번호를 확인해주세요!');
+            emailInput.focus();
+            break;
+          }
         }
-      },
-    );
+
+        return;
+      } else {
+        const connectedRef = ref(realtimeDbService, `userList/${authService.currentUser.uid}`);
+        update(connectedRef, { isOn: true });
+        //로컬스토리지에서 채팅방 레이아웃 확인 후 없으면 초기값 세팅
+        if (!window.localStorage.getItem('oneToOneChatLayout')) {
+          console.log('채팅레이아웃 설정값없어서 세팅!');
+          window.localStorage.setItem('oneToOneChatLayout', 'oneToOne');
+          window.localStorage.setItem('groupChatLayout', 'group');
+        }
+        //로그인 시점에 onDisconnect를 설정하여 앱을 바로 종료하여도 종료 업데이트가 되도록 오류 수정
+        onDisconnect(connectedRef).update({ isOn: false });
+
+        router.replace('/userList');
+      }
+    });
   };
 
   return (

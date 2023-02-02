@@ -70,12 +70,14 @@ const MessageContainerGroup = ({ chatList }: { chatList: ChatDataNew[] }) => {
 
   //메시지dom이 그려진 후 스크롤 맨 아래로 이동
   useLayoutEffect(() => {
-    messageContainerScrollHandler.current.scrollTop =
-      messageContainerScrollHandler.current.scrollHeight;
+    messageContainerScrollHandler.current.scrollTop = messageContainerScrollHandler.current.scrollHeight;
   }, [chatList]);
 
   return (
-    <MessageContainers id='msgWrap' ref={messageContainerScrollHandler}>
+    <MessageContainers
+      id='msgWrap'
+      ref={messageContainerScrollHandler}
+    >
       {chatList.map((i, index) => {
         return (
           <React.Fragment key={index}>

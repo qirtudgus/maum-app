@@ -210,11 +210,7 @@ const CreateGroupChatModal = ({
     //2.초대된 유저를 순회하며, 각 유저들의 채팅리스트를 업데이트해준다.
     updateUsersGroupChatList(addUserListUpdateMe, chatRoomUid);
     //3.그룹채팅방을 생성한다.
-    createGroupChat(
-      addUserListUpdateMe,
-      chatRoomUid,
-      chatRoomsTitleInputRef.current.value,
-    );
+    createGroupChat(addUserListUpdateMe, chatRoomUid, chatRoomsTitleInputRef.current.value);
     setShowAddGroupChat(false);
     //바로 입장?
     router.push(
@@ -246,13 +242,9 @@ const CreateGroupChatModal = ({
                       onClick={() => {
                         console.log('취소할 이름');
                         console.log(i.displayName);
-                        setAddUserList((prev) =>
-                          prev.filter((list) => list.uid !== i.uid),
-                        );
+                        setAddUserList((prev) => prev.filter((list) => list.uid !== i.uid));
                         //className이 i.uid와 동일한 요소를 찾아서 active 제거
-                        const removeDom = document.querySelector(
-                          `.uid${i.uid}`,
-                        );
+                        const removeDom = document.querySelector(`.uid${i.uid}`);
                         removeDom.classList.remove('active');
                         console.log(document.querySelector(`.uid${i.uid}`));
                         setInviteUserCount((prev) => prev - 1);
@@ -277,9 +269,7 @@ const CreateGroupChatModal = ({
                   onClick={(e: React.MouseEvent) => {
                     //액티브가 있는 경우에는 state에서 삭제 후, active 제거
                     if (e.currentTarget.classList.contains('active')) {
-                      setAddUserList((prev) =>
-                        prev.filter((todo) => todo.uid !== i.uid),
-                      );
+                      setAddUserList((prev) => prev.filter((todo) => todo.uid !== i.uid));
                       e.currentTarget.classList.remove('active');
                       setInviteUserCount((prev) => prev - 1);
                     }
@@ -287,10 +277,7 @@ const CreateGroupChatModal = ({
                     //액티브가 없는 경우에는 추가
                     else {
                       e.currentTarget.classList.add('active');
-                      setAddUserList((prev) => [
-                        ...prev,
-                        { displayName: i.displayName, uid: i.uid },
-                      ]);
+                      setAddUserList((prev) => [...prev, { displayName: i.displayName, uid: i.uid }]);
                       setInviteUserCount((prev) => prev + 1);
                     }
                   }}

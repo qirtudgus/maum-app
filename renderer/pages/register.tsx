@@ -1,8 +1,4 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { ref, set, update } from 'firebase/database';
 import Head from 'next/head';
 import Image from 'next/image';
@@ -55,25 +51,20 @@ const Register = () => {
 
   const signUpWithEmail = async (email, password, nickname) => {
     try {
-      await createUserWithEmailAndPassword(authService, email, password).then(
-        async (res) => {
-          console.log('회원가입 결과값을 실시간 db에 바로 저장해주자');
-          updateProfile(authService.currentUser, {
-            displayName: nickname,
-          });
-          const connectedRef = ref(
-            realtimeDbService,
-            `userList/${authService.currentUser.uid}`,
-          );
-          //바로 로그인되는 상태라 우선 isOn을 true로 초기화해준다.
-          //회원가입 후 로그인창으로 이동하기때문에 false로 초기화하는것으로 수정
-          await set(connectedRef, {
-            uid: authService.currentUser.uid,
-            displayName: nickname,
-            isOn: false,
-          });
-        },
-      );
+      await createUserWithEmailAndPassword(authService, email, password).then(async (res) => {
+        console.log('회원가입 결과값을 실시간 db에 바로 저장해주자');
+        updateProfile(authService.currentUser, {
+          displayName: nickname,
+        });
+        const connectedRef = ref(realtimeDbService, `userList/${authService.currentUser.uid}`);
+        //바로 로그인되는 상태라 우선 isOn을 true로 초기화해준다.
+        //회원가입 후 로그인창으로 이동하기때문에 false로 초기화하는것으로 수정
+        await set(connectedRef, {
+          uid: authService.currentUser.uid,
+          displayName: nickname,
+          isOn: false,
+        });
+      });
     } catch (error) {
       return error;
     }
