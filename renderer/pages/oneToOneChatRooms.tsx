@@ -63,6 +63,14 @@ export const ChatRoomLastMessage = styled.div`
   display: flex;
   justify-content: space-between;
   color: #444;
+  width: 100%;
+  word-break: break-all;
+  /* & > .message {
+    width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  } */
 `;
 export const ChatRoomNotReadCount = styled.div`
   padding: 3px 5px;
@@ -72,6 +80,9 @@ export const ChatRoomNotReadCount = styled.div`
   font-weight: bold;
   border-radius: 10px;
   background: #d61818;
+  width: fit-content;
+  height: fit-content;
+  flex-shrink: 0;
 `;
 export const ChatRoomTitleAndTime = styled.div`
   display: flex;
@@ -92,6 +103,7 @@ export const ChatIcon = styled.div`
   position: relative;
   width: 45px;
   height: 45px;
+  flex-shrink: 0;
   background: #d0ddff;
   border-radius: 10px;
   margin-right: 10px;
@@ -302,7 +314,7 @@ function ChatList() {
                         )}
                     </ChatRoomTitleAndTime>
                     <ChatRoomLastMessage>
-                      <div>{item.lastMessage}</div>
+                      <div className='message'>{item.lastMessage}</div>
                       {item.notReadCount !== 0 && (
                         <ChatRoomNotReadCount>
                           {item.notReadCount}
