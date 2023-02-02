@@ -10,11 +10,11 @@
 
 ## 🛠 Stacks
 ### Frontend
-Next.js / TypeScript / Styled-Components 
+React@18.2.0 / Next.js@12.3.4 / TypeScript@4.9.4 / Styled-Components@5.3.6
 ### Backend
-Firebase
+Firebase@9.16.0 / node.js@17.4.0
 ### deploy
-Electron
+Electron@21.3.3 / Electron-Builder@23.6.0
 
 ## Firebase Server 구동 방법
 0. Firebase 프로젝트를 생성하여 SDK를 발급 받습니다. 
@@ -30,7 +30,7 @@ NEXT_PUBLIC_FIREBASE_storageBucket = ""
 NEXT_PUBLIC_FIREBASE_messagingSenderId =""
 NEXT_PUBLIC_FIREBASE_appId =""
 ````
-3. 앱을 실행 및 빌드합니다, 사용 가능한 명령어는 아래와 같습니다.
+3.npm install을 명령하여 패키지 설치 후 앱을 실행 및 빌드합니다, 사용 가능한 명령어는 아래와 같습니다.
 ````
   "scripts": {
     "dev": "nextron",
@@ -63,7 +63,6 @@ NEXT_PUBLIC_FIREBASE_appId =""
 - #### 그룹 대화명을 따로 지정할 수 있도록 구현
 - #### 그룹 대화를 생성한 뒤에도 유저를 초대할 수 있는 초대 기능 구현
 - #### 그룹 대화중 나갈 수 있는 나가기 기능 구현
-
 
 
 
