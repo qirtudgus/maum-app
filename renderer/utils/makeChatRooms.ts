@@ -1,5 +1,5 @@
-import { get, ref } from "firebase/database";
-import { getChatRoomLastMessage, realtimeDbService } from "../firebaseConfig";
+import { get, ref } from 'firebase/database';
+import { getChatRoomLastMessage, realtimeDbService } from '../firebaseConfig';
 
 /**
  * 대화를 이루는 각 하나의 대화 요소에 대한 타입입니다.
@@ -51,7 +51,7 @@ export interface ResultGroupRoom {
 /**
  * 특정 함수에서 대화방의 타입을 구분하기 위함
  */
-export type ChatRoomType = "group" | "oneToOne";
+export type ChatRoomType = 'group' | 'oneToOne';
 
 /**
  * oneToOneChatRooms에 렌더링할 배열을
@@ -62,33 +62,33 @@ export type ChatRoomType = "group" | "oneToOne";
  */
 export const createOneToOneChatRooms = async (uid: string) => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
-  const listObj = await getMyChatRoomsRef(uid, "oneToOne");
-  // console.log('listObj');
-  // console.log(listObj);
+  const listObj = await getMyChatRoomsRef(uid, 'oneToOne');
+  console.log('listObj');
+  console.log(listObj);
   if (!listObj) return null; //채팅방이 존재할 때 함수 진행
   // console.log('listValues');
   // console.log(listValues);
   const getMyChatListArray: pureMessage[] = Object.values(listObj);
-  console.log("getMyChatListArray");
+  console.log('getMyChatListArray');
   console.log(getMyChatListArray);
   const resultGroupChatRooms: Promise<ResultOneToOneRoom>[] =
     getMyChatListArray.map(async (i) => {
       const lastMessage = await getChatRoomLastMessage(
         i.chatRoomUid.chatRoomUid,
-        "oneToOne",
+        'oneToOne',
       );
       const chatList = await getMyGroupChatRoomChatList(
         i.chatRoomUid.chatRoomUid,
       );
       const notReadCount = getNotReadMessageCount(chatList, uid);
 
-      console.log("lastMessage");
+      console.log('lastMessage');
       console.log(lastMessage);
 
       let result2 = Object.values(i)[0];
-      result2["lastMessage"] = lastMessage.message;
-      result2["notReadCount"] = notReadCount;
-      result2["createdSecondsAt"] = lastMessage.createdSecondsAt;
+      result2['lastMessage'] = lastMessage.message;
+      result2['notReadCount'] = notReadCount;
+      result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
       return result2;
     });
   return await Promise.all(resultGroupChatRooms);
@@ -104,6 +104,27 @@ const getMyGroupChatRoomTitle = async (chatRoomUid: string) => {
   return titleList;
 };
 
+//특정 유저의 그룹채팅 배열을 반환
+export const groupChatRoomUidArr = async (uid: string) => {
+  const 그룹채팅배열 = await getMyChatRoomsRef(uid, 'group');
+  console.log(그룹채팅배열);
+
+  if (그룹채팅배열) return Object.values(그룹채팅배열) as string[];
+  else return null;
+};
+
+const getMyChatRoomsRef = async (uid: string, chatRoomType: ChatRoomType) => {
+  if (chatRoomType === 'group') {
+    return await (
+      await get(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`))
+    ).val();
+  } else {
+    return await (
+      await get(ref(realtimeDbService, `oneToOneChatRooms/${uid}`))
+    ).val();
+  }
+};
+
 /**
  * groupChatRooms에 렌더링할 배열을
  * 만들어 반환해주는 비동기 함수입니다.
@@ -115,17 +136,17 @@ export const createGroupChatRooms = async (
   uid: string,
 ): Promise<ResultGroupRoom[] | null> => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
-  const listObj = await getMyChatRoomsRef(uid, "group");
-  console.log("listObj");
+  const listObj = await getMyChatRoomsRef(uid, 'group');
+  console.log('listObj');
   console.log(listObj);
   if (!listObj) return null; //채팅방이 존재할 때 함수 진행
   const listValues: string[] = Object.values(listObj); // 그룹채팅 uid가 들어있다
-  console.log("listValues");
+  console.log('listValues');
   console.log(listValues);
 
   const resultGroupChatRooms = listValues.map(async (i) => {
     const title = await getMyGroupChatRoomTitle(i);
-    const lastMessage = await getChatRoomLastMessage(i, "group");
+    const lastMessage = await getChatRoomLastMessage(i, 'group');
     const chatList = await getMyGroupChatRoomChatList(i);
     const notReadCount = await getNotReadMessageCount(chatList, uid);
     let 결과객체: ResultGroupRoom = {
@@ -141,40 +162,36 @@ export const createGroupChatRooms = async (
 };
 
 //유저의 채팅타입중 하나의 채팅db 데이터를 읽어오는것
-export const getMyChatRoomsRef = async (
-  uid: string,
-  chatRoomType: ChatRoomType,
-) => {
-  if (chatRoomType === "group") {
-    return await (
-      await get(
-        ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
-      )
-    ).val();
-  } else {
-    return await (
-      await get(ref(realtimeDbService, `oneToOneChatRooms/${uid}`))
-    ).val();
-  }
-};
+// export const getMyChatRoomsRef = async (
+//   uid: string,
+//   chatRoomType: ChatRoomType,
+// ) => {
+//   if (chatRoomType === 'group') {
+//     return await (
+//       await get(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`))
+//     ).val();
+//   } else {
+//     return await (
+//       await get(ref(realtimeDbService, `oneToOneChatRooms/${uid}`))
+//     ).val();
+//   }
+// };
 
 //유저의 채팅타입중 하나의 채팅db 데이터를 읽어오는것
-export const getMyChatRoomsRef2 = async (
-  uid: string,
-  chatRoomType: ChatRoomType,
-) => {
-  if (chatRoomType === "group") {
-    return await (
-      await get(
-        ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
-      )
-    ).val();
-  } else {
-    return await (
-      await get(ref(realtimeDbService, `userList/${uid}/myOneToOneChatList`))
-    ).val();
-  }
-};
+// export const getMyChatRoomsArr = async (
+//   uid: string,
+//   chatRoomType: ChatRoomType,
+// ) => {
+//   if (chatRoomType === 'group') {
+//     return await (
+//       await get(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`))
+//     ).val();
+//   } else {
+//     return await (
+//       await get(ref(realtimeDbService, `userList/${uid}/onetoone_chat_rooms`))
+//     ).val();
+//   }
+// };
 
 /**
  * 그룹채팅의 uid를 받아와 해당 채팅방의 대화내용을
@@ -217,6 +234,12 @@ export const getNotReadMessageCount = (
   return 안읽은메시지인덱스 === -1 ? 0 : 안읽은메시지갯수;
 };
 
+// export const groupChatRoomUidArr = async () => {
+//   const 그룹채팅배열 = await getMyChatRoomsRef(uid, 'group');
+//   console.log(그룹채팅배열);
+//   return Object.values(그룹채팅배열) as string[];
+// };
+
 //일대일채팅과 그룹채팅을 합친 배열 리턴해주기
 //제작중...
 // export const 일대일그룹 = async (uid: string) => {
@@ -226,7 +249,7 @@ export const getNotReadMessageCount = (
 
 //   const 그룹대화리스트 = await (
 //     await get(
-//       ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
+//       ref(realtimeDbService, `userList/${uid}/group_chat_rooms/groupChatUid`),
 //     )
 //   ).val();
 

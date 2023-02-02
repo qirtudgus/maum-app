@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import {
   get,
   getDatabase,
@@ -10,10 +10,10 @@ import {
   ref,
   set,
   update,
-} from "firebase/database";
-import { getFirestore, Timestamp } from "firebase/firestore";
-import { convertDate } from "./utils/convertDate";
-import { ChatDataNew } from "./utils/makeChatRooms";
+} from 'firebase/database';
+import { getFirestore, Timestamp } from 'firebase/firestore';
+import { convertDate } from './utils/convertDate';
+import { ChatDataNew } from './utils/makeChatRooms';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
@@ -30,7 +30,7 @@ export const authService = getAuth(apps);
 export const dbService = getFirestore(apps);
 export const realtimeDbService = getDatabase(apps);
 //현재 유저목록을 가져온다.
-export const userListRef = ref(realtimeDbService, "userList");
+export const userListRef = ref(realtimeDbService, 'userList');
 //uid로 식별한 유저의 데이터를 가져온다.
 export const getUserDataRef = (uid: string) => {
   return ref(realtimeDbService, `userList/${uid}`);
@@ -123,7 +123,7 @@ export const getGroupUserListPath = (chatRoomUid: string) => {
 
 //특정 유저가 참여중인 그룹채팅 리스트를 불러오기 위한 경로
 export const getUserConnectedGroupChatList = (uid: string) => {
-  return ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`);
+  return ref(realtimeDbService, `userList/${uid}/group_chat_rooms`);
 };
 
 //특정 유저의 그룹채팅리스트에 그룹채팅을 추가하는 함수
@@ -131,9 +131,9 @@ export const updateUserGroupChatList = async (
   uid: string,
   chatRoomUid: string,
 ) => {
-  const myGroupChatListPath = getUserConnectedGroupChatList(uid);
-  const 데이터사이즈 = (await get(myGroupChatListPath)).size;
-  update(myGroupChatListPath, {
+  const group_chat_roomsPath = getUserConnectedGroupChatList(uid);
+  const 데이터사이즈 = (await get(group_chat_roomsPath)).size;
+  update(group_chat_roomsPath, {
     [데이터사이즈]: chatRoomUid,
   });
 };
@@ -144,10 +144,10 @@ export const updateUsersGroupChatList = async (
   chatRoomUid: string,
 ) => {
   userList.forEach(async (i, index) => {
-    const myGroupChatListPath = getUserConnectedGroupChatList(i.uid);
-    const 데이터사이즈 = (await get(myGroupChatListPath)).size;
-    update(myGroupChatListPath, {
-      [데이터사이즈]: chatRoomUid,
+    // // const group_chat_roomsPath = getUserConnectedGroupChatList(i.uid);
+    // const 데이터사이즈 = (await get(그룹채팅ref)).size;
+    update(ref(realtimeDbService, `userList/${i.uid}/group_chat_rooms`), {
+      [chatRoomUid]: chatRoomUid,
     });
   });
 };
@@ -167,7 +167,7 @@ export const updateGroupChatConnectedUsers = async (
 };
 
 //특정유저가 그룹채팅방에서 퇴장 시 자신의 채팅리스트에서 삭제해주는 함수
-export const exitUserCleanUpMyGroupChatList = async (
+export const exitUserCleanUpGroupChatRooms = async (
   uid: string,
   chatRoomUid: string,
 ) => {
@@ -176,23 +176,23 @@ export const exitUserCleanUpMyGroupChatList = async (
   ];
   //삭제해야하는 채팅방의 인덱스를 구한다.
   let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
-  console.log("내그룹채팅리스트");
+  console.log('내그룹채팅리스트');
   console.log(내그룹채팅리스트);
-  console.log("삭제인덱스");
+  console.log('삭제인덱스');
   console.log(삭제인덱스);
 
   if (삭제인덱스 !== -1) {
     //삭제
     내그룹채팅리스트.splice(삭제인덱스, 1);
     //삭제한 배열을 다시 set해준다.
-    let 그룹채팅 = ref(realtimeDbService, `userList/${uid}/myGroupChatList`);
-    console.log("삭제 후");
+    let 그룹채팅 = ref(realtimeDbService, `userList/${uid}/group_chat_rooms`);
+    console.log('삭제 후');
     console.log(내그룹채팅리스트);
     set(그룹채팅, {
       groupChatUid: 내그룹채팅리스트,
     });
   } else {
-    alert("존재하지않는 채팅방입니다.");
+    alert('존재하지않는 채팅방입니다.');
   }
 };
 
@@ -259,12 +259,12 @@ export const createGroupChat = (
  */
 export const getChatRoomLastMessage = async (
   chatRoomUid: string,
-  chatRoomType: "oneToOne" | "group",
+  chatRoomType: 'oneToOne' | 'group',
 ): Promise<ChatDataNew | null> => {
   let resultLastMessage = null;
   //들어온값에 따라서 적절한 ref를 할당시킨다.
   const chatRef =
-    chatRoomType === "oneToOne"
+    chatRoomType === 'oneToOne'
       ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
       : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
 
