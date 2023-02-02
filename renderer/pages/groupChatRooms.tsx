@@ -16,6 +16,7 @@ import {
   ChatRoomType,
   createGroupChatRooms,
   getNotReadMessageCount,
+  ResultGroupMessage,
 } from '../utils/makeChatRooms';
 import {
   ChatIcon,
@@ -60,9 +61,13 @@ interface oneToOneChatList {
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
-  const [groupChatList2, setGroupChatList2] = useState([]);
-  const [combineChatList, setCombineChatList] = useState([]);
-  const [sortChatList, setSortChatList] = useState([]);
+  const [groupChatList2, setGroupChatList2] = useState<ResultGroupMessage[]>(
+    [],
+  );
+  const [combineChatList, setCombineChatList] = useState<ResultGroupMessage[]>(
+    [],
+  );
+  const [sortChatList, setSortChatList] = useState<ResultGroupMessage[]>([]);
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
   const router = useRouter();
   const uid = authService.currentUser?.uid;
@@ -84,7 +89,7 @@ function ChatList() {
     }
   };
 
-  const 그룹채팅옵저버 = async (chatUid: string) => {
+  const startGroupChatObserver = async (chatUid: string) => {
     console.log(`${chatUid}방 옵저버 실행`);
     const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
     onValue(refs, async (snapshot) => {
@@ -116,6 +121,11 @@ function ChatList() {
         });
       }
     });
+  };
+  const exitGroupChatObserver = (chatUid: string) => {
+    const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
+    console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
+    off(refs);
   };
 
   useEffect(() => {
@@ -155,27 +165,22 @@ function ChatList() {
 
   useEffect(() => {
     if (groupChatList2.length === 0) return;
-    const 옵저버켜기 = async () => {
+    const groupChatRoomUidArr = async () => {
       const 그룹채팅배열 = await getMyChatRoomsRef(uid, 'group');
       //   console.log(그룹채팅배열);
       return 그룹채팅배열;
     };
-    const 그룹채팅옵저버종료 = (chatUid: string) => {
-      const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
-      console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
-      off(refs);
-    };
 
-    옵저버켜기().then((res) => {
+    groupChatRoomUidArr().then((res) => {
       res.forEach((i) => {
-        그룹채팅옵저버(i);
+        startGroupChatObserver(i);
       });
     });
 
     return () => {
-      옵저버켜기().then((res) => {
+      groupChatRoomUidArr().then((res) => {
         res.forEach((i) => {
-          그룹채팅옵저버종료(i);
+          exitGroupChatObserver(i);
         });
       });
     };
