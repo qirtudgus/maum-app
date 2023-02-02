@@ -4,9 +4,9 @@
 
 
 목차
-
-1. [Stacks](#-stacks)
-2. [프로젝트를 통해 경험한 것!](#-프로젝트를-통해-경험한-것)
+1. [Firebase Server 구동 방법](#Firebase-Server-구동-방법)
+2. [Stacks](#-stacks)
+3. [프로젝트를 통해 경험한 것!](#-프로젝트를-통해-경험한-것)
 
 ## 🛠 Stacks
 ### Frontend
@@ -15,6 +15,34 @@ Next.js / TypeScript / Styled-Components
 Firebase
 ### deploy
 Electron
+
+## Firebase Server 구동 방법
+0. Firebase 프로젝트를 생성하여 SDK를 발급 받습니다. 
+1. /maum-app/renderer 경로에 .env 파일을 생성해줍니다.
+
+2. sample.env를 참고하여 .env 파일에 파이어베이스 SDK를 작성해줍니다.
+````
+NEXT_PUBLIC_FIREBASE_apiKey = ""
+NEXT_PUBLIC_FIREBASE_authDomain =""
+NEXT_PUBLIC_FIREBASE_databaseURL = ""
+NEXT_PUBLIC_FIREBASE_projectId = ""
+NEXT_PUBLIC_FIREBASE_storageBucket = ""
+NEXT_PUBLIC_FIREBASE_messagingSenderId =""
+NEXT_PUBLIC_FIREBASE_appId =""
+````
+3. 앱을 실행 및 빌드합니다, 사용 가능한 명령어는 아래와 같습니다.
+````
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "build:all": "nextron build --all",
+    "build:win32": "nextron build --win --ia32",
+    "build:win64": "nextron build --win --x64",
+    "build:mac": "nextron build --mac --x64",
+    "build:linux": "nextron build --linux",
+    "postinstall": "electron-builder install-app-deps"
+  },
+````
 
 
 ## 🏆 프로젝트를 통해 경험한 것!
