@@ -5,12 +5,13 @@ import { ChatDataNew } from '../utils/makeChatRooms';
 const MessageComponent = styled.li`
   width: fit-content;
   position: relative;
-  max-width: 60%;
+  max-width: 100%;
   min-height: 30px;
   max-height: fit-content;
   display: flex;
   align-items: center;
   color: #000;
+  word-break: break-all;
 `;
 
 const ReadCount = styled.div`
