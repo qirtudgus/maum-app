@@ -1,6 +1,15 @@
 import { get, ref } from 'firebase/database';
 import { getChatRoomLastMessage, realtimeDbService } from '../firebaseConfig';
 
+/**
+ * 대화를 이루는 각 하나의 대화 요소에 대한 타입입니다.
+ * @param createdAt 대화 생성 시간을 convert한 값 ex) 23. 02. 02. 오전 09:41
+ * @param createdSecondsAt 대화 생성 시간을 초단위로 환산한 값 ex) 1675298518
+ * @param displayName 대화를 작성한 사용자 닉네임
+ * @param message 대화 내용
+ * @param readUsers [사용자의 uid]:booelan의 객체배열 읽음 유무를 판단한다.
+ * @param uid 대화를 작성한 사용자 uid
+ */
 export interface ChatDataNew {
   createdAt: string;
   createdSecondsAt: number;
@@ -12,7 +21,7 @@ export interface ChatDataNew {
   uid: string;
 }
 
-interface ResultMessage {
+interface pureMessage {
   chatRoomUid: {
     chatRoomUid: string;
     opponentName: string;
@@ -22,15 +31,7 @@ interface ResultMessage {
   notReadCount?: number;
 }
 
-interface GroupChatList {
-  chatRoomUid: string;
-  chatRoomsTitle: string;
-  lastMessage: string;
-  notReadCount: number;
-  createdSecondsAt: number;
-}
-
-interface oneToOneChatList {
+interface ResultMessage {
   chatRoomUid: string;
   opponentName: string;
   opponentUid: string;
@@ -39,48 +40,104 @@ interface oneToOneChatList {
   createdSecondsAt: number;
 }
 
+interface ResultGroupMessage {
+  chatRoomUid: string;
+  displayName: string;
+  lastMessage: string;
+  notReadCount: number;
+  createdSecondsAt: number;
+}
+
+/**
+ * 특정 함수에서 대화방의 타입을 구분하기 위함
+ */
 export type ChatRoomType = 'group' | 'oneToOne';
 
-//일대일채팅리스트를 적절히 렌더링할 배열로 변환
-//[
-//     {
-//         "chatRoomUid": "c01k3i48pv",
-//         "opponentName": "qwer2",
-//         "opponentUid": "C7UWImonLGcfDDj5f6Tq0LHdAdv2",
-//         "lastMessage": "zzz",
-//         "notReadCount": 0,
-//         "createdSecondsAt": 1675282466
-//     }
-// ]
+/**
+ * oneToOneChatRooms에 렌더링할 배열을
+ * 만들어 반환해주는 비동기 함수입니다.
+ * 채팅방이 존재하지않으면 null을 반환합니다.
+ * @param uid 대화목록을 만들 사용자의 uid
+ * @returns ResultMessage[] | null
+ */
 export const createOneToOneChatRooms = async (uid: string) => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
   const listObj = await getMyChatRoomsRef(uid, 'oneToOne');
   // console.log('listObj');
   // console.log(listObj);
-  if (!listObj) return; //채팅방이 존재할 때 함수 진행
+  if (!listObj) return null; //채팅방이 존재할 때 함수 진행
   // console.log('listValues');
   // console.log(listValues);
-  const getMyChatListArray: ResultMessage[] = Object.values(listObj);
+  const getMyChatListArray: pureMessage[] = Object.values(listObj);
   console.log('getMyChatListArray');
   console.log(getMyChatListArray);
-  const resultGroupChatRooms = getMyChatListArray.map(async (i) => {
-    const lastMessage = await getChatRoomLastMessage(
-      i.chatRoomUid.chatRoomUid,
-      'oneToOne',
-    );
-    const chatList = await getMyGroupChatRoomChatList(
-      i.chatRoomUid.chatRoomUid,
-    );
+  const resultGroupChatRooms: Promise<ResultMessage>[] = getMyChatListArray.map(
+    async (i) => {
+      const lastMessage = await getChatRoomLastMessage(
+        i.chatRoomUid.chatRoomUid,
+        'oneToOne',
+      );
+      const chatList = await getMyGroupChatRoomChatList(
+        i.chatRoomUid.chatRoomUid,
+      );
+      const notReadCount = getNotReadMessageCount(chatList, uid);
+
+      console.log('lastMessage');
+      console.log(lastMessage);
+
+      let result2 = Object.values(i)[0];
+      result2['lastMessage'] = lastMessage.message;
+      result2['notReadCount'] = notReadCount;
+      result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
+      return result2;
+    },
+  );
+  return await Promise.all(resultGroupChatRooms);
+};
+
+//특정 그룹채팅uid의 제목을 리턴
+const getMyGroupChatRoomTitle = async (chatRoomUid: string) => {
+  const titleList = (
+    await get(
+      ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chatRoomsTitle`),
+    )
+  ).val();
+  return titleList;
+};
+
+/**
+ * groupChatRooms에 렌더링할 배열을
+ * 만들어 반환해주는 비동기 함수입니다.
+ * 채팅방이 존재하지않으면 null을 반환합니다.
+ * @param uid 대화목록을 만들 사용자의 uid
+ * @returns ResultMessage[] | null
+ */
+export const createGroupChatRooms = async (
+  uid: string,
+): Promise<ResultGroupMessage[] | null> => {
+  //   const listObj = await getMyGroupChatRoomsRef(uid);
+  const listObj = await getMyChatRoomsRef(uid, 'group');
+  // console.log('listObj');
+  // console.log(listObj);
+  if (!listObj) return null; //채팅방이 존재할 때 함수 진행
+  const listValues: string[] = Object.values(listObj); // 그룹채팅 uid가 들어있다
+  // console.log('listValues');
+  // console.log(listValues);
+  // setGroupChatList2(listValues);
+
+  const resultGroupChatRooms = listValues.map(async (i) => {
+    const title = await getMyGroupChatRoomTitle(i);
+    const lastMessage = await getChatRoomLastMessage(i, 'group');
+    const chatList = await getMyGroupChatRoomChatList(i);
     const notReadCount = await getNotReadMessageCount(chatList, uid);
-
-    console.log('lastMessage');
-    console.log(lastMessage);
-
-    let result2 = Object.values(i)[0];
-    result2['lastMessage'] = lastMessage.message;
-    result2['notReadCount'] = notReadCount;
-    result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
-    return result2;
+    let 결과객체: ResultGroupMessage = {
+      chatRoomUid: i,
+      displayName: title,
+      lastMessage: lastMessage.message,
+      notReadCount: notReadCount,
+      createdSecondsAt: lastMessage.createdSecondsAt,
+    };
+    return 결과객체;
   });
   return await Promise.all(resultGroupChatRooms);
 };
@@ -121,7 +178,12 @@ export const getMyChatRoomsRef2 = async (
   }
 };
 
-//특정 그룹채팅uid의 대화내용을 리턴
+/**
+ * 그룹채팅의 uid를 받아와 해당 채팅방의 대화내용을
+ * 배열로 가공하여 반환해주는 함수입니다.
+ * @param chatRoomUid 그룹 채팅방 고유 uid입니다.
+ * @returns
+ */
 export const getMyGroupChatRoomChatList = async (
   chatRoomUid: string,
 ): Promise<ChatDataNew[] | null> => {
@@ -159,48 +221,48 @@ export const getNotReadMessageCount = (
 
 //일대일채팅과 그룹채팅을 합친 배열 리턴해주기
 //제작중...
-export const 일대일그룹 = async (uid: string) => {
-  const 일대일대화리스트 = await (
-    await get(ref(realtimeDbService, `userList/${uid}/myOneToOneChatList`))
-  ).val();
+// export const 일대일그룹 = async (uid: string) => {
+//   const 일대일대화리스트 = await (
+//     await get(ref(realtimeDbService, `userList/${uid}/myOneToOneChatList`))
+//   ).val();
 
-  const 그룹대화리스트 = await (
-    await get(
-      ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
-    )
-  ).val();
+//   const 그룹대화리스트 = await (
+//     await get(
+//       ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
+//     )
+//   ).val();
 
-  console.log('일대일대화리스트');
-  console.log(일대일대화리스트);
-  console.log('그룹대화리스트');
-  console.log(그룹대화리스트);
-  let 일대일대화uid배열 = [];
-  let 그룹대화uid배열 = [];
-  if (일대일대화리스트) {
-    일대일대화uid배열 = Object.keys(일대일대화리스트);
-  }
-  if (그룹대화리스트) {
-    그룹대화uid배열 = 그룹대화리스트;
-  }
-  console.log('일대일대화uid배열');
-  console.log(일대일대화uid배열);
-  console.log('그룹대화uid배열');
-  console.log(그룹대화uid배열);
+//   console.log('일대일대화리스트');
+//   console.log(일대일대화리스트);
+//   console.log('그룹대화리스트');
+//   console.log(그룹대화리스트);
+//   let 일대일대화uid배열 = [];
+//   let 그룹대화uid배열 = [];
+//   if (일대일대화리스트) {
+//     일대일대화uid배열 = Object.keys(일대일대화리스트);
+//   }
+//   if (그룹대화리스트) {
+//     그룹대화uid배열 = 그룹대화리스트;
+//   }
+//   console.log('일대일대화uid배열');
+//   console.log(일대일대화uid배열);
+//   console.log('그룹대화uid배열');
+//   console.log(그룹대화uid배열);
 
-  let 일대일채팅 = 일대일대화uid배열.map(async (i) => {
-    const lastMessage = await getChatRoomLastMessage(i, 'oneToOne');
-    const chatList = await getMyGroupChatRoomChatList(i);
-    const notReadCount = await getNotReadMessageCount(chatList, uid);
-    let result2 = Object.values(i);
-    console.log('lastMessage');
-    console.log(lastMessage);
-    console.log('result2');
-    console.log(result2);
-    result2['lastMessage'] = lastMessage.message;
-    result2['notReadCount'] = notReadCount;
-    result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
-    return result2;
-  });
-  console.log('일대일채팅');
-  console.log(일대일채팅);
-};
+//   let 일대일채팅 = 일대일대화uid배열.map(async (i) => {
+//     const lastMessage = await getChatRoomLastMessage(i, 'oneToOne');
+//     const chatList = await getMyGroupChatRoomChatList(i);
+//     const notReadCount = await getNotReadMessageCount(chatList, uid);
+//     let result2 = Object.values(i);
+//     console.log('lastMessage');
+//     console.log(lastMessage);
+//     console.log('result2');
+//     console.log(result2);
+//     result2['lastMessage'] = lastMessage.message;
+//     result2['notReadCount'] = notReadCount;
+//     result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
+//     return result2;
+//   });
+//   console.log('일대일채팅');
+//   console.log(일대일채팅);
+// };
