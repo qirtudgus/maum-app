@@ -24,10 +24,9 @@ const 접미어 = [
   '코끼리들',
 ];
 
+/**
+ * 그룹 채팅 생성 시 input에 랜덤으로 들어가는 문자열을 생성합니다.
+ */
 export const RandomTitle = () => {
-  return (
-    접두어[Math.floor(Math.random() * 10)] +
-    ' ' +
-    접미어[Math.floor(Math.random() * 10)]
-  );
+  return 접두어[Math.floor(Math.random() * 10)] + ' ' + 접미어[Math.floor(Math.random() * 10)];
 };
