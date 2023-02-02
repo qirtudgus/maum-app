@@ -17,7 +17,7 @@ const SideBarContainer = styled.div`
 `;
 
 const SideBarWrap = styled.div`
-  width: 60px;
+  width: 120px;
   flex-shrink: 0;
   /* height: 100%; */
   background: #006cc5;
@@ -33,76 +33,33 @@ const HeaderButtonWrap = styled.div`
   align-items: center;
   top: 5px;
   height: fit-content;
-
-  & > div {
-    margin: 10px 0;
-  }
-`;
-
-const LogoutButton = styled.div`
-  cursor: pointer;
-  /* position: absolute; */
-
-  width: fit-content;
-  height: 35px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  & svg {
-    width: 30px;
-    height: 30px;
-  }
-  &:hover svg {
-    fill: #000;
-  }
 `;
 
 const SettingButton = styled.div`
+  font-size: 13px;
+  color: #fff;
   cursor: pointer;
-  width: fit-content;
-  height: 35px;
+  width: 120px;
+  height: 40px;
   display: flex;
-  justify-content: center;
+  margin: 5px 0;
   align-items: center;
+  justify-content: flex-start;
   & svg {
     width: 30px;
     height: 30px;
-  }
-  &:hover svg {
-    fill: #000;
-  }
-  &.active {
-    border-radius: 15px;
-    width: 40px;
-    background: #fff;
-  }
-  &.active svg {
-    fill: ${({ theme }) => theme.colors.main};
-  }
-`;
-
-const PeopleButton = styled.div`
-  cursor: pointer;
-  /* position: absolute; */
-
-  width: fit-content;
-  height: 35px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  & svg {
-    width: 30px;
     fill: white;
-    height: 30px;
+    margin: 0 5px 0 15px;
   }
-
+  &:hover {
+    color: #000;
+  }
   &:hover svg {
     fill: #000;
   }
-
   &.active {
-    border-radius: 15px;
-    width: 40px;
+    color: ${({ theme }) => theme.colors.main};
+    width: 120px;
     background: #fff;
   }
   &.active svg {
@@ -132,7 +89,7 @@ const SideBar = () => {
     <SideBarContainer>
       <SideBarWrap>
         <HeaderButtonWrap>
-          <PeopleButton
+          <SettingButton
             title='유저 목록'
             //중첩 경로에 대한 액티브 해결책
             //https://stackoverflow.com/questions/53262263/target-active-link-when-the-route-is-active-in-next-js
@@ -141,8 +98,8 @@ const SideBar = () => {
               router.push('/userList');
             }}
           >
-            <PeopleSvg />
-          </PeopleButton>
+            <PeopleSvg /> 유저목록
+          </SettingButton>
           <SettingButton
             title='일대일 대화 목록'
             className={
@@ -152,7 +109,7 @@ const SideBar = () => {
               router.push('/oneToOneChatRooms');
             }}
           >
-            <OneToOneSvg />
+            <OneToOneSvg /> 일대일
           </SettingButton>{' '}
           <SettingButton
             title='단체 대화 목록'
@@ -163,7 +120,7 @@ const SideBar = () => {
               router.push('/groupChatRooms');
             }}
           >
-            <ChatListSvg />
+            <ChatListSvg /> 그룹
           </SettingButton>
           <SettingButton
             title='설정'
@@ -172,11 +129,11 @@ const SideBar = () => {
               router.push('/settings');
             }}
           >
-            <SettingSvg />
+            <SettingSvg /> 설정
           </SettingButton>
-          <LogoutButton title='로그아웃' onClick={userSignOut}>
-            <LogoutSvg />
-          </LogoutButton>
+          <SettingButton title='로그아웃' onClick={userSignOut}>
+            <LogoutSvg /> 로그아웃
+          </SettingButton>
         </HeaderButtonWrap>
       </SideBarWrap>
     </SideBarContainer>
