@@ -33,10 +33,11 @@ interface pureMessage {
 
 export interface ResultOneToOneRoom {
   chatRoomUid: string;
-  opponentName: string;
+  displayName?: string;
+  opponentName?: string;
   opponentUid: string;
-  lastMessage?: string;
-  notReadCount?: number;
+  lastMessage: string;
+  notReadCount: number;
   createdSecondsAt: number;
 }
 
@@ -86,9 +87,14 @@ export const createOneToOneChatRooms = async (uid: string) => {
       console.log(lastMessage);
 
       let result2 = Object.values(i)[0];
+      result2['displayName'] = i.chatRoomUid.opponentName;
       result2['lastMessage'] = lastMessage.message;
       result2['notReadCount'] = notReadCount;
       result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
+      delete result2['opponentName'];
+
+      console.log('result2의 객체값 ');
+      console.log(result2);
       return result2;
     });
   return await Promise.all(resultGroupChatRooms);
@@ -113,7 +119,10 @@ export const groupChatRoomUidArr = async (uid: string) => {
   else return null;
 };
 
-const getMyChatRoomsRef = async (uid: string, chatRoomType: ChatRoomType) => {
+export const getMyChatRoomsRef = async (
+  uid: string,
+  chatRoomType: ChatRoomType,
+) => {
   if (chatRoomType === 'group') {
     return await (
       await get(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`))
