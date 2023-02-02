@@ -44,27 +44,24 @@ function ChatList() {
 
   const startGroupChatRoomsObserver = async (uid: string) => {
     await groupChatRoomUidArr(uid).then((res) => {
+      //그룹채팅이 하나도 없을경우 함수 멈춤
       if (!res) return;
       res.forEach((chatUid) => {
         console.log(`${chatUid}방 옵저버 실행`);
         const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
         onValue(refs, async (snapshot) => {
-          console.log('snapshot.val()');
-          console.log(snapshot.val());
           const lastMessage = await getChatRoomLastMessage(chatUid, 'group');
           //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
           if (lastMessage.readUsers[authService.currentUser?.uid] === false) {
-            //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
             const 메시지들: ChatDataNew[] = Object.values(snapshot.val());
             const notReadCount = getNotReadMessageCount(메시지들, uid);
             setCombineChatList((prev) => {
-              //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
+              //같은 채팅방uid를 가진 스테이트에 마지막메시지값 갱신하기
               let updateChatList = prev.map((i, index) => {
                 if (i.chatRoomUid === chatUid) {
                   i.lastMessage = lastMessage.message;
                   i.createdSecondsAt = lastMessage.createdSecondsAt;
                   i.notReadCount = notReadCount;
-                  // i.notReadCount++;
                 }
                 return i;
               });
