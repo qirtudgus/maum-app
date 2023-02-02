@@ -44,6 +44,7 @@ function ChatList() {
 
   const startGroupChatRoomsObserver = async (uid: string) => {
     await groupChatRoomUidArr(uid).then((res) => {
+      if (!res) return;
       res.forEach((chatUid) => {
         console.log(`${chatUid}방 옵저버 실행`);
         const refs = ref(realtimeDbService, `groupChatRooms/${chatUid}/chat`);
