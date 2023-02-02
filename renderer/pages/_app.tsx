@@ -1,9 +1,9 @@
 import React from 'react';
 import Head from 'next/head';
 import type { AppProps } from 'next/app';
-import GlobalStyle from '../components/GlobalStyle';
+import GlobalStyle from '../styles/GlobalStyleWithResetCss';
 import { ThemeProvider } from 'styled-components';
-import theme from '../components/GlobalTheme';
+import theme from '../styles/GlobalTheme';
 import Layout from '../layout/layout';
 
 if (process.env.NODE_ENV === 'production') {
