@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { convertDate } from '../utils/convertDate';
 import { ChatRoomType, ResultGroupRoom, ResultOneToOneRoom } from '../utils/makeChatRooms';
 import PeopleSvg from './svg/peopleSvg';
-const ChatRoomList = styled.li`
+export const ChatRoomList = styled.li`
   cursor: pointer;
   width: 100%;
   background: #fff;
@@ -14,7 +14,7 @@ const ChatRoomList = styled.li`
     background: #eee;
   }
 `;
-const ChatRoomInfo = styled.div`
+export const ChatRoomInfo = styled.div`
   width: 100%;
 `;
 
@@ -52,7 +52,7 @@ const ChatRoomTitleAndTime = styled.div`
   }
 `;
 
-const ChatIcon = styled.div`
+export const ChatIcon = styled.div`
   position: relative;
   width: 45px;
   height: 45px;
