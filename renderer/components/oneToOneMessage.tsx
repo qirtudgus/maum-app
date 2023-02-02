@@ -20,7 +20,7 @@ const MessageComponent = styled.li`
   color: #000;
   background: #fff;
   max-height: fit-content;
-
+  word-break: break-all;
   /* padding: 13px 10px; */
   border-radius: 7px;
   box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
