@@ -16,7 +16,7 @@ import {
   ChatRoomType,
   createGroupChatRooms,
   getNotReadMessageCount,
-  ResultGroupMessage,
+  ResultGroupRoom,
 } from '../utils/makeChatRooms';
 import {
   ChatIcon,
@@ -61,13 +61,9 @@ interface oneToOneChatList {
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
-  const [groupChatList2, setGroupChatList2] = useState<ResultGroupMessage[]>(
-    [],
-  );
-  const [combineChatList, setCombineChatList] = useState<ResultGroupMessage[]>(
-    [],
-  );
-  const [sortChatList, setSortChatList] = useState<ResultGroupMessage[]>([]);
+  const [groupChatList2, setGroupChatList2] = useState<ResultGroupRoom[]>([]);
+  const [combineChatList, setCombineChatList] = useState<ResultGroupRoom[]>([]);
+  const [sortChatList, setSortChatList] = useState<ResultGroupRoom[]>([]);
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
   const router = useRouter();
   const uid = authService.currentUser?.uid;

@@ -40,7 +40,7 @@ interface ResultMessage {
   createdSecondsAt: number;
 }
 
-interface ResultGroupMessage {
+export interface ResultGroupRoom {
   chatRoomUid: string;
   displayName: string;
   lastMessage: string;
@@ -114,7 +114,7 @@ const getMyGroupChatRoomTitle = async (chatRoomUid: string) => {
  */
 export const createGroupChatRooms = async (
   uid: string,
-): Promise<ResultGroupMessage[] | null> => {
+): Promise<ResultGroupRoom[] | null> => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
   const listObj = await getMyChatRoomsRef(uid, 'group');
   // console.log('listObj');
@@ -130,7 +130,7 @@ export const createGroupChatRooms = async (
     const lastMessage = await getChatRoomLastMessage(i, 'group');
     const chatList = await getMyGroupChatRoomChatList(i);
     const notReadCount = await getNotReadMessageCount(chatList, uid);
-    let 결과객체: ResultGroupMessage = {
+    let 결과객체: ResultGroupRoom = {
       chatRoomUid: i,
       displayName: title,
       lastMessage: lastMessage.message,
