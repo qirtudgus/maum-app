@@ -6,31 +6,31 @@ import {
   push,
   ref,
   update,
-} from "firebase/database";
-import { Timestamp } from "firebase/firestore";
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import styled from "styled-components";
+} from 'firebase/database';
+import { Timestamp } from 'firebase/firestore';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import {
   authService,
-  exitUserCleanUpMyGroupChatList,
+  exitUserCleanUpGroupChatRooms,
   exitUserCleanUpThisGroupChatList,
   getGroupChatListPath,
   getGroupUserListPath,
   realtimeDbService,
   UserList,
-} from "../firebaseConfig";
-import { convertDate } from "../utils/convertDate";
-import { ChatDataNew } from "../utils/makeChatRooms";
-import ChatRoomHeader from "./ChatRoomHeader";
-import InviteGroupChatModal from "./inviteGroupChatModal";
-import LoadingSpinner from "./LoadingSpinner";
-import MessageContainerGroup from "./messageContainerGroup";
-import MessageContainerOneToOne from "./messageContainerOneToOne";
-import SendMessageInput, { ConnectedUser } from "./SendMessageInput";
-import LogoutSvg from "./svg/logoutSvg";
-import PersonAddSvg from "./svg/personAddSvg";
+} from '../firebaseConfig';
+import { convertDate } from '../utils/convertDate';
+import { ChatDataNew } from '../utils/makeChatRooms';
+import ChatRoomHeader from './ChatRoomHeader';
+import InviteGroupChatModal from './inviteGroupChatModal';
+import LoadingSpinner from './LoadingSpinner';
+import MessageContainerGroup from './messageContainerGroup';
+import MessageContainerOneToOne from './messageContainerOneToOne';
+import SendMessageInput, { ConnectedUser } from './SendMessageInput';
+import LogoutSvg from './svg/logoutSvg';
+import PersonAddSvg from './svg/personAddSvg';
 
 const LeftButtonGroup = styled.div`
   height: 30px;
@@ -70,7 +70,7 @@ const GroupChatRoom = () => {
   const groupChatListPath = getGroupChatListPath(chatRoomUid);
   const groupUserListPath = getGroupUserListPath(chatRoomUid);
 
-  const [레이아웃, 레이아웃설정] = useState("");
+  const [레이아웃, 레이아웃설정] = useState('');
 
   const 접속유저경로 = ref(
     realtimeDbService,
@@ -166,9 +166,9 @@ const GroupChatRoom = () => {
   // }, [chatRoomUid]);
 
   useEffect(() => {
-    레이아웃설정(localStorage.getItem("groupChatLayout"));
+    레이아웃설정(localStorage.getItem('groupChatLayout'));
     onValue(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}`), (snap) => {
-      console.log("그룹채팅이 갱신");
+      console.log('그룹채팅이 갱신');
       console.log(snap);
       let messageList = Object.values(snap.val().chat);
       let messageObj = snap.val().chat;
@@ -233,7 +233,7 @@ const GroupChatRoom = () => {
   useEffect(() => {
     //현재채팅방 사용유저 onValue
     onValue(groupUserListPath, async (snapshot) => {
-      console.log("사용자가 갱신되었습니다.");
+      console.log('사용자가 갱신되었습니다.');
       let inviteUserList: ConnectedUser[] = await snapshot.val();
       console.log(inviteUserList);
       setConnectedUserList(Object.values(inviteUserList));
@@ -258,7 +258,7 @@ const GroupChatRoom = () => {
       </Head>
       <ChatRoomHeader title={displayName} userList={ConnectedUsers} />
       {isChatLoading ? (
-        레이아웃 === "group" ? (
+        레이아웃 === 'group' ? (
           <MessageContainerGroup chatList={chatList} />
         ) : (
           <MessageContainerOneToOne chatList={chatList} />
@@ -270,7 +270,7 @@ const GroupChatRoom = () => {
       <SendMessageInput
         connectedUsers={ConnectedUsers}
         chatRoomUid={chatRoomUid}
-        isOneToOneOrGroup="group"
+        isOneToOneOrGroup='group'
       />
       {/* <button
         onClick={async () => {
@@ -329,10 +329,10 @@ const GroupChatRoom = () => {
       </button>
       */}
 
-      {router.pathname.startsWith("/groupChatRooms") && (
+      {router.pathname.startsWith('/groupChatRooms') && (
         <LeftButtonGroup>
           <LeftButton
-            title="채팅방 나가기"
+            title='채팅방 나가기'
             onClick={async () => {
               if (confirm(`${chatRoomUid} 방에서 나가시겠습니까?`)) {
                 //먼저 옵저버를 종료시킨다.
@@ -350,7 +350,7 @@ const GroupChatRoom = () => {
                   });
 
                   await router.back();
-                  console.log("onUserObj");
+                  console.log('onUserObj');
                   console.log(onUserObj);
 
                   await push(groupChatListPath, {
@@ -365,7 +365,7 @@ const GroupChatRoom = () => {
                   });
 
                   //내 채팅리스트에서 삭제
-                  await exitUserCleanUpMyGroupChatList(
+                  await exitUserCleanUpGroupChatRooms(
                     authService.currentUser?.uid,
                     chatRoomUid,
                   );
@@ -383,7 +383,7 @@ const GroupChatRoom = () => {
             <LogoutSvg />
           </LeftButton>
           <LeftButton
-            title="초대하기"
+            title='초대하기'
             onClick={() => {
               setShowAddGroupChat(true);
             }}
