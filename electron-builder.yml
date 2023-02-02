@@ -1,6 +1,6 @@
-appId: com.maumTalk.sunghyun
-productName: maumTalk
-copyright: Copyright © 2023 maumTalk
+appId: com.ddokddok.sunghyun
+productName: ddokddok
+copyright: Copyright © 2023 ddokddok
 directories:
   output: dist
   buildResources: resources
