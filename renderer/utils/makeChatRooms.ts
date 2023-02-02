@@ -133,8 +133,15 @@ export const getMyGroupChatRoomChatList = async (
   return chatList ? (Object.values(chatList) as ChatDataNew[]) : null;
 };
 
-//chatList와 uid를 넘기면  그 대화중에서 안읽은 메시지 개수를 반환
-export const getNotReadMessageCount = async (
+/**
+ *  readUsers가 들어있는 대화목록을 순회하며
+ *  매개변수로 받은 uid를 이용해 읽지않은 메시지 갯수가
+ *  총 몇개인지 반환해주는 함수입니다.
+ * @param chatList readUsers가 들어야하는 대화목록입니다.
+ * @param uid 사용자의 uid입니다.
+ * @returns number: 0 또는 n(안읽은 메시지 갯수)를 반환합니다.
+ */
+export const getNotReadMessageCount = (
   chatList: ChatDataNew[],
   uid: string,
 ) => {
@@ -151,6 +158,7 @@ export const getNotReadMessageCount = async (
 };
 
 //일대일채팅과 그룹채팅을 합친 배열 리턴해주기
+//제작중...
 export const 일대일그룹 = async (uid: string) => {
   const 일대일대화리스트 = await (
     await get(ref(realtimeDbService, `userList/${uid}/myOneToOneChatList`))
