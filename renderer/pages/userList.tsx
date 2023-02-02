@@ -163,26 +163,6 @@ const UserList = () => {
         },
       });
 
-      // const 내채팅방리스트에추가 = ref(
-      //   realtimeDbService,
-      //   `userList/${authService.currentUser?.uid}/myOneToOneChatList/${chatRoomRandomString}/`,
-      // );
-      // const 상대채팅방리스트에추가 = ref(
-      //   realtimeDbService,
-      //   `userList/${opponentUid}/myOneToOneChatList/${chatRoomRandomString}/`,
-      // );
-
-      // update(내채팅방리스트에추가, {
-      //   displayName: opponentDisplayName,
-      //   opponentUid: opponentUid,
-      //   chatRoomUid: chatRoomRandomString,
-      // });
-      // update(상대채팅방리스트에추가, {
-      //   displayName: currentUserDisplayName,
-      //   opponentUid: currentUserUid,
-      //   chatRoomUid: chatRoomRandomString,
-      // });
-
       // 초기 메시지 삽입
       push(
         ref(
