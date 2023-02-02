@@ -4,7 +4,7 @@
 
 
 목차
-1. [Firebase Server 구동 방법](#Firebase-Server-구동-방법)
+1. [Firebase Server 구동 방법](#firebase-server-구동-방법)
 2. [Stacks](#-stacks)
 3. [프로젝트를 통해 경험한 것!](#-프로젝트를-통해-경험한-것)
 
@@ -17,11 +17,28 @@ Firebase@9.16.0 / node.js@17.4.0
 Electron@21.3.3 / Electron-Builder@23.6.0
 
 ## Firebase Server 구동 방법
-0. Firebase 프로젝트를 생성하여 SDK를 발급 받습니다. 
-1. /maum-app/renderer 경로에 .env 파일을 생성해줍니다.
+#### 0. Firebase에서 새 프로젝트를 생성하여 SDK를 발급 받습니다. 
+프로젝트에 사용되는 기능은 총 2개입니다. 
+- Authentication  
+1.상단 메뉴중 Sign-in-method에 접속  
+2.제공 업체 추가 클릭  
+3.기본 제공 업체 중 '이메일/비밀번호' 사용  
 
-2. sample.env를 참고하여 .env 파일에 파이어베이스 SDK를 작성해줍니다.
+- Realtime Database  
+1.상단 메뉴중 규칙에 접속  
+2.규칙 수정을 아래와 같이 수정  
 ````
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+````
+#### 1. /maum-app/renderer 경로에 .env 파일을 생성해줍니다.
+#### 2. sample.env를 참고하여 .env 파일에 파이어베이스 SDK를 작성해줍니다.
+````
+//sample.env
 NEXT_PUBLIC_FIREBASE_apiKey = ""
 NEXT_PUBLIC_FIREBASE_authDomain =""
 NEXT_PUBLIC_FIREBASE_databaseURL = ""
@@ -30,7 +47,7 @@ NEXT_PUBLIC_FIREBASE_storageBucket = ""
 NEXT_PUBLIC_FIREBASE_messagingSenderId =""
 NEXT_PUBLIC_FIREBASE_appId =""
 ````
-3.npm install을 명령하여 패키지 설치 후 앱을 실행 및 빌드합니다, 사용 가능한 명령어는 아래와 같습니다.
+#### 4..npm install을 명령하여 패키지 설치 후 앱을 실행 및 빌드합니다, 사용 가능한 명령어는 아래와 같습니다.
 ````
   "scripts": {
     "dev": "nextron",
@@ -46,7 +63,7 @@ NEXT_PUBLIC_FIREBASE_appId =""
 
 
 ## 🏆 프로젝트를 통해 경험한 것!
-
+ 
 ## 공통
 - #### 일대일 대화와 그룹 대화를 각기 다른 페이지에서 구현
 - #### Firebase Realtime Datebase를 통한 실시간 채팅 구현
