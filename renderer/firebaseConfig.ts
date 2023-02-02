@@ -1,7 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore, Timestamp } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import {
   get,
   getDatabase,
@@ -11,9 +10,10 @@ import {
   ref,
   set,
   update,
-} from 'firebase/database';
-import { convertDate } from './utils/convertDate';
-import { ChatDataNew } from './utils/makeChatRooms';
+} from "firebase/database";
+import { getFirestore, Timestamp } from "firebase/firestore";
+import { convertDate } from "./utils/convertDate";
+import { ChatDataNew } from "./utils/makeChatRooms";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_apiKey,
@@ -30,7 +30,7 @@ export const authService = getAuth(apps);
 export const dbService = getFirestore(apps);
 export const realtimeDbService = getDatabase(apps);
 //현재 유저목록을 가져온다.
-export const userListRef = ref(realtimeDbService, 'userList');
+export const userListRef = ref(realtimeDbService, "userList");
 //uid로 식별한 유저의 데이터를 가져온다.
 export const getUserDataRef = (uid: string) => {
   return ref(realtimeDbService, `userList/${uid}`);
@@ -176,16 +176,23 @@ export const exitUserCleanUpMyGroupChatList = async (
   ];
   //삭제해야하는 채팅방의 인덱스를 구한다.
   let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
+  console.log("내그룹채팅리스트");
+  console.log(내그룹채팅리스트);
+  console.log("삭제인덱스");
+  console.log(삭제인덱스);
+
   if (삭제인덱스 !== -1) {
     //삭제
     내그룹채팅리스트.splice(삭제인덱스, 1);
     //삭제한 배열을 다시 set해준다.
     let 그룹채팅 = ref(realtimeDbService, `userList/${uid}/myGroupChatList`);
+    console.log("삭제 후");
+    console.log(내그룹채팅리스트);
     set(그룹채팅, {
       groupChatUid: 내그룹채팅리스트,
     });
   } else {
-    alert('존재하지않는 채팅방입니다.');
+    alert("존재하지않는 채팅방입니다.");
   }
 };
 
@@ -194,26 +201,11 @@ export const exitUserCleanUpThisGroupChatList = async (
   uid: string,
   chatRoomUid: string,
 ) => {
-  console.log('groupChatConnectedUserList');
-  let groupChatConnectedUserList: {
-    [key: string]: {
-      displayName: string;
-      isOn: boolean;
-      lastConnectTimeStamp: number;
-      uid: string;
-    };
-  } = (await get(getGroupUserListPath(chatRoomUid))).val();
-  let groupChatConnectedUserListValues = Object.values(
-    groupChatConnectedUserList,
+  //공식 문서에 안내대로, 객체의 값을 null로 update하여 값을 삭제한다.
+  update(
+    ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`),
+    { [uid]: null },
   );
-  //리스트에서 특정 유저를 삭제
-  groupChatConnectedUserListValues.forEach((i, index) => {
-    if (i.uid === uid) {
-      groupChatConnectedUserListValues.splice(index, 1);
-    }
-  });
-  //삭제한 배열로 다시 set
-  set(getGroupUserListPath(chatRoomUid), groupChatConnectedUserListValues);
 };
 
 //그룹 채팅 생성 시 방을 생성하고, 유저목록 set 후, 시작메시지를 작성해주는 함수
@@ -267,12 +259,12 @@ export const createGroupChat = (
  */
 export const getChatRoomLastMessage = async (
   chatRoomUid: string,
-  chatRoomType: 'oneToOne' | 'group',
+  chatRoomType: "oneToOne" | "group",
 ): Promise<ChatDataNew | null> => {
   let resultLastMessage = null;
   //들어온값에 따라서 적절한 ref를 할당시킨다.
   const chatRef =
-    chatRoomType === 'oneToOne'
+    chatRoomType === "oneToOne"
       ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
       : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
 

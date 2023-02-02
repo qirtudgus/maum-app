@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import { get, off, onValue, ref } from "firebase/database";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import CreateGroupChatModal from "../components/createGroupChatModal";
+import LoadingSpinner from "../components/LoadingSpinner";
+import AddSvg from "../components/svg/addSvg";
+import PeopleSvg from "../components/svg/peopleSvg";
 import {
   authService,
-  realtimeDbService,
   getChatRoomLastMessage,
-} from '../firebaseConfig';
-import { get, ref, off, onValue } from 'firebase/database';
-import { useRouter } from 'next/router';
-import LoadingSpinner from '../components/LoadingSpinner';
-import PeopleSvg from '../components/svg/peopleSvg';
-import CreateGroupChatModal from '../components/createGroupChatModal';
-import AddSvg from '../components/svg/addSvg';
-import { convertDate } from '../utils/convertDate';
+  realtimeDbService,
+} from "../firebaseConfig";
+import { convertDate } from "../utils/convertDate";
 import {
   ChatDataNew,
   ChatRoomType,
   createGroupChatRooms,
   getNotReadMessageCount,
   ResultGroupRoom,
-} from '../utils/makeChatRooms';
+} from "../utils/makeChatRooms";
 import {
   ChatIcon,
   ChatListHeader,
@@ -30,7 +30,7 @@ import {
   PageTitle,
   Wrap,
   ZeroChatRoom,
-} from './oneToOneChatRooms';
+} from "./oneToOneChatRooms";
 
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ function ChatList() {
   const uid = authService.currentUser?.uid;
 
   const getMyChatRoomsRef = async (uid: string, chatRoomType: ChatRoomType) => {
-    if (chatRoomType === 'group') {
+    if (chatRoomType === "group") {
       return await (
         await get(
           ref(
@@ -65,7 +65,7 @@ function ChatList() {
       //라스트인덱스오브를 통해 뒤에서부터 true를 찾은 뒤 그 인덱스 = 마지막으로 읽은 메시지 index
       //스냅샷의 사이즈를 가져와서, 스냅샷 - index = 안읽은 메시지 갯수
       //마지막 메시지넣기 시작
-      const newLastMessage = await getChatRoomLastMessage(chatUid, 'group');
+      const newLastMessage = await getChatRoomLastMessage(chatUid, "group");
       // console.log(newLastMessage);
       const isLastMessageLead =
         newLastMessage.readUsers[authService.currentUser?.uid];
@@ -118,6 +118,8 @@ function ChatList() {
         // console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
         setTimeout(() => {
           createGroupChatRooms(uid).then((res) => {
+            console.log("그룹 수신 후res");
+            console.log(res);
             if (res) {
               setGroupChatList2(res);
               setCombineChatList(res);
@@ -136,22 +138,26 @@ function ChatList() {
   useEffect(() => {
     if (groupChatList2.length === 0) return;
     const groupChatRoomUidArr = async () => {
-      const 그룹채팅배열 = await getMyChatRoomsRef(uid, 'group');
+      const 그룹채팅배열 = await getMyChatRoomsRef(uid, "group");
       //   console.log(그룹채팅배열);
       return 그룹채팅배열;
     };
 
     groupChatRoomUidArr().then((res) => {
-      res.forEach((i) => {
-        startGroupChatObserver(i);
-      });
+      if (res) {
+        res.forEach((i) => {
+          startGroupChatObserver(i);
+        });
+      }
     });
 
     return () => {
       groupChatRoomUidArr().then((res) => {
-        res.forEach((i) => {
-          exitGroupChatObserver(i);
-        });
+        if (res) {
+          res.forEach((i) => {
+            exitGroupChatObserver(i);
+          });
+        }
       });
     };
   }, [groupChatList2]);
@@ -177,7 +183,7 @@ function ChatList() {
       <ChatListHeader>
         <PageTitle>대화 목록</PageTitle>
         <CreateGroupChatButton
-          className='addGroupChatButton'
+          className="addGroupChatButton"
           onClick={() => setShowAddGroupChat((prev) => !prev)}
         >
           <AddSvg />
@@ -204,10 +210,10 @@ function ChatList() {
                   </ChatIcon>
                   <ChatRoomInfo>
                     <ChatRoomTitleAndTime>
-                      <span className='title'>{item?.displayName}</span>
+                      <span className="title">{item?.displayName}</span>
                       {item.createdSecondsAt !== 0 &&
                         item.createdSecondsAt !== undefined && (
-                          <span className='timeStamp'>
+                          <span className="timeStamp">
                             {convertDate(item.createdSecondsAt)}
                           </span>
                         )}

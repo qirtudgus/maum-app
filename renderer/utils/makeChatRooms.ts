@@ -1,5 +1,5 @@
-import { get, ref } from 'firebase/database';
-import { getChatRoomLastMessage, realtimeDbService } from '../firebaseConfig';
+import { get, ref } from "firebase/database";
+import { getChatRoomLastMessage, realtimeDbService } from "../firebaseConfig";
 
 /**
  * 대화를 이루는 각 하나의 대화 요소에 대한 타입입니다.
@@ -51,7 +51,7 @@ export interface ResultGroupRoom {
 /**
  * 특정 함수에서 대화방의 타입을 구분하기 위함
  */
-export type ChatRoomType = 'group' | 'oneToOne';
+export type ChatRoomType = "group" | "oneToOne";
 
 /**
  * oneToOneChatRooms에 렌더링할 배열을
@@ -62,33 +62,33 @@ export type ChatRoomType = 'group' | 'oneToOne';
  */
 export const createOneToOneChatRooms = async (uid: string) => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
-  const listObj = await getMyChatRoomsRef(uid, 'oneToOne');
+  const listObj = await getMyChatRoomsRef(uid, "oneToOne");
   // console.log('listObj');
   // console.log(listObj);
   if (!listObj) return null; //채팅방이 존재할 때 함수 진행
   // console.log('listValues');
   // console.log(listValues);
   const getMyChatListArray: pureMessage[] = Object.values(listObj);
-  console.log('getMyChatListArray');
+  console.log("getMyChatListArray");
   console.log(getMyChatListArray);
   const resultGroupChatRooms: Promise<ResultOneToOneRoom>[] =
     getMyChatListArray.map(async (i) => {
       const lastMessage = await getChatRoomLastMessage(
         i.chatRoomUid.chatRoomUid,
-        'oneToOne',
+        "oneToOne",
       );
       const chatList = await getMyGroupChatRoomChatList(
         i.chatRoomUid.chatRoomUid,
       );
       const notReadCount = getNotReadMessageCount(chatList, uid);
 
-      console.log('lastMessage');
+      console.log("lastMessage");
       console.log(lastMessage);
 
       let result2 = Object.values(i)[0];
-      result2['lastMessage'] = lastMessage.message;
-      result2['notReadCount'] = notReadCount;
-      result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
+      result2["lastMessage"] = lastMessage.message;
+      result2["notReadCount"] = notReadCount;
+      result2["createdSecondsAt"] = lastMessage.createdSecondsAt;
       return result2;
     });
   return await Promise.all(resultGroupChatRooms);
@@ -115,18 +115,17 @@ export const createGroupChatRooms = async (
   uid: string,
 ): Promise<ResultGroupRoom[] | null> => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
-  const listObj = await getMyChatRoomsRef(uid, 'group');
-  // console.log('listObj');
-  // console.log(listObj);
+  const listObj = await getMyChatRoomsRef(uid, "group");
+  console.log("listObj");
+  console.log(listObj);
   if (!listObj) return null; //채팅방이 존재할 때 함수 진행
   const listValues: string[] = Object.values(listObj); // 그룹채팅 uid가 들어있다
-  // console.log('listValues');
-  // console.log(listValues);
-  // setGroupChatList2(listValues);
+  console.log("listValues");
+  console.log(listValues);
 
   const resultGroupChatRooms = listValues.map(async (i) => {
     const title = await getMyGroupChatRoomTitle(i);
-    const lastMessage = await getChatRoomLastMessage(i, 'group');
+    const lastMessage = await getChatRoomLastMessage(i, "group");
     const chatList = await getMyGroupChatRoomChatList(i);
     const notReadCount = await getNotReadMessageCount(chatList, uid);
     let 결과객체: ResultGroupRoom = {
@@ -146,7 +145,7 @@ export const getMyChatRoomsRef = async (
   uid: string,
   chatRoomType: ChatRoomType,
 ) => {
-  if (chatRoomType === 'group') {
+  if (chatRoomType === "group") {
     return await (
       await get(
         ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
@@ -164,7 +163,7 @@ export const getMyChatRoomsRef2 = async (
   uid: string,
   chatRoomType: ChatRoomType,
 ) => {
-  if (chatRoomType === 'group') {
+  if (chatRoomType === "group") {
     return await (
       await get(
         ref(realtimeDbService, `userList/${uid}/myGroupChatList/groupChatUid`),
