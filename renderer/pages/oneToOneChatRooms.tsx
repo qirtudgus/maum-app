@@ -81,27 +81,17 @@ function ChatList() {
     console.log(`${chatUid}방 옵저버 실행`);
     const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
     onValue(refs, async (snapshot) => {
-      //라스트인덱스오브를 통해 뒤에서부터 true를 찾은 뒤 그 인덱스 = 마지막으로 읽은 메시지 index
-      //스냅샷의 사이즈를 가져와서, 스냅샷 - index = 안읽은 메시지 갯수
-      //마지막 메시지넣기 시작
-      const newLastMessage = await getChatRoomLastMessage(chatUid, 'oneToOne');
-      // console.log('newLastMessage');
-
-      // console.log(newLastMessage);
-      const isLastMessageLead = newLastMessage.readUsers[authService.currentUser?.uid];
-      // console.log('chatUid');
-      // console.log(chatUid);
+      const lastMessage = await getChatRoomLastMessage(chatUid, 'oneToOne');
       //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
-      if (!isLastMessageLead) {
-        //안읽음 카운트 넣기 - 이건 메시지가 존재하는 경우에만 실행되는 if문 안에 있다.
-        const 메시지들: ChatDataNew[] = Object.values((await get(refs)).val());
-        const notReadCount = await getNotReadMessageCount(메시지들, uid);
+      if (!lastMessage.readUsers[authService.currentUser?.uid]) {
+        const 메시지들: ChatDataNew[] = Object.values(snapshot.val());
+        const notReadCount = getNotReadMessageCount(메시지들, uid);
         setSortChatList((prev) => {
           //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
           let updateChatList = prev.map((i, index) => {
             if (i.chatRoomUid === chatUid) {
-              i.lastMessage = newLastMessage.message;
-              i.createdSecondsAt = newLastMessage.createdSecondsAt;
+              i.lastMessage = lastMessage.message;
+              i.createdSecondsAt = lastMessage.createdSecondsAt;
               i.notReadCount = notReadCount;
               // i.notReadCount++;
             }
