@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { authService, realtimeDbService, getChatRoomLastMessage } from '../firebaseConfig';
+import { authService, realtimeDbService } from '../firebaseConfig';
 import { get, ref, off, onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -11,6 +11,7 @@ import {
   getMyChatRoomsRef,
   getNotReadMessageCount,
   ResultOneToOneRoom,
+  getChatRoomLastMessage,
 } from '../utils/makeChatRooms';
 import ChatRoom from '../components/ChatRoom';
 

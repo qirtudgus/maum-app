@@ -5,12 +5,13 @@ import ChatRoom from '../components/ChatRoom';
 import CreateGroupChatModal from '../components/createGroupChatModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import AddSvg from '../components/svg/addSvg';
-import { authService, getChatRoomLastMessage, realtimeDbService } from '../firebaseConfig';
+import { authService, realtimeDbService } from '../firebaseConfig';
 import {
   ChatDataNew,
   createGroupChatRooms,
   getNotReadMessageCount,
   groupChatRoomUidArr,
+  getChatRoomLastMessage,
   ResultGroupRoom,
 } from '../utils/makeChatRooms';
 import { ChatListHeader, CreateGroupChatButton, PageTitle, Wrap, ZeroChatRoom } from './oneToOneChatRooms';
