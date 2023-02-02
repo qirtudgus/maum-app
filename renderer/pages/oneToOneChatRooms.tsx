@@ -8,8 +8,6 @@ import {
 import { get, ref, off, onValue } from 'firebase/database';
 import { useRouter } from 'next/router';
 import LoadingSpinner from '../components/LoadingSpinner';
-import PeopleSvg from '../components/svg/peopleSvg';
-
 import AddSvg from '../components/svg/addSvg';
 import { convertDate } from '../utils/convertDate';
 import {
@@ -19,6 +17,7 @@ import {
   getNotReadMessageCount,
   ResultOneToOneRoom,
 } from '../utils/makeChatRooms';
+import ChatRoom from '../components/ChatRoom';
 
 export const Wrap = styled.div`
   width: 100%;
@@ -42,79 +41,6 @@ export const PageTitle = styled.div`
   font-size: 20px;
   font-weight: bold;
   color: #444;
-`;
-
-export const ChatRoomList = styled.li`
-  cursor: pointer;
-  width: 100%;
-  background: #fff;
-  padding: 10px;
-  height: fit-content;
-  display: flex;
-  &:hover {
-    background: #eee;
-  }
-`;
-export const ChatRoomInfo = styled.div`
-  width: 100%;
-`;
-
-export const ChatRoomLastMessage = styled.div`
-  display: flex;
-  justify-content: space-between;
-  color: #444;
-  width: 100%;
-  word-break: break-all;
-  /* & > .message {
-    width: 90%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  } */
-`;
-export const ChatRoomNotReadCount = styled.div`
-  padding: 3px 5px;
-  text-align: center;
-  color: #fff;
-  font-size: 15px;
-  font-weight: bold;
-  border-radius: 10px;
-  background: #d61818;
-  width: fit-content;
-  height: fit-content;
-  flex-shrink: 0;
-`;
-export const ChatRoomTitleAndTime = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  & .title {
-    font-size: 15px;
-    font-weight: bold;
-  }
-
-  & .timeStamp {
-    font-size: 15px;
-    color: #555;
-  }
-`;
-
-export const ChatIcon = styled.div`
-  position: relative;
-  width: 45px;
-  height: 45px;
-  flex-shrink: 0;
-  background: #d0ddff;
-  border-radius: 10px;
-  margin-right: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  & svg {
-    width: 30px;
-    height: 30px;
-    fill: #fff;
-  }
 `;
 
 export const ZeroChatRoom = styled.div`
@@ -290,40 +216,7 @@ function ChatList() {
         ) : (
           <>
             {sortChatList.map((item) => {
-              return (
-                <ChatRoomList
-                  key={item.chatRoomUid}
-                  onClick={() => {
-                    router.push(
-                      //   `/chatRooms/oneToOne?displayName=${item?.opponentName}&chatRoomUid=${item?.chatRoomUid}`,
-                      `/oneToOneChatRooms/oneToOne?displayName=${item.opponentName}&chatRoomUid=${item.chatRoomUid}`,
-                    );
-                  }}
-                >
-                  <ChatIcon>
-                    <PeopleSvg />
-                  </ChatIcon>
-                  <ChatRoomInfo>
-                    <ChatRoomTitleAndTime>
-                      <span className='title'>{item?.opponentName}</span>
-                      {item.createdSecondsAt !== 0 &&
-                        item.createdSecondsAt !== undefined && (
-                          <span className='timeStamp'>
-                            {convertDate(item.createdSecondsAt)}
-                          </span>
-                        )}
-                    </ChatRoomTitleAndTime>
-                    <ChatRoomLastMessage>
-                      <div className='message'>{item.lastMessage}</div>
-                      {item.notReadCount !== 0 && (
-                        <ChatRoomNotReadCount>
-                          {item.notReadCount}
-                        </ChatRoomNotReadCount>
-                      )}
-                    </ChatRoomLastMessage>
-                  </ChatRoomInfo>
-                </ChatRoomList>
-              );
+              return <ChatRoom chatRoom={item} chatRoomType='oneToOne' />;
             })}
           </>
         )

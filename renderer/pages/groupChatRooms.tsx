@@ -1,32 +1,24 @@
 import { get, off, onValue, ref } from 'firebase/database';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import ChatRoom from '../components/ChatRoom';
 import CreateGroupChatModal from '../components/createGroupChatModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import AddSvg from '../components/svg/addSvg';
-import PeopleSvg from '../components/svg/peopleSvg';
 import {
   authService,
   getChatRoomLastMessage,
   realtimeDbService,
 } from '../firebaseConfig';
-import { convertDate } from '../utils/convertDate';
 import {
   ChatDataNew,
-  ChatRoomType,
   createGroupChatRooms,
   getNotReadMessageCount,
   groupChatRoomUidArr,
   ResultGroupRoom,
 } from '../utils/makeChatRooms';
 import {
-  ChatIcon,
   ChatListHeader,
-  ChatRoomInfo,
-  ChatRoomLastMessage,
-  ChatRoomList,
-  ChatRoomNotReadCount,
-  ChatRoomTitleAndTime,
   CreateGroupChatButton,
   PageTitle,
   Wrap,
@@ -80,10 +72,9 @@ function ChatList() {
     });
   };
 
+  //채팅방 초기 세팅
   useEffect(() => {
     createGroupChatRooms(uid).then((res) => {
-      // console.log('채팅리스트');
-      // console.log(res);
       if (res) {
         setGroupChatList2(res);
         setCombineChatList(res);
@@ -92,6 +83,9 @@ function ChatList() {
         setIsLoading(true);
       }
     });
+  }, []);
+
+  useEffect(() => {
     //현재 유저의 새로운 그룹채팅이 생김을 감지하는 옵저버
     //새로 감지가 되면 방을 다시 렌더링하여 순차정렬해준다.
     onValue(
@@ -157,39 +151,7 @@ function ChatList() {
         ) : (
           <>
             {sortChatList.map((item) => {
-              return (
-                <ChatRoomList
-                  key={item.chatRoomUid}
-                  onClick={() => {
-                    router.push(
-                      `/groupChatRooms/group?chatRoomsTitle=${item.displayName}&chatRoomUid=${item.chatRoomUid}`,
-                    );
-                  }}
-                >
-                  <ChatIcon>
-                    <PeopleSvg />
-                  </ChatIcon>
-                  <ChatRoomInfo>
-                    <ChatRoomTitleAndTime>
-                      <span className='title'>{item?.displayName}</span>
-                      {item.createdSecondsAt !== 0 &&
-                        item.createdSecondsAt !== undefined && (
-                          <span className='timeStamp'>
-                            {convertDate(item.createdSecondsAt)}
-                          </span>
-                        )}
-                    </ChatRoomTitleAndTime>
-                    <ChatRoomLastMessage>
-                      <div>{item.lastMessage}</div>
-                      {item.notReadCount !== 0 && (
-                        <ChatRoomNotReadCount>
-                          {item.notReadCount}
-                        </ChatRoomNotReadCount>
-                      )}
-                    </ChatRoomLastMessage>
-                  </ChatRoomInfo>
-                </ChatRoomList>
-              );
+              return <ChatRoom chatRoom={item} chatRoomType='group' />;
             })}
           </>
         )
