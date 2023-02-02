@@ -32,33 +32,6 @@ import {
   ZeroChatRoom,
 } from './oneToOneChatRooms';
 
-interface ResultMessage {
-  chatRoomUid: {
-    chatRoomUid: string;
-    opponentName: string;
-    opponentUid: string;
-  };
-  lastMessage?: string;
-  notReadCount?: number;
-}
-
-interface GroupChatList {
-  chatRoomUid: string;
-  chatRoomsTitle: string;
-  lastMessage: string;
-  notReadCount: number;
-  createdSecondsAt: number;
-}
-
-interface oneToOneChatList {
-  chatRoomUid: string;
-  opponentName: string;
-  opponentUid: string;
-  lastMessage?: string;
-  notReadCount?: number;
-  createdSecondsAt: number;
-}
-
 function ChatList() {
   const [isLoading, setIsLoading] = useState(false);
   const [groupChatList2, setGroupChatList2] = useState<ResultGroupRoom[]>([]);
