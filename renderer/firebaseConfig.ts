@@ -130,33 +130,13 @@ export const updateGroupChatConnectedUsers = async (userList: UserList[], groupC
 
 //특정유저가 그룹채팅방에서 퇴장 시 자신의 채팅리스트에서 삭제해주는 함수
 export const exitUserCleanUpGroupChatRooms = async (uid: string, chatRoomUid: string) => {
-  let 내그룹채팅리스트 = [...(await (await get(getUserConnectedGroupChatList(uid))).val())];
-  //삭제해야하는 채팅방의 인덱스를 구한다.
-  let 삭제인덱스 = 내그룹채팅리스트.indexOf(chatRoomUid);
-  console.log('내그룹채팅리스트');
-  console.log(내그룹채팅리스트);
-  console.log('삭제인덱스');
-  console.log(삭제인덱스);
-
-  if (삭제인덱스 !== -1) {
-    //삭제
-    내그룹채팅리스트.splice(삭제인덱스, 1);
-    //삭제한 배열을 다시 set해준다.
-    let 그룹채팅 = ref(realtimeDbService, `userList/${uid}/group_chat_rooms`);
-    console.log('삭제 후');
-    console.log(내그룹채팅리스트);
-    set(그룹채팅, {
-      groupChatUid: 내그룹채팅리스트,
-    });
-  } else {
-    alert('존재하지않는 채팅방입니다.');
-  }
+  await update(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`), { [chatRoomUid]: null });
 };
 
-//그룹채팅에서 특정 유저를 삭제하는 것
+//그룹채팅에서 connectedUser중에서 특정 유저를 삭제하는 것
 export const exitUserCleanUpThisGroupChatList = async (uid: string, chatRoomUid: string) => {
   //공식 문서에 안내대로, 객체의 값을 null로 update하여 값을 삭제한다.
-  update(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`), { [uid]: null });
+  await update(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`), { [uid]: null });
 };
 
 //그룹 채팅 생성 시 방을 생성하고, 유저목록 set 후, 시작메시지를 작성해주는 함수
