@@ -141,6 +141,7 @@ function ChatList() {
             {sortChatList.map((item) => {
               return (
                 <ChatRoom
+                  key={item.chatRoomUid}
                   chatRoom={item}
                   chatRoomType='group'
                 />
