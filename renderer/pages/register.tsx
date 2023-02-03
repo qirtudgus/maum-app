@@ -83,7 +83,7 @@ const Register = () => {
       nicknameInput.value === ' ' ||
       nicknameInput.value.length === 0 ||
       blank_pattern.test(nicknameInput.value) ||
-      nicknameInput.value.length > 10
+      nicknameInput.value.length > 8
     ) {
       setIsNicknameError(true);
       setIsNicknameText('닉네임을 확인해주세요!');
@@ -152,7 +152,7 @@ const Register = () => {
           </Logo>
           <BasicInput
             ref={nicknameRef}
-            placeholderValue='닉네임(최대 10자)'
+            placeholderValue='닉네임(최대 8자)'
             isError={isNicknameError}
             statusText={isNicknameText}
           ></BasicInput>
