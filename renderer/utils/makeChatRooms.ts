@@ -70,8 +70,41 @@ export const createOneToOneChatRooms = async (uid: string) => {
   const getMyChatListArray: pureMessage[] = Object.values(listObj);
   const resultGroupChatRooms: Promise<ResultOneToOneRoom>[] = getMyChatListArray.map(async (i) => {
     const lastMessage = await getChatRoomLastMessage(i.chatRoomUid.chatRoomUid, 'oneToOne');
-    const chatList = await getMyGroupChatRoomChatList(i.chatRoomUid.chatRoomUid);
+    const chatList = await getMyOneToOneChatRoomChatList(i.chatRoomUid.chatRoomUid);
     const notReadCount = getNotReadMessageCount(chatList, uid);
+    let result2 = Object.values(i)[0];
+    result2['displayName'] = i.chatRoomUid.opponentName;
+    result2['lastMessage'] = lastMessage.message;
+    result2['notReadCount'] = notReadCount;
+    result2['createdSecondsAt'] = lastMessage.createdSecondsAt;
+    delete result2['opponentName']; // 그룹채팅과 객체명을 통일하기위해 opponentName을 제거하고 displayName을 추가한다.
+    return result2;
+  });
+  return await Promise.all(resultGroupChatRooms);
+};
+
+/**
+ * oneToOneChatRooms에 렌더링할 배열을
+ * 만들어 반환해주는 비동기 함수입니다.
+ * 채팅방이 존재하지않으면 []을 반환합니다.
+ * @param uid 대화목록을 만들 사용자의 uid
+ * @returns ResultMessage[] | []
+ */
+export const createOneToOneChatRoomsTest = async (uid: string) => {
+  //   const listObj = await getMyGroupChatRoomsRef(uid);
+  const listObj = await getMyChatRoomsRef(uid, 'oneToOne');
+  console.log('listObj');
+  console.log(listObj);
+  // if (!listObj) return null; //채팅방이 존재할 때 함수 진행
+  if (!listObj) return []; //채팅방이 존재할 때 함수 진행
+  const getMyChatListArray: pureMessage[] = Object.values(listObj);
+  const resultGroupChatRooms: Promise<ResultOneToOneRoom>[] = getMyChatListArray.map(async (i) => {
+    const lastMessage = await getChatRoomLastMessage(i.chatRoomUid.chatRoomUid, 'oneToOne');
+    const chatList = await getMyOneToOneChatRoomChatList(i.chatRoomUid.chatRoomUid);
+    const notReadCount = getNotReadMessageCount(chatList, uid);
+    console.log('일대일 채팅방 notReadCount');
+    console.log(chatList);
+    console.log(notReadCount);
     let result2 = Object.values(i)[0];
     result2['displayName'] = i.chatRoomUid.opponentName;
     result2['lastMessage'] = lastMessage.message;
@@ -113,6 +146,37 @@ export const getMyChatRoomsRef = async (uid: string, chatRoomType: ChatRoomType)
 export const createGroupChatRooms = async (uid: string): Promise<ResultGroupRoom[] | null> => {
   const listObj = await getMyChatRoomsRef(uid, 'group');
   if (!listObj) return null; //채팅방이 존재할 때 함수 진행
+  // if (!listObj) return []; //채팅방이 존재할 때 함수 진행
+  const listValues: string[] = Object.values(listObj); // 그룹채팅 uid가 들어있다
+  const resultGroupChatRooms = listValues.map(async (i) => {
+    const title = await getMyGroupChatRoomTitle(i);
+    const lastMessage = await getChatRoomLastMessage(i, 'group');
+    const chatList = await getMyGroupChatRoomChatList(i);
+    const notReadCount = getNotReadMessageCount(chatList, uid);
+
+    let 결과객체: ResultGroupRoom = {
+      chatRoomUid: i,
+      displayName: title,
+      lastMessage: lastMessage.message,
+      notReadCount: notReadCount,
+      createdSecondsAt: lastMessage.createdSecondsAt,
+    };
+    return 결과객체;
+  });
+  return await Promise.all(resultGroupChatRooms);
+};
+
+/**
+ * groupChatRooms에 렌더링할 배열을
+ * 만들어 반환해주는 비동기 함수입니다.
+ * 채팅방이 존재하지않으면 []을 반환합니다.
+ * @param uid 대화목록을 만들 사용자의 uid
+ * @returns ResultMessage[] | []
+ */
+export const createGroupChatRoomsTest = async (uid: string): Promise<ResultGroupRoom[] | []> => {
+  const listObj = await getMyChatRoomsRef(uid, 'group');
+  // if (!listObj) return null; //채팅방이 존재할 때 함수 진행
+  if (!listObj) return []; //채팅방이 존재할 때 함수 진행
   const listValues: string[] = Object.values(listObj); // 그룹채팅 uid가 들어있다
   const resultGroupChatRooms = listValues.map(async (i) => {
     const title = await getMyGroupChatRoomTitle(i);
@@ -139,6 +203,18 @@ export const createGroupChatRooms = async (uid: string): Promise<ResultGroupRoom
  */
 export const getMyGroupChatRoomChatList = async (chatRoomUid: string): Promise<ChatDataNew[] | null> => {
   const chatList = (await get(ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`))).val();
+  if (!chatList) return null;
+  return chatList ? (Object.values(chatList) as ChatDataNew[]) : null;
+};
+
+/**
+ * 일대일채팅의 의 uid를 받아와 해당 채팅방의 대화내용을
+ * 배열로 가공하여 반환해주는 함수입니다.
+ * @param chatRoomUid 그룹 채팅방 고유 uid입니다.
+ * @returns
+ */
+export const getMyOneToOneChatRoomChatList = async (chatRoomUid: string): Promise<ChatDataNew[] | null> => {
+  const chatList = (await get(ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`))).val();
   if (!chatList) return null;
   return chatList ? (Object.values(chatList) as ChatDataNew[]) : null;
 };
