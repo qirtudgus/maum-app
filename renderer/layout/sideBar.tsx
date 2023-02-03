@@ -97,7 +97,7 @@ const SideBar = () => {
   return (
     <SideBarContainer>
       <SideBarWrap>
-        <UserDisplayName>{authService.currentUser.displayName}</UserDisplayName>
+        <UserDisplayName>{authService.currentUser?.displayName}</UserDisplayName>
         <HeaderButtonWrap>
           <SettingButton
             title='유저 목록'
