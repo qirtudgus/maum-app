@@ -121,7 +121,7 @@ const OneToOneChatRoom = () => {
           <MessageContainerGroup chatList={chatList} />
         )
       ) : (
-        <LoadingSpinner />
+        <LoadingSpinner wrapColor='#fff' />
       )}
       <SendMessageInput
         connectedUsers={ConnectedUsers}

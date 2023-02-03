@@ -152,7 +152,7 @@ const GroupChatRoom = () => {
           <MessageContainerOneToOne chatList={chatList} />
         )
       ) : (
-        <LoadingSpinner />
+        <LoadingSpinner wrapColor='#fff' />
       )}
 
       <SendMessageInput
