@@ -102,6 +102,11 @@ function ChatList() {
       }
     });
   };
+  const exitOneToOneChatObserver = (chatUid: string) => {
+    const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
+    console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
+    off(refs);
+  };
   useEffect(() => {
     createOneToOneChatRooms(uid).then((res) => {
       console.log('채팅리스트');
@@ -140,11 +145,6 @@ function ChatList() {
       console.log(그룹채팅배열);
       return 그룹채팅배열;
     };
-    const quitOneToOneChatObserver = (chatUid: string) => {
-      const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
-      console.log(`${chatUid}의 안읽은메시지 갯수 옵저버가 종료`);
-      off(refs);
-    };
 
     옵저버채팅배열().then((res) => {
       console.log('ref');
@@ -159,7 +159,7 @@ function ChatList() {
       옵저버채팅배열().then((res) => {
         let ref: any[] = Object.values(res);
         ref.forEach((i) => {
-          quitOneToOneChatObserver(i.chatRoomUid.chatRoomUid);
+          exitOneToOneChatObserver(i.chatRoomUid.chatRoomUid);
         });
       });
     };
