@@ -27,11 +27,9 @@ const SideBarWrap = styled.div`
 
 const HeaderButtonWrap = styled.div`
   width: 100%;
-  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  top: 5px;
   height: fit-content;
 `;
 
@@ -45,6 +43,9 @@ const SettingButton = styled.div`
   margin: 5px 0;
   align-items: center;
   justify-content: flex-start;
+  &:first-child {
+    margin-top: 0px;
+  }
   & svg {
     width: 30px;
     height: 30px;
@@ -65,6 +66,14 @@ const SettingButton = styled.div`
   &.active svg {
     fill: ${({ theme }) => theme.colors.main};
   }
+`;
+
+const UserDisplayName = styled.div`
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
 `;
 
 const SideBar = () => {
@@ -88,6 +97,7 @@ const SideBar = () => {
   return (
     <SideBarContainer>
       <SideBarWrap>
+        <UserDisplayName>{authService.currentUser.displayName}</UserDisplayName>
         <HeaderButtonWrap>
           <SettingButton
             title='유저 목록'
