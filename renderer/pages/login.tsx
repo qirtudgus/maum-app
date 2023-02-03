@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import BasicInput from '../components/BasicInput';
 import { SolidButton } from '../components/ButtonGroup';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { authService, realtimeDbService } from '../firebaseConfig';
 import logo from '../image/ddokddok.webp';
 
@@ -59,6 +60,8 @@ export const Logo = styled.div`
   }
 `;
 
+const LoadingBg = styled.div``;
+
 const Login = () => {
   const router = useRouter();
   const emailRef = useRef<HTMLDivElement>();
@@ -68,7 +71,7 @@ const Login = () => {
   const [isLoginText, setIsLoginText] = useState('');
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [isPasswordText, setIsPasswordText] = useState('');
-
+  const [isLoading, setIsLoading] = useState(false);
   const 방금가입한메일 = router.query.email as string;
 
   const signInWithEmail = async (email: string, password: string) => {
@@ -111,6 +114,7 @@ const Login = () => {
     const emailInput = emailRef.current.firstChild as HTMLInputElement;
     const passwordInput = passwordRef.current.firstChild as HTMLInputElement;
     const isEmailSave = emailSaveRef.current.checked;
+    setIsLoading(true);
     //로그인 시 check가 true면 로컬스토리지에 이메일을 저장시키고,
     //check가 false면 로컬스토리지에 이메일을 삭제시킨다.
     if (isEmailSave) {
@@ -132,6 +136,7 @@ const Login = () => {
             setIsLoginError(true);
             setIsLoginText('존재하지않는 사용자입니다.');
             emailInput.focus();
+            setIsLoading(false);
             break;
           }
 
@@ -139,6 +144,7 @@ const Login = () => {
             setIsLoginError(true);
             setIsLoginText('이메일 양식을 확인해주세요!');
             emailInput.focus();
+            setIsLoading(false);
             break;
           }
           case 'auth/wrong-password': {
@@ -147,6 +153,7 @@ const Login = () => {
             setIsPasswordError(true);
             setIsPasswordText('비밀번호를 확인해주세요!');
             passwordInput.focus();
+            setIsLoading(false);
             break;
           }
           case 'auth/internal-error': {
@@ -155,6 +162,7 @@ const Login = () => {
             setIsPasswordError(true);
             setIsPasswordText('비밀번호를 확인해주세요!');
             passwordInput.focus();
+            setIsLoading(false);
             break;
           }
           default: {
@@ -162,10 +170,10 @@ const Login = () => {
             setIsPasswordError(false);
             setIsLoginText('이메일 혹은 비밀번호를 확인해주세요!');
             emailInput.focus();
+            setIsLoading(false);
             break;
           }
         }
-
         return;
       } else {
         const connectedRef = ref(realtimeDbService, `userList/${authService.currentUser.uid}`);
@@ -191,6 +199,7 @@ const Login = () => {
       </Head>
       <Box>
         <Wrap>
+          {isLoading && <LoadingSpinner wrapColor='rgba(0, 0, 0, 0.2)' />}
           <Logo>
             <Image src={logo} />
             <p>똑똑에 오신걸 환영해요!</p>
@@ -225,7 +234,6 @@ const Login = () => {
               type='checkbox'
             ></input>
           </div>
-
           <SolidButton
             BasicButtonValue='로그인'
             width={400}
