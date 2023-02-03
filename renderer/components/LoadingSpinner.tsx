@@ -1,17 +1,23 @@
 import styled from 'styled-components';
 
-const Wrap = styled.div`
+type wrapColorType = '#fff' | 'rgba(0, 0, 0, 0.2)';
+
+interface WrapColor {
+  wrapColor: wrapColorType;
+}
+
+const Wrap = styled.div<WrapColor>`
   width: 100%;
   height: 100%;
   left: 0;
   top: 0;
-  position: relative;
+  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1;
-  /* background: rgba(0, 0, 0, 0.3); */
-  background: #fff;
+  background: ${(props) => props.wrapColor || '#fff'};
+  /* background: #fff; */
 `;
 const P = styled.div`
   width: 100%;
@@ -59,10 +65,10 @@ const P = styled.div`
   }
 `;
 
-const LoadingSpinner = () => {
+const LoadingSpinner = ({ wrapColor }: { wrapColor: wrapColorType }) => {
   return (
     <>
-      <Wrap></Wrap>
+      <Wrap wrapColor={wrapColor}></Wrap>
       <P>
         <p className='loader'></p>
         <p className='loadingText'>불러오는 중..</p>
