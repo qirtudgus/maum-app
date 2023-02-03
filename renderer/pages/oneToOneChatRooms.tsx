@@ -208,7 +208,7 @@ function ChatList() {
           </>
         )
       ) : (
-        <LoadingSpinner />
+        <LoadingSpinner wrapColor='#fff' />
       )}
     </Wrap>
   );

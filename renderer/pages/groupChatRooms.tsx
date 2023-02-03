@@ -149,7 +149,7 @@ function ChatList() {
           </>
         )
       ) : (
-        <LoadingSpinner />
+        <LoadingSpinner wrapColor='#fff' />
       )}
       {showAddGroupChat && <CreateGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />}
     </Wrap>
