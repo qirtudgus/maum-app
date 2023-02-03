@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { convertDate } from '../utils/convertDate';
 import { ChatRoomType, ResultGroupRoom, ResultOneToOneRoom } from '../utils/makeChatRooms';
 import PeopleSvg from './svg/peopleSvg';
+import PersonSvg from './svg/personSvg';
 export const ChatRoomList = styled.li`
   cursor: pointer;
   width: 100%;
@@ -91,9 +92,7 @@ const ChatRoom = ({
           );
         }}
       >
-        <ChatIcon>
-          <PeopleSvg />
-        </ChatIcon>
+        <ChatIcon>{chatRoomType === 'oneToOne' ? <PersonSvg /> : <PeopleSvg />}</ChatIcon>
         <ChatRoomInfo>
           <ChatRoomTitleAndTime>
             <span className='title'>{chatRoom?.displayName}</span>
