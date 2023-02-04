@@ -81,12 +81,12 @@ const SideBar = () => {
   const uid = authService.currentUser?.uid;
   const userSignOut = async () => {
     try {
+      router.push('/login');
       signOut(authService).then(() => {
         if (uid) {
           const myConnectionsRef = ref(realtimeDbService, `userList/${uid}`);
           //유저구조중에 isOn값만 false로 만들기, 아래처럼 update 함수를 호출 // 정상작동
           update(myConnectionsRef, { isOn: false });
-          router.push('/login');
         }
       });
     } catch (error) {
@@ -127,6 +127,15 @@ const SideBar = () => {
             }}
           >
             <ChatListSvg /> 그룹
+          </SettingButton>
+          <SettingButton
+            title='단체 대화 목록'
+            className={router.pathname.startsWith('/combineChatRooms') && 'active'}
+            onClick={() => {
+              router.push('/combineChatRooms');
+            }}
+          >
+            <ChatListSvg /> 통합
           </SettingButton>
           <SettingButton
             title='설정'
