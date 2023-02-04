@@ -171,7 +171,7 @@ const CombineCahtRooms = () => {
       console.log('새로운 일대일 채팅 수신');
       console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
       setTimeout(() => {
-        createOneToOneChatRooms(uid).then((res) => {
+        createOneToOneChatRoomsTest(uid).then((res) => {
           if (res) {
             setChat([...res]);
             setIsNewChat((prev) => !prev);
@@ -191,7 +191,7 @@ const CombineCahtRooms = () => {
       // console.log('새로운 그룹 채팅 수신');
       // console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
       setTimeout(() => {
-        createGroupChatRooms(uid).then((res) => {
+        createGroupChatRoomsTest(uid).then((res) => {
           console.log('그룹 수신 후res');
           console.log(res);
           if (res) {
