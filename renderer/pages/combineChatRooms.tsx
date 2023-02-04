@@ -1,4 +1,4 @@
-import { get, off, onValue, orderByChild, orderByValue, query, ref } from 'firebase/database';
+import { get, off, onValue, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import ChatRoom from '../components/ChatRoom';
 import CreateGroupChatModal from '../components/createGroupChatModal';
@@ -36,10 +36,6 @@ const CombineCahtRooms = () => {
     //대화가 없을경우 null이 아닌 []를 반환해주도록 변경하여 스프레드문법에 오류가 없게 하였다.
     const chat1 = await createGroupChatRoomsTest(uid);
     const chat2 = await createOneToOneChatRoomsTest(uid);
-    console.log('그룹챗');
-    console.log(chat1);
-    console.log('일댈챗');
-    console.log(chat2);
     setGroupChat([...chat1]);
     setChat([...chat2]);
   };
