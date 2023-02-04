@@ -163,7 +163,7 @@ const GroupChatRoom = () => {
         isOneToOneOrGroup='group'
       />
 
-      {router.pathname.startsWith('/groupChatRooms') && (
+      {router.pathname.startsWith('/combineChatRooms/group') && (
         <LeftButtonGroup>
           <LeftButton
             title='채팅방 나가기'

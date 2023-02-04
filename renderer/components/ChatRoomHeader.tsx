@@ -95,7 +95,7 @@ const ChatRoomHeader = ({ title, userList }: { title: string; userList?: UserLis
       >
         <CloseSvg />
       </span>
-      {router.pathname.startsWith('/groupChatRooms') && (
+      {router.pathname.startsWith('/combineChatRooms/group') && (
         <UserListButton
           onClick={() => {
             setIsOpenUserList((prev) => !prev);
