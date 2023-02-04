@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import ChatListSvg from '../components/svg/chatListSvg';
 import LogoutSvg from '../components/svg/logoutSvg';
-import OneToOneSvg from '../components/svg/oneToOneSvg';
 import PeopleSvg from '../components/svg/peopleSvg';
 import SettingSvg from '../components/svg/settingSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
