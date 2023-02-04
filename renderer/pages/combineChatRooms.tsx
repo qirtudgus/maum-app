@@ -1,5 +1,6 @@
 import { get, off, onValue, ref } from 'firebase/database';
-import { useEffect, useState } from 'react';
+import React from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import ChatRoom from '../components/ChatRoom';
 import CreateGroupChatModal from '../components/createGroupChatModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -19,6 +20,7 @@ import {
 import { ChatListHeader, CreateGroupChatButton, PageTitle, Wrap, ZeroChatRoom } from './oneToOneChatRooms';
 
 const CombineCahtRooms = () => {
+  console.log('몇번 렌더링되나~~');
   const uid = authService.currentUser?.uid;
 
   const [chat, setChat] = useState([]);
@@ -32,18 +34,18 @@ const CombineCahtRooms = () => {
   //초대모달창
   const [showAddGroupChat, setShowAddGroupChat] = useState(false);
 
-  const FirstRenderer = async () => {
-    //대화가 없을경우 null이 아닌 []를 반환해주도록 변경하여 스프레드문법에 오류가 없게 하였다.
-    const chat1 = await createGroupChatRoomsTest(uid);
-    const chat2 = await createOneToOneChatRoomsTest(uid);
-    setGroupChat([...chat1]);
-    setChat([...chat2]);
-  };
+  // const FirstRenderer = async () => {
+  //   //대화가 없을경우 null이 아닌 []를 반환해주도록 변경하여 스프레드문법에 오류가 없게 하였다.
+  //   const chat1 = await createGroupChatRoomsTest(uid);
+  //   const chat2 = await createOneToOneChatRoomsTest(uid);
+  //   setGroupChat([...chat1]);
+  //   setChat([...chat2]);
+  // };
 
-  //초기에 chat에 각 채팅을 set해준다.
-  useEffect(() => {
-    FirstRenderer();
-  }, []);
+  // //초기에 chat에 각 채팅을 set해준다.
+  // useEffect(() => {
+  //   FirstRenderer();
+  // }, []);
 
   //chat 변화감지가 되면 sortChat의 값을 정렬해준다.
   useEffect(() => {
@@ -52,7 +54,9 @@ const CombineCahtRooms = () => {
       let sort = sortbefore.sort((a, b) => b.createdSecondsAt - a.createdSecondsAt);
       return sort;
     });
-    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(true);
+    }, 0);
   }, [chat, groupChat]);
 
   //각 채팅은 옵저버를 만들어준다. 먼저 그룹채팅
@@ -245,4 +249,4 @@ const CombineCahtRooms = () => {
   );
 };
 
-export default CombineCahtRooms;
+export default React.memo(CombineCahtRooms);
