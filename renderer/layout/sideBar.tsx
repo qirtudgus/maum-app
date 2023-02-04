@@ -38,6 +38,7 @@ const SettingButton = styled.div`
   color: #fff;
   cursor: pointer;
   width: 120px;
+  border-radius: 25px 0 0 25px;
   height: 40px;
   display: flex;
   margin: 5px 0;
@@ -110,7 +111,7 @@ const SideBar = () => {
           >
             <PeopleSvg /> 유저목록
           </SettingButton>
-          <SettingButton
+          {/* <SettingButton
             title='일대일 대화 목록'
             className={router.pathname.startsWith('/oneToOneChatRooms') && 'active'}
             onClick={() => {
@@ -127,7 +128,7 @@ const SideBar = () => {
             }}
           >
             <ChatListSvg /> 그룹
-          </SettingButton>
+          </SettingButton> */}
           <SettingButton
             title='단체 대화 목록'
             className={router.pathname.startsWith('/combineChatRooms') && 'active'}
@@ -135,7 +136,7 @@ const SideBar = () => {
               router.push('/combineChatRooms');
             }}
           >
-            <ChatListSvg /> 통합
+            <ChatListSvg /> 채팅
           </SettingButton>
           <SettingButton
             title='설정'
