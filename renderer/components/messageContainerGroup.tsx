@@ -1,5 +1,4 @@
-import React from 'react';
-import { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { ChatDataNew } from '../utils/makeChatRooms';
 import Message from './GroupMessage';
@@ -78,7 +77,7 @@ const MessageContainerGroup = ({ chatList }: { chatList: ChatDataNew[] }) => {
       id='msgWrap'
       ref={messageContainerScrollHandler}
     >
-      {chatList.map((i, index) => {
+      {chatList.map((i, index: number) => {
         return (
           <MessageWrap
             key={index}
@@ -89,7 +88,12 @@ const MessageContainerGroup = ({ chatList }: { chatList: ChatDataNew[] }) => {
             //   'myMessage'
             // }
           >
-            <span className='messageWrite'>{i.displayName}</span>
+            <span className='messageWrite'>
+              {index !== 0 ? (chatList[index - 1].displayName === i.displayName ? null : i.displayName) : i.displayName}
+
+              {/* // {chatList[index - 1].displayName === i.displayName ? null : i.displayName} */}
+              {/* {i.displayName} */}
+            </span>
 
             <Message message={i} />
           </MessageWrap>
