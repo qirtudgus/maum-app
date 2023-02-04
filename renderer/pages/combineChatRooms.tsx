@@ -142,6 +142,7 @@ const CombineCahtRooms = () => {
 
     옵저버채팅배열().then((res) => {
       console.log('ref');
+      if (!res) return;
       let ref: any[] = Object.values(res);
       console.log(ref);
       ref.forEach((i) => {
@@ -151,6 +152,7 @@ const CombineCahtRooms = () => {
 
     return () => {
       옵저버채팅배열().then((res) => {
+        if (!res) return;
         let ref: any[] = Object.values(res);
         ref.forEach((i) => {
           exitOneToOneChatObserver(i.chatRoomUid.chatRoomUid);
