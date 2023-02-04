@@ -54,7 +54,7 @@ const CombineCahtRooms = () => {
     });
     setTimeout(() => {
       setIsLoading(true);
-    }, 500);
+    }, 200);
   }, [chat, groupChat]);
 
   //각 채팅은 옵저버를 만들어준다. 먼저 그룹채팅
