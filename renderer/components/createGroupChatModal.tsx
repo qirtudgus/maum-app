@@ -261,7 +261,7 @@ const CreateGroupChatModal = ({
         readUsers: { [currentUserUid]: true, [opponentUid]: false },
       });
 
-      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
+      router.push(`/combineChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
     }
   };
 
@@ -271,9 +271,9 @@ const CreateGroupChatModal = ({
       chatRoomsTitleInputRef.current.focus();
       return;
     }
+    //한명만 선택 시 일대일 채팅 로직으로 실행
     if (addUserList.length === 1) {
-      // alert('일대일 채팅으로 전환됩니다.');
-      console.log(addUserList);
+      console.log('일대일 채팅으로 전환됩니다.');
       enterOneToOneChatRooms(addUserList[0]);
       return;
     }
@@ -293,7 +293,7 @@ const CreateGroupChatModal = ({
     setShowAddGroupChat(false);
     //바로 입장?
     router.push(
-      `/groupChatRooms/group?chatRoomsTitle=${chatRoomsTitleInputRef.current.value}&chatRoomUid=${chatRoomUid}`,
+      `/combineChatRooms/group?chatRoomsTitle=${chatRoomsTitleInputRef.current.value}&chatRoomUid=${chatRoomUid}`,
     );
   };
 
@@ -302,8 +302,8 @@ const CreateGroupChatModal = ({
       <AddGroupChatModal>
         <>
           <HeaderWrap>
-            <ModalTitle>그룹 채팅 생성</ModalTitle>
-            채팅방 이름을 지어주세요.
+            <ModalTitle>채팅 생성</ModalTitle>
+            채팅방 이름을 지어주세요.(그룹 채팅 생성에만 사용됩니다.)
             <ChatTitleInput
               ref={chatRoomsTitleInputRef}
               placeholder={'채팅방 이름'}
