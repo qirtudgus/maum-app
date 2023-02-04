@@ -102,9 +102,6 @@ export const createOneToOneChatRoomsTest = async (uid: string) => {
     const lastMessage = await getChatRoomLastMessage(i.chatRoomUid.chatRoomUid, 'oneToOne');
     const chatList = await getMyOneToOneChatRoomChatList(i.chatRoomUid.chatRoomUid);
     const notReadCount = getNotReadMessageCount(chatList, uid);
-    console.log('일대일 채팅방 notReadCount');
-    console.log(chatList);
-    console.log(notReadCount);
     let result2 = Object.values(i)[0];
     result2['displayName'] = i.chatRoomUid.opponentName;
     result2['lastMessage'] = lastMessage.message;
