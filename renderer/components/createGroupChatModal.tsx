@@ -1,3 +1,5 @@
+import { get, set, ref, update, push } from 'firebase/database';
+import { Timestamp } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
@@ -5,11 +7,16 @@ import {
   authService,
   createChatUid,
   createGroupChat,
+  createOneToOneChatRoom,
+  createOneToOneChatRoomsRef,
+  createOneToOneChatRoomsRefForOpponent,
   getUserList,
+  realtimeDbService,
   updateUsersGroupChatList,
   UserList,
 } from '../firebaseConfig';
 import { checkBlankValue } from '../utils/checkBlankValue';
+import { convertDate } from '../utils/convertDate';
 import { RandomTitle } from '../utils/createRandomChatTitle';
 import { BasicButton, SolidButton } from './ButtonGroup';
 import CloseSvg from './svg/closeSvg';
@@ -192,10 +199,82 @@ const CreateGroupChatModal = ({
     });
   }, []);
 
+  const enterOneToOneChatRooms = async ({ uid, displayName }: UserList) => {
+    let currentUserUid = authService.currentUser?.uid;
+    let currentUserDisplayName = authService.currentUser?.displayName;
+    let opponentUid = uid;
+    let opponentDisplayName = displayName;
+    let chatRoomRandomString = createChatUid();
+    const 일대일채팅방 = createOneToOneChatRoomsRef(currentUserUid, opponentUid);
+    //이 값은 상대방 계정에서도 채팅방에 들어갔을 때 정상적으로 조회되도록 채팅방을 동시에 생성하는것.
+    const 상대채팅방 = createOneToOneChatRoomsRefForOpponent(opponentUid, currentUserUid);
+    const 채팅방 = createOneToOneChatRoom(chatRoomRandomString);
+
+    //클릭시 이미 존재하는 채팅방인지 확인하기
+    let isOpenChatRooms: {
+      chatRoomUid: string;
+      opponentName: string;
+    } | null = (await get(일대일채팅방)).val();
+    if (isOpenChatRooms) {
+      //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
+      console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
+      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`);
+    } else {
+      //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
+      console.log('새로운 채팅방이 생성');
+      set(일대일채팅방, {
+        chatRoomUid: chatRoomRandomString,
+        opponentName: opponentDisplayName,
+        opponentUid: opponentUid,
+      });
+      set(상대채팅방, {
+        chatRoomUid: chatRoomRandomString,
+        opponentName: currentUserDisplayName,
+        opponentUid: currentUserUid,
+      });
+
+      const 채팅방에uid기록 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomRandomString}/connectedUser`);
+      update(채팅방에uid기록, {
+        [currentUserUid]: {
+          uid: currentUserUid,
+          displayName: currentUserDisplayName,
+          isOn: true,
+          lastConnectTimeStamp: 0,
+        },
+      });
+      update(채팅방에uid기록, {
+        [opponentUid]: {
+          uid: opponentUid,
+          displayName: opponentDisplayName,
+          isOn: false,
+          lastConnectTimeStamp: 0,
+        },
+      });
+
+      // 초기 메시지 삽입
+      push(ref(realtimeDbService, `oneToOneChatRooms/${chatRoomRandomString}/chat`), {
+        displayName: authService.currentUser.displayName,
+        uid: authService.currentUser.uid,
+        message: `일대일 대화방이 생성되었습니다.`,
+        createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
+        createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
+        readUsers: { [currentUserUid]: true, [opponentUid]: false },
+      });
+
+      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
+    }
+  };
+
   const createGroupChatRoom = () => {
     //제목 인풋의 공백 검사
     if (checkBlankValue(chatRoomsTitleInputRef.current.value)) {
       chatRoomsTitleInputRef.current.focus();
+      return;
+    }
+    if (addUserList.length === 1) {
+      // alert('일대일 채팅으로 전환됩니다.');
+      console.log(addUserList);
+      enterOneToOneChatRooms(addUserList[0]);
       return;
     }
     //1.한번의 호출로 같은 고유번호를 넣어야하기때문에 미리 선언
