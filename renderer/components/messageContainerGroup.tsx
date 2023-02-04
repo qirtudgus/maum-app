@@ -80,21 +80,19 @@ const MessageContainerGroup = ({ chatList }: { chatList: ChatDataNew[] }) => {
     >
       {chatList.map((i, index) => {
         return (
-          <React.Fragment key={index}>
-            <MessageWrap
-              createdAt={i.createdAt}
-              key={index}
-              //본인 메시지일 경우에 대한 스타일링용 className
-              // className={
-              //   i.displayName === authService.currentUser.displayName &&
-              //   'myMessage'
-              // }
-            >
-              <span className='messageWrite'>{i.displayName}</span>
+          <MessageWrap
+            key={index}
+            createdAt={i.createdAt}
+            //본인 메시지일 경우에 대한 스타일링용 className
+            // className={
+            //   i.displayName === authService.currentUser.displayName &&
+            //   'myMessage'
+            // }
+          >
+            <span className='messageWrite'>{i.displayName}</span>
 
-              <Message message={i} />
-            </MessageWrap>
-          </React.Fragment>
+            <Message message={i} />
+          </MessageWrap>
         );
       })}
     </MessageContainers>
