@@ -87,8 +87,8 @@ const ChatRoom = ({
         onClick={() => {
           router.push(
             chatRoomType === 'oneToOne'
-              ? `/oneToOneChatRooms/oneToOne?displayName=${chatRoom.displayName}&chatRoomUid=${chatRoom.chatRoomUid}`
-              : `/groupChatRooms/group?chatRoomsTitle=${chatRoom.displayName}&chatRoomUid=${chatRoom.chatRoomUid}`,
+              ? `/combineChatRooms/oneToOne?displayName=${chatRoom.displayName}&chatRoomUid=${chatRoom.chatRoomUid}`
+              : `/combineChatRooms/group?chatRoomsTitle=${chatRoom.displayName}&chatRoomUid=${chatRoom.chatRoomUid}`,
           );
         }}
       >
