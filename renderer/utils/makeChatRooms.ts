@@ -93,8 +93,8 @@ export const createOneToOneChatRooms = async (uid: string) => {
 export const createOneToOneChatRoomsTest = async (uid: string) => {
   //   const listObj = await getMyGroupChatRoomsRef(uid);
   const listObj = await getMyChatRoomsRef(uid, 'oneToOne');
-  console.log('listObj');
-  console.log(listObj);
+  // console.log('listObj');
+  // console.log(listObj);
   // if (!listObj) return null; //채팅방이 존재할 때 함수 진행
   if (!listObj) return []; //채팅방이 존재할 때 함수 진행
   const getMyChatListArray: pureMessage[] = Object.values(listObj);
