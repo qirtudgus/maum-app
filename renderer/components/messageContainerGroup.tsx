@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { ChatDataNew } from '../utils/makeChatRooms';
 import Message from './GroupMessage';
+import PersonSvg from './svg/personSvg';
 
 const MessageContainers = styled.div`
   position: relative;
@@ -23,20 +24,8 @@ const MessageWrap = styled.div<MessageSendData>`
   display: flex;
   align-items: flex-start;
   /* justify-content: flex-start; */
+  /* margin-bottom: 10px; */
   flex-direction: column;
-  &:hover {
-    background: #eee;
-  }
-  margin-bottom: 10px;
-  /* flex-direction: column; */
-  &.myMessage {
-    align-items: flex-end;
-  }
-
-  &.myMessage > li {
-    background: ${({ theme }) => theme.colors.main};
-  }
-
   & .sendDate {
     font-size: 12px;
     color: #494949;
@@ -58,9 +47,36 @@ const MessageWrap = styled.div<MessageSendData>`
     color: #494949;
   }
 
-  & .messageWrite {
+  & > li::after {
+    content: '${(props) => props.createdAt}';
+    position: absolute;
+    /* width: 100%; */
+    display: none;
+    right: 0px;
+    font-size: 12px;
+    color: #494949;
+  }
+  & > li:hover::after {
+    display: block;
+  }
+
+  & .sameWrite {
+    margin: 10px 0px 5px 0;
     font-weight: bold;
-    margin-bottom: 5px;
+    font-size: 15px;
+    & > span {
+      display: block;
+      width: 15px;
+      height: 15px;
+      background: #eee;
+      border-radius: 3px;
+      margin-right: 3px;
+    }
+    & svg {
+      width: 15px;
+      height: 15px;
+      fill: #555;
+    }
   }
 `;
 
@@ -82,19 +98,24 @@ const MessageContainerGroup = ({ chatList }: { chatList: ChatDataNew[] }) => {
           <MessageWrap
             key={index}
             createdAt={i.createdAt}
-            //본인 메시지일 경우에 대한 스타일링용 className
-            // className={
-            //   i.displayName === authService.currentUser.displayName &&
-            //   'myMessage'
-            // }
           >
-            <span className='messageWrite'>
-              {index !== 0 ? (chatList[index - 1].displayName === i.displayName ? null : i.displayName) : i.displayName}
-
-              {/* // {chatList[index - 1].displayName === i.displayName ? null : i.displayName} */}
-              {/* {i.displayName} */}
-            </span>
-
+            {index !== 0 ? (
+              chatList[index - 1].displayName === i.displayName ? null : (
+                <span className='sameWrite'>
+                  <span>
+                    <PersonSvg />
+                  </span>
+                  {i.displayName}
+                </span>
+              )
+            ) : (
+              <span className='sameWrite'>
+                <span>
+                  <PersonSvg />
+                </span>
+                {i.displayName}
+              </span>
+            )}
             <Message message={i} />
           </MessageWrap>
         );
