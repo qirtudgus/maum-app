@@ -3,15 +3,20 @@ import styled from 'styled-components';
 import { ChatDataNew } from '../utils/makeChatRooms';
 
 const MessageComponent = styled.li`
+  font-size: 14px;
   width: fit-content;
   position: relative;
-  max-width: 100%;
-  min-height: 30px;
+  width: 100%;
+  padding: 4px 0;
+  /* min-height: 30px; */
   max-height: fit-content;
   display: flex;
   align-items: center;
   color: #000;
   word-break: break-all;
+  &:hover {
+    background: #eee;
+  }
 `;
 
 const ReadCount = styled.div`
