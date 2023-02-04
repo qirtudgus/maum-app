@@ -21,7 +21,7 @@ export interface ChatDataNew {
   uid: string;
 }
 
-interface pureMessage {
+export interface pureMessage {
   chatRoomUid: {
     chatRoomUid: string;
     opponentName: string;
