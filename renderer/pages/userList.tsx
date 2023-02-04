@@ -11,6 +11,7 @@ import {
   createOneToOneChatRoomsRef,
   createOneToOneChatRoomsRefForOpponent,
   realtimeDbService,
+  UserList,
 } from '../firebaseConfig';
 
 import PersonSvg from '../components/svg/personSvg';
@@ -55,7 +56,7 @@ const ZeroChatUser = styled.div`
   color: #555;
 `;
 
-const UserList = () => {
+const UserListComponent = () => {
   const userListRef = ref(realtimeDbService, 'userList');
   const router = useRouter();
   interface UserListUserInfoInterface {
@@ -89,11 +90,11 @@ const UserList = () => {
     };
   }, []);
 
-  const enterOneToOneChatRooms = async (i: { uid: string; displayName: string }) => {
-    let currentUserUid = authService.currentUser.uid;
-    let currentUserDisplayName = authService.currentUser.displayName;
-    let opponentUid = i.uid;
-    let opponentDisplayName = i.displayName;
+  const enterOneToOneChatRooms = async ({ uid, displayName }: UserList) => {
+    let currentUserUid = authService.currentUser?.uid;
+    let currentUserDisplayName = authService.currentUser?.displayName;
+    let opponentUid = uid;
+    let opponentDisplayName = displayName;
     let chatRoomRandomString = createChatUid();
     const 일대일채팅방 = createOneToOneChatRoomsRef(currentUserUid, opponentUid);
     //이 값은 상대방 계정에서도 채팅방에 들어갔을 때 정상적으로 조회되도록 채팅방을 동시에 생성하는것.
@@ -108,9 +109,7 @@ const UserList = () => {
     if (isOpenChatRooms) {
       //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
       console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
-      router.push(
-        `/oneToOneChatRooms/oneToOne?displayName=${i.displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`,
-      );
+      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`);
     } else {
       //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
       console.log('새로운 채팅방이 생성');
@@ -153,7 +152,7 @@ const UserList = () => {
         readUsers: { [currentUserUid]: true, [opponentUid]: false },
       });
 
-      router.push(`/oneToOneChatRooms/oneToOne?displayName=${i.displayName}&chatRoomUid=${chatRoomRandomString}`);
+      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
     }
   };
 
@@ -207,4 +206,4 @@ const UserList = () => {
   );
 };
 
-export default React.memo(UserList);
+export default React.memo(UserListComponent);
