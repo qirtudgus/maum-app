@@ -109,7 +109,7 @@ const UserListComponent = () => {
     if (isOpenChatRooms) {
       //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
       console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
-      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`);
+      router.push(`/combineChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`);
     } else {
       //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
       console.log('새로운 채팅방이 생성');
@@ -152,7 +152,7 @@ const UserListComponent = () => {
         readUsers: { [currentUserUid]: true, [opponentUid]: false },
       });
 
-      router.push(`/oneToOneChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
+      router.push(`/combineChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
     }
   };
 
