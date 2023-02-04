@@ -21,6 +21,7 @@ const OneToOneChatRoom = () => {
   const [ConnectedUsers, setConnectedUsers] = useState([]);
   const getChatListPath = getOneToOneChatListPath(chatRoomUid2);
   const [레이아웃, 레이아웃설정] = useState('');
+  const uid = authService.currentUser?.uid;
 
   console.log(router.query);
   console.log(router);
@@ -28,10 +29,7 @@ const OneToOneChatRoom = () => {
   //첫 입장 시, 퇴장 시  접속시간 기록
   //각 ui에 isOn값도 추가해주자 이는 SendInput에서 쓰기위함이다.
   useEffect(() => {
-    const 경로 = ref(
-      realtimeDbService,
-      `oneToOneChatRooms/${chatRoomUid2}/connectedUser/${authService.currentUser?.uid}`,
-    );
+    const 경로 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}/connectedUser/${uid}`);
     update(경로, {
       displayName: authService.currentUser.displayName,
       uid: authService.currentUser.uid,
@@ -57,11 +55,12 @@ const OneToOneChatRoom = () => {
     onValue(ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}`), async (snap) => {
       console.log('채팅갱신');
       console.log(snap.val().chat);
+      // if (!snap.val().chat) return;
       let messageList: ChatDataNew[] = Object.values(await snap.val().chat);
       let messageObj = snap.val().chat;
       //요소를 반복하며 ?..
       for (let property in messageObj) {
-        let 내가읽었는지결과 = messageObj[property].readUsers[authService.currentUser.uid];
+        let 내가읽었는지결과 = messageObj[property].readUsers[uid];
         //값이 true면 패스, false면 true로 업데이트하는 함수 호출
         // console.log(내가읽었는지결과);
         if (내가읽었는지결과 === false) {
@@ -70,7 +69,7 @@ const OneToOneChatRoom = () => {
             `oneToOneChatRooms/${chatRoomUid2}/chat/${property}/readUsers`,
           );
 
-          update(업데이트할메시지, { [authService.currentUser.uid]: true });
+          update(업데이트할메시지, { [uid]: true });
         }
       }
 

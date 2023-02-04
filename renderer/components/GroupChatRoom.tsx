@@ -62,15 +62,17 @@ const GroupChatRoom = () => {
 
   const [레이아웃, 레이아웃설정] = useState('');
 
+  const uid = authService.currentUser?.uid;
+
   const 접속유저경로 = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser`);
 
   //첫 입장 시, 퇴장 시  접속시간 기록
   //각 ui에 isOn값도 추가해주자 이는 SendInput에서 쓰기위함이다.
   useEffect(() => {
-    const 경로 = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser/${authService.currentUser?.uid}`);
+    const 경로 = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/connectedUser/${uid}`);
     update(경로, {
-      displayName: authService.currentUser.displayName,
-      uid: authService.currentUser.uid,
+      displayName: authService.currentUser?.displayName,
+      uid: uid,
       lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
       isOn: true,
     });
@@ -96,10 +98,10 @@ const GroupChatRoom = () => {
       let messageList = Object.values(snap.val().chat);
       let messageObj = snap.val().chat;
       for (let property in messageObj) {
-        let 내가읽었는지결과 = messageObj[property].readUsers[authService.currentUser?.uid];
+        let 내가읽었는지결과 = messageObj[property].readUsers[uid];
         if (내가읽었는지결과 === false) {
           const 업데이트할메시지 = ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat/${property}/readUsers`);
-          update(업데이트할메시지, { [authService.currentUser?.uid]: true });
+          update(업데이트할메시지, { [uid]: true });
         }
       }
 
@@ -181,13 +183,13 @@ const GroupChatRoom = () => {
                     }
                   });
 
-                  await router.back();
+                  router.back();
                   console.log('onUserObj');
                   console.log(onUserObj);
 
                   await push(groupChatListPath, {
                     displayName: authService.currentUser?.displayName,
-                    uid: authService.currentUser?.uid,
+                    uid: uid,
                     message: `${authService.currentUser?.displayName}님이 채팅방에서 나가셨습니다..`,
                     createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
                     createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
@@ -195,9 +197,9 @@ const GroupChatRoom = () => {
                   });
 
                   //내 채팅리스트에서 삭제
-                  await exitUserCleanUpGroupChatRooms(authService.currentUser?.uid, chatRoomUid);
+                  await exitUserCleanUpGroupChatRooms(uid, chatRoomUid);
                   //채팅리스트에서 나를 삭제
-                  await exitUserCleanUpThisGroupChatList(authService.currentUser?.uid, chatRoomUid);
+                  await exitUserCleanUpThisGroupChatList(uid, chatRoomUid);
                 };
 
                 삭제및퇴장();
