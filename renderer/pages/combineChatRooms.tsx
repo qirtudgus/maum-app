@@ -13,6 +13,7 @@ import {
   getMyChatRoomsRef,
   getNotReadMessageCount,
   groupChatRoomUidArr,
+  pureMessage,
 } from '../utils/makeChatRooms';
 import { ChatListHeader, CreateGroupChatButton, PageTitle, Wrap, ZeroChatRoom } from './oneToOneChatRooms';
 
@@ -154,7 +155,8 @@ const CombineCahtRooms = () => {
     옵저버채팅배열().then((res) => {
       console.log('ref');
       if (!res) return;
-      let ref: any[] = Object.values(res);
+
+      let ref: pureMessage[] = Object.values(res);
       console.log(ref);
       ref.forEach((i) => {
         startOneToOneChatObserver(i.chatRoomUid.chatRoomUid);
@@ -164,7 +166,7 @@ const CombineCahtRooms = () => {
     return () => {
       옵저버채팅배열().then((res) => {
         if (!res) return;
-        let ref: any[] = Object.values(res);
+        let ref: pureMessage[] = Object.values(res);
         ref.forEach((i) => {
           exitOneToOneChatObserver(i.chatRoomUid.chatRoomUid);
         });
@@ -186,7 +188,7 @@ const CombineCahtRooms = () => {
             setIsNewChat((prev) => !prev);
           }
         });
-      }, 50);
+      }, 0);
     });
     return () => {
       off(ref(realtimeDbService, `oneToOneChatList/${uid}`));
@@ -208,7 +210,7 @@ const CombineCahtRooms = () => {
             setIsNewChat((prev) => !prev);
           }
         });
-      }, 50);
+      }, 0);
     });
     return () => {
       off(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`));
@@ -218,7 +220,7 @@ const CombineCahtRooms = () => {
   return (
     <Wrap>
       <ChatListHeader>
-        <PageTitle>통합 대화 목록</PageTitle>
+        <PageTitle>대화 목록</PageTitle>
         <CreateGroupChatButton
           className='addGroupChatButton'
           onClick={() => setShowAddGroupChat((prev) => !prev)}
