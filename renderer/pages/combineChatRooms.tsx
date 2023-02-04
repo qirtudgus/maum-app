@@ -1,6 +1,5 @@
-import { get, off, onValue, ref } from 'firebase/database';
-import React from 'react';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { off, onValue, ref } from 'firebase/database';
+import React, { useEffect, useState } from 'react';
 import ChatRoom from '../components/ChatRoom';
 import CreateGroupChatModal from '../components/createGroupChatModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -8,9 +7,7 @@ import AddSvg from '../components/svg/addSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
 import {
   ChatDataNew,
-  createGroupChatRooms,
   createGroupChatRoomsTest,
-  createOneToOneChatRooms,
   createOneToOneChatRoomsTest,
   getChatRoomLastMessage,
   getMyChatRoomsRef,
@@ -56,7 +53,7 @@ const CombineCahtRooms = () => {
     });
     setTimeout(() => {
       setIsLoading(true);
-    }, 0);
+    }, 500);
   }, [chat, groupChat]);
 
   //각 채팅은 옵저버를 만들어준다. 먼저 그룹채팅
@@ -111,27 +108,27 @@ const CombineCahtRooms = () => {
     console.log(`${chatUid}방 옵저버 실행`);
     const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
     onValue(refs, async (snapshot) => {
-      //굳이 다시 메시지를 전부 읽어오지말고 스냅샷으로도 처리가 가능하다..
-      // const lastMessage = await getChatRoomLastMessage(chatUid, 'oneToOne');
-      const 스냅샷메시지 = Object.values(snapshot.val());
-      const 스냅샷사이즈 = snapshot.size;
-      const 스냅샷마지막메시지 = 스냅샷메시지[스냅샷사이즈 - 1];
-      const 스냅샷마지막 = 스냅샷마지막메시지.readUsers[authService.currentUser?.uid];
-      console.log('snapshot 일대일채팅');
-      console.log(스냅샷마지막메시지);
-      console.log(스냅샷사이즈);
-      console.log(스냅샷마지막);
+      const lastMessage = await getChatRoomLastMessage(chatUid, 'oneToOne');
+      //굳이 마지막 메시지를 읽어오지말고 스냅샷으로도 처리가 가능하다..
+      // const 스냅샷메시지: ChatDataNew[] = Object.values(snapshot.val());
+      // const 스냅샷사이즈 = snapshot.size;
+      // const 스냅샷마지막메시지 = 스냅샷메시지[스냅샷사이즈 - 1];
+      // const 스냅샷마지막 = 스냅샷마지막메시지.readUsers[authService.currentUser?.uid];
+      // console.log('snapshot 일대일채팅');
+      // console.log(스냅샷마지막메시지);
+      // console.log(스냅샷사이즈);
+      // console.log(스냅샷마지막);
 
       //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
-      if (!스냅샷마지막) {
+      if (!lastMessage.readUsers[uid]) {
         const 메시지들: ChatDataNew[] = Object.values(snapshot.val());
         const notReadCount = getNotReadMessageCount(메시지들, uid);
         setChat((prev) => {
           //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
           let updateChatList = prev.map((i, index) => {
             if (i.chatRoomUid === chatUid) {
-              i.lastMessage = 스냅샷마지막메시지.message;
-              i.createdSecondsAt = 스냅샷마지막메시지.createdSecondsAt;
+              i.lastMessage = lastMessage.message;
+              i.createdSecondsAt = lastMessage.createdSecondsAt;
               i.notReadCount = notReadCount;
               // i.notReadCount++;
             }
@@ -181,6 +178,8 @@ const CombineCahtRooms = () => {
       console.log('새로운 일대일 채팅 수신');
       console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
       setTimeout(() => {
+        //전체 채팅객체를 만드는건 비효율적이다. 하나의 채팅방객체를 만드는 함수를 모듈화하여
+        //객체하나만 이어붙인다면 더 아낄 수 있을것이다.
         createOneToOneChatRoomsTest(uid).then((res) => {
           if (res) {
             setChat([...res]);
