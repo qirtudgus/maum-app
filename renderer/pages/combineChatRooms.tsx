@@ -111,17 +111,27 @@ const CombineCahtRooms = () => {
     console.log(`${chatUid}방 옵저버 실행`);
     const refs = ref(realtimeDbService, `oneToOneChatRooms/${chatUid}/chat`);
     onValue(refs, async (snapshot) => {
-      const lastMessage = await getChatRoomLastMessage(chatUid, 'oneToOne');
+      //굳이 다시 메시지를 전부 읽어오지말고 스냅샷으로도 처리가 가능하다..
+      // const lastMessage = await getChatRoomLastMessage(chatUid, 'oneToOne');
+      const 스냅샷메시지 = Object.values(snapshot.val());
+      const 스냅샷사이즈 = snapshot.size;
+      const 스냅샷마지막메시지 = 스냅샷메시지[스냅샷사이즈 - 1];
+      const 스냅샷마지막 = 스냅샷마지막메시지.readUsers[authService.currentUser?.uid];
+      console.log('snapshot 일대일채팅');
+      console.log(스냅샷마지막메시지);
+      console.log(스냅샷사이즈);
+      console.log(스냅샷마지막);
+
       //마지막 메시지가 false일 경우에만 notReadCount++ 해주기
-      if (!lastMessage.readUsers[authService.currentUser?.uid]) {
+      if (!스냅샷마지막) {
         const 메시지들: ChatDataNew[] = Object.values(snapshot.val());
         const notReadCount = getNotReadMessageCount(메시지들, uid);
         setChat((prev) => {
           //같은 채팅방uid를 가진 스테이트에 notReadCount 추가하기
           let updateChatList = prev.map((i, index) => {
             if (i.chatRoomUid === chatUid) {
-              i.lastMessage = lastMessage.message;
-              i.createdSecondsAt = lastMessage.createdSecondsAt;
+              i.lastMessage = 스냅샷마지막메시지.message;
+              i.createdSecondsAt = 스냅샷마지막메시지.createdSecondsAt;
               i.notReadCount = notReadCount;
               // i.notReadCount++;
             }
