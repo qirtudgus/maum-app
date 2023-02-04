@@ -1,7 +1,9 @@
 import { get, off, onValue, orderByChild, orderByValue, query, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import ChatRoom from '../components/ChatRoom';
+import CreateGroupChatModal from '../components/createGroupChatModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import AddSvg from '../components/svg/addSvg';
 import { authService, realtimeDbService } from '../firebaseConfig';
 import {
   ChatDataNew,
@@ -14,7 +16,7 @@ import {
   getNotReadMessageCount,
   groupChatRoomUidArr,
 } from '../utils/makeChatRooms';
-import { ZeroChatRoom } from './oneToOneChatRooms';
+import { ChatListHeader, CreateGroupChatButton, PageTitle, Wrap, ZeroChatRoom } from './oneToOneChatRooms';
 
 const CombineCahtRooms = () => {
   const uid = authService.currentUser?.uid;
@@ -27,8 +29,10 @@ const CombineCahtRooms = () => {
   const [isNewChat, setIsNewChat] = useState(false);
   //채팅방 로딩 스피너
   const [isLoading, setIsLoading] = useState(false);
+  //초대모달창
+  const [showAddGroupChat, setShowAddGroupChat] = useState(false);
 
-  const Check = async () => {
+  const FirstRenderer = async () => {
     //대화가 없을경우 null이 아닌 []를 반환해주도록 변경하여 스프레드문법에 오류가 없게 하였다.
     const chat1 = await createGroupChatRoomsTest(uid);
     const chat2 = await createOneToOneChatRoomsTest(uid);
@@ -42,7 +46,7 @@ const CombineCahtRooms = () => {
 
   //초기에 chat에 각 채팅을 set해준다.
   useEffect(() => {
-    Check();
+    FirstRenderer();
   }, []);
 
   //chat 변화감지가 되면 sortChat의 값을 정렬해준다.
@@ -203,9 +207,16 @@ const CombineCahtRooms = () => {
   }, []);
 
   return (
-    <>
-      <div onClick={Check}>통합채팅배열 확인</div>
-      <div onClick={() => console.log(chat)}>통합채팅배열 콘솔</div>
+    <Wrap>
+      <ChatListHeader>
+        <PageTitle>통합 대화 목록</PageTitle>
+        <CreateGroupChatButton
+          className='addGroupChatButton'
+          onClick={() => setShowAddGroupChat((prev) => !prev)}
+        >
+          <AddSvg />
+        </CreateGroupChatButton>
+      </ChatListHeader>
       {isLoading ? (
         sortChat.length === 0 ? (
           <ZeroChatRoom>아직 만들어진 대화가 없어요!</ZeroChatRoom>
@@ -233,7 +244,8 @@ const CombineCahtRooms = () => {
       ) : (
         <LoadingSpinner wrapColor='#fff' />
       )}
-    </>
+      {showAddGroupChat && <CreateGroupChatModal setShowAddGroupChat={setShowAddGroupChat} />}
+    </Wrap>
   );
 };
 
