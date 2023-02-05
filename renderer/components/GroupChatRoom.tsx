@@ -14,13 +14,13 @@ import {
   UserList,
 } from '../firebaseConfig';
 import { convertDate } from '../utils/convertDate';
-import { ChatDataNew } from '../utils/makeChatRooms';
+import { ChatDataNew, ConnectedUser } from '../utils/makeChatRooms';
 import ChatRoomHeader from './ChatRoomHeader';
 import InviteGroupChatModal from './inviteGroupChatModal';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerGroup from './messageContainerGroup';
 import MessageContainerOneToOne from './messageContainerOneToOne';
-import SendMessageInput, { ConnectedUser } from './SendMessageInput';
+import SendMessageInput from './SendMessageInput';
 import LogoutSvg from './svg/logoutSvg';
 import PersonAddSvg from './svg/personAddSvg';
 
@@ -121,10 +121,10 @@ const GroupChatRoom = () => {
     //현재채팅방 사용유저 onValue
     onValue(groupUserListPath, async (snapshot) => {
       console.log('사용자가 갱신되었습니다.');
-      let inviteUserList: ConnectedUser[] = await snapshot.val();
+      let inviteUserList: ConnectedUser[] = Object.values(await snapshot.val());
       console.log(inviteUserList);
-      setConnectedUserList(Object.values(inviteUserList));
-      setConnectedUsers(Object.values(inviteUserList));
+      setConnectedUserList(inviteUserList);
+      setConnectedUsers(inviteUserList);
       get(groupChatListPath).then((res) => {
         if (res.val()) {
           const 메시지배열: ChatDataNew[] = Object.values(res.val());
