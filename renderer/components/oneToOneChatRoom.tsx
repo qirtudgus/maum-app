@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { authService, getOneToOneChatListPath, realtimeDbService } from '../firebaseConfig';
-import { ChatDataNew } from '../utils/makeChatRooms';
+import { ChatDataNew, ConnectedUser } from '../utils/makeChatRooms';
 import ChatRoomHeader from './ChatRoomHeader';
 import LoadingSpinner from './LoadingSpinner';
 import MessageContainerGroup from './messageContainerGroup';
@@ -88,8 +88,8 @@ const OneToOneChatRoom = () => {
     const 접속유저경로 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}/connectedUser`);
     onValue(접속유저경로, (snapshot) => {
       console.log('방에 접속했다');
-      const 밸류스 = Object.values(snapshot.val());
-      setConnectedUsers(밸류스);
+      const connectedUser: ConnectedUser[] = Object.values(snapshot.val());
+      setConnectedUsers(connectedUser);
       //메시지를 가져와서 갱신 시켜주자
       get(getChatListPath).then((res) => {
         if (res.val()) {

@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { realtimeDbService, authService } from '../firebaseConfig';
 import { checkBlankValue } from '../utils/checkBlankValue';
 import { convertDate } from '../utils/convertDate';
+import { ConnectedUser } from '../utils/makeChatRooms';
 
 const MessageInput = styled.div`
   width: 100%;
@@ -47,13 +48,6 @@ const Footer = styled.div`
   height: 100px;
   background-color: #fff;
 `;
-
-export interface ConnectedUser {
-  displayName: string;
-  isOn: boolean;
-  lastConnectTimeStamp: number;
-  uid: string;
-}
 
 //읽음표시해야하는 유저의 uid를 받아와야할듯하다.
 const SendMessageInput = ({
