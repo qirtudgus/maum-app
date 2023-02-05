@@ -57,6 +57,13 @@ export interface ResultGroupRoom {
   createdSecondsAt: number;
 }
 
+export interface ConnectedUser {
+  displayName: string;
+  isOn: boolean;
+  lastConnectTimeStamp: number;
+  uid: string;
+}
+
 /**
  * 특정 함수에서 대화방의 타입을 구분하기 위함
  */
