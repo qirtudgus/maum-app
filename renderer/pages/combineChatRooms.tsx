@@ -18,7 +18,6 @@ import {
 import { ChatListHeader, CreateGroupChatButton, PageTitle, Wrap, ZeroChatRoom } from './oneToOneChatRooms';
 
 const CombineCahtRooms = () => {
-  console.log('몇번 렌더링되나~~');
   const uid = authService.currentUser?.uid;
 
   const [chat, setChat] = useState([]);
@@ -153,11 +152,8 @@ const CombineCahtRooms = () => {
     };
 
     옵저버채팅배열().then((res) => {
-      console.log('ref');
       if (!res) return;
-
       let ref: pureMessage[] = Object.values(res);
-      console.log(ref);
       ref.forEach((i) => {
         startOneToOneChatObserver(i.chatRoomUid.chatRoomUid);
       });
@@ -199,8 +195,6 @@ const CombineCahtRooms = () => {
     //현재 유저의 새로운 그룹채팅이 생김을 감지하는 옵저버
     //새로 감지가 되면 방을 다시 렌더링하여 순차정렬해준다.
     onValue(ref(realtimeDbService, `userList/${uid}/group_chat_rooms`), (snap) => {
-      // console.log('새로운 그룹 채팅 수신');
-      // console.log(snap.val()); // ['pqscrrx072', '5z39xf31v7']
       setTimeout(() => {
         createGroupChatRoomsTest(uid).then((res) => {
           console.log('그룹 수신 후res');
