@@ -1,4 +1,3 @@
-import { pushNotifications } from 'electron';
 import { get, off, onDisconnect, onValue, ref, update } from 'firebase/database';
 import { Timestamp } from 'firebase/firestore';
 import Head from 'next/head';
@@ -22,27 +21,30 @@ const OneToOneChatRoom = () => {
   const getChatListPath = getOneToOneChatListPath(chatRoomUid2);
   const [레이아웃, 레이아웃설정] = useState('');
   const uid = authService.currentUser?.uid;
-
-  console.log(router.query);
-  console.log(router);
+  const displayName = authService.currentUser?.displayName;
 
   //첫 입장 시, 퇴장 시  접속시간 기록
   //각 ui에 isOn값도 추가해주자 이는 SendInput에서 쓰기위함이다.
   useEffect(() => {
-    const 경로 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}/connectedUser/${uid}`);
-    update(경로, {
-      displayName: authService.currentUser.displayName,
-      uid: authService.currentUser.uid,
-      lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
-      isOn: true,
-    });
-    //앱 강종시에도 채팅접속상태 Off 해주기
-    onDisconnect(경로).update({
-      isOn: false,
-      lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
-    });
+    try {
+      const 경로 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}/connectedUser/${uid}`);
+      update(경로, {
+        displayName: displayName,
+        uid: uid,
+        lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
+        isOn: true,
+      });
+      //앱 강종시에도 채팅접속상태 Off 해주기
+      onDisconnect(경로).update({
+        isOn: false,
+        lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
+      });
+    } catch (err) {
+      console.log(err);
+    }
     //채팅방 나갈 시에 접속상태 off해주기
     return () => {
+      const 경로 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}/connectedUser/${uid}`);
       update(경로, {
         lastConnectTimeStamp: Timestamp.fromDate(new Date()).seconds,
         isOn: false,
@@ -53,8 +55,6 @@ const OneToOneChatRoom = () => {
   useEffect(() => {
     레이아웃설정(localStorage.getItem('oneToOneChatLayout'));
     onValue(ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid2}`), async (snap) => {
-      console.log('채팅갱신');
-      console.log(snap.val().chat);
       // if (!snap.val().chat) return;
       let messageList: ChatDataNew[] = Object.values(await snap.val().chat);
       let messageObj = snap.val().chat;
@@ -72,8 +72,6 @@ const OneToOneChatRoom = () => {
           update(업데이트할메시지, { [uid]: true });
         }
       }
-
-      console.log('로딩완료');
       setChatList(messageList);
       setIsChatLoading(true);
     });
