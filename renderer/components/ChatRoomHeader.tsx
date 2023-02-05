@@ -89,7 +89,6 @@ const ChatRoomHeader = ({ title, userList }: { title: string; userList?: UserLis
         title='닫기'
         className='closeBtn'
         onClick={() => {
-          // router.push('/chatRooms');
           router.back();
         }}
       >

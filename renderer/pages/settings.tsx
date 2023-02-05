@@ -118,6 +118,7 @@ const Settings = () => {
   const groupLayoutRef2 = useRef<HTMLInputElement>();
 
   useEffect(() => {
+    //설정 화면에 체크되어있을 항목들을 설정합니다.
     if (localStorage.getItem('oneToOneChatLayout') === 'oneToOne') {
       ref.current.checked = true;
     } else if (localStorage.getItem('oneToOneChatLayout') === 'group') {

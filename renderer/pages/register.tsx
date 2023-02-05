@@ -95,7 +95,7 @@ const Register = () => {
     }
 
     signUpWithEmail(email, password, nickname).then((res) => {
-      console.log(res);
+      //에러가 나면 res가 true로 나온다.
       if (res) {
         let errorCode = res.code;
         console.log(errorCode);
@@ -127,7 +127,6 @@ const Register = () => {
             passwordInput.focus();
             break;
           }
-
           default: {
             break;
           }
@@ -147,7 +146,6 @@ const Register = () => {
         <Wrap>
           <Logo>
             <Image src={logo} />
-            {/* <p>똑똑에 오신걸 환영해요!</p> */}
             <Link href={'/home'}>로그인 창으로</Link>
           </Logo>
           <BasicInput
