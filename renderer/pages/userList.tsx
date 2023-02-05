@@ -19,6 +19,7 @@ import { convertDate } from '../utils/convertDate';
 import { Timestamp } from 'firebase/firestore';
 import { Wrap, PageTitle } from './oneToOneChatRooms';
 import { ChatRoomList, ChatIcon, ChatRoomInfo } from '../components/ChatRoom';
+import { enterOneToOneChatRoom } from '../utils/makeChatRooms';
 const ChatRoomInfoWithUserList = styled(ChatRoomList)`
   align-items: center;
   font-weight: bold;
@@ -64,7 +65,8 @@ const UserListComponent = () => {
     isOn: boolean;
     uid: string;
   }
-
+  let myUid = authService.currentUser?.uid;
+  let myDisplayName = authService.currentUser?.displayName;
   //해당 페이지로 왔을 때 db에서 가져와서 추가
   //로그인했을 때 해당 state에 추가,
   //로그아웃 시 db에서 uid 제거
@@ -90,70 +92,22 @@ const UserListComponent = () => {
     };
   }, []);
 
-  const enterOneToOneChatRooms = async ({ uid, displayName }: UserList) => {
-    let currentUserUid = authService.currentUser?.uid;
-    let currentUserDisplayName = authService.currentUser?.displayName;
-    let opponentUid = uid;
-    let opponentDisplayName = displayName;
-    let chatRoomRandomString = createChatUid();
-    const 일대일채팅방 = createOneToOneChatRoomsRef(currentUserUid, opponentUid);
-    //이 값은 상대방 계정에서도 채팅방에 들어갔을 때 정상적으로 조회되도록 채팅방을 동시에 생성하는것.
-    const 상대채팅방 = createOneToOneChatRoomsRefForOpponent(opponentUid, currentUserUid);
-    const 채팅방 = createOneToOneChatRoom(chatRoomRandomString);
-
-    //클릭시 이미 존재하는 채팅방인지 확인하기
-    let isOpenChatRooms: {
-      chatRoomUid: string;
-      opponentName: string;
-    } | null = (await get(일대일채팅방)).val();
-    if (isOpenChatRooms) {
-      //존재하는 방에 대해서 바로 들어갔을 때 채팅창 내용을 수정하려면?..
-      console.log(`이미 방이 존재 : ${isOpenChatRooms.chatRoomUid}`);
-      router.push(`/combineChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${isOpenChatRooms.chatRoomUid}`);
-    } else {
-      //채팅이 처음인 상대인 경우 채팅방을 생성해준다.
-      console.log('새로운 채팅방이 생성');
-      set(일대일채팅방, {
-        chatRoomUid: chatRoomRandomString,
-        opponentName: opponentDisplayName,
-        opponentUid: opponentUid,
-      });
-      set(상대채팅방, {
-        chatRoomUid: chatRoomRandomString,
-        opponentName: currentUserDisplayName,
-        opponentUid: currentUserUid,
-      });
-
-      const 채팅방에uid기록 = ref(realtimeDbService, `oneToOneChatRooms/${chatRoomRandomString}/connectedUser`);
-      update(채팅방에uid기록, {
-        [currentUserUid]: {
-          uid: currentUserUid,
-          displayName: currentUserDisplayName,
-          isOn: true,
-          lastConnectTimeStamp: 0,
-        },
-      });
-      update(채팅방에uid기록, {
-        [opponentUid]: {
-          uid: opponentUid,
-          displayName: opponentDisplayName,
-          isOn: false,
-          lastConnectTimeStamp: 0,
-        },
-      });
-
-      // 초기 메시지 삽입
-      push(ref(realtimeDbService, `oneToOneChatRooms/${chatRoomRandomString}/chat`), {
-        displayName: authService.currentUser.displayName,
-        uid: authService.currentUser.uid,
-        message: `일대일 대화방이 생성되었습니다.`,
-        createdAt: convertDate(Timestamp.fromDate(new Date()).seconds),
-        createdSecondsAt: Timestamp.fromDate(new Date()).seconds,
-        readUsers: { [currentUserUid]: true, [opponentUid]: false },
-      });
-
-      router.push(`/combineChatRooms/oneToOne?displayName=${displayName}&chatRoomUid=${chatRoomRandomString}`);
-    }
+  const joinOneToOneChatRoom = (
+    myUid: string,
+    myDisplayName: string,
+    opponentUid: string,
+    opponentDisplayName: string,
+  ) => {
+    enterOneToOneChatRoom(myUid, myDisplayName, opponentUid, opponentDisplayName).then((res) => {
+      console.log(res);
+      if (res.code === 'already-has-chat') {
+        router.push(
+          `/oneToOneChatRooms/oneToOne?displayName=${res.opponentDisplayName}&chatRoomUid=${res.chatRoomUid}`,
+        );
+      } else {
+        router.push(`/combineChatRooms/oneToOne?displayName=${res.opponentDisplayName}&chatRoomUid=${res.chatRoomUid}`);
+      }
+    });
   };
 
   return (
@@ -165,9 +119,7 @@ const UserListComponent = () => {
             <MyselfLi key={item.uid}>
               <ChatRoomInfoWithUserList
                 key={item.uid}
-                onClick={() => {
-                  enterOneToOneChatRooms(item);
-                }}
+                onClick={() => joinOneToOneChatRoom(myUid, myDisplayName, item.uid, item.displayName)}
               >
                 <ChatIcon>
                   <PersonSvg />
@@ -186,9 +138,7 @@ const UserListComponent = () => {
           item.uid !== authService.currentUser?.uid && (
             <ChatRoomInfoWithUserList
               key={item.uid}
-              onClick={() => {
-                enterOneToOneChatRooms(item);
-              }}
+              onClick={() => joinOneToOneChatRoom(myUid, myDisplayName, item.uid, item.displayName)}
             >
               <ChatIcon>
                 <PersonSvg />
