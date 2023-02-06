@@ -94,18 +94,23 @@ const StatusText = styled.p`
 export const BasicInput = forwardRef<HTMLDivElement, BasicInputInterface>((props, ref) => {
   const [focus, setFocus] = useState(false);
   const inputRef = useRef() as RefObject<HTMLInputElement>;
+  // const setFocusFalse = () => {
+  //   //input에 value 유무에 따라 라벨이 위치로 돌아옴
+  //   if (inputRef.current?.value) {
+  //     //props로 OnBlur를 받았으면 실행
+  //     if (props.PropsOnBlurFunc) {
+  //       props.PropsOnBlurFunc();
+  //     }
+  //     //input에 value 유무에 따라 라벨이 위치로 돌아옴 #2
+  //     return;
+  //   }
+  //   setFocus(false);
+  // };
   const setFocusFalse = () => {
-    //input에 value 유무에 따라 라벨이 위치로 돌아옴
-    if (inputRef.current?.value) {
-      //props로 OnBlur를 받았으면 실행
-      if (props.PropsOnBlurFunc) {
-        props.PropsOnBlurFunc();
-      }
-      //input에 value 유무에 따라 라벨이 위치로 돌아옴 #2
-      return;
-    }
+    if (inputRef.current?.value) return props.PropsOnBlurFunc?.();
     setFocus(false);
   };
+
   const setFocusTrue = () => {
     //props로 OnBlur를 받았으면 실행
     if (props.PropsOnFocusFunc) {
