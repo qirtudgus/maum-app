@@ -245,15 +245,6 @@ export const getNotReadMessageCount = (chatList: ChatDataNew[], uid: string) => 
   const unreadMessageIndex = chatList.findIndex((i) => !i.readUsers[uid]);
   return unreadMessageIndex === -1 ? 0 : chatListLength - unreadMessageIndex;
 };
-// export const getNotReadMessageCount = (chatList: ChatDataNew[], uid: string) => {
-//   if (!chatList) return 0;
-//   let chatListLength = chatList.length;
-//   let 안읽은메시지인덱스 = chatList.findIndex((i) => {
-//     return i!.readUsers[uid] === false;
-//   });
-//   let 안읽은메시지갯수 = chatListLength - 안읽은메시지인덱스;
-//   return 안읽은메시지인덱스 === -1 ? 0 : 안읽은메시지갯수;
-// };
 
 /**
  * 채팅의 uid와 종류를 넘겨주면 메시지가 있을때 마지막 메시지를, 없으면 null을 반환합니다.
@@ -265,22 +256,29 @@ export const getChatRoomLastMessage = async (
   chatRoomUid: string,
   chatRoomType: 'oneToOne' | 'group',
 ): Promise<ChatDataNew | null> => {
-  let resultLastMessage = null;
   //들어온값에 따라서 적절한 ref를 할당시킨다.
   const chatRef =
     chatRoomType === 'oneToOne'
       ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
       : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
-
   //메시지를 가져온다. 해당 채팅방에 메시지가 없으면 null이 나온다.
   const queryLastMessage = await (await get(query(chatRef, limitToLast(1)))).val();
-
-  if (queryLastMessage) {
-    //메시지가 있으면 values로 풀어준다
-    resultLastMessage = Object.values(queryLastMessage)[0];
-  }
-  return resultLastMessage;
+  //메시지가 있으면 values로 풀어준다
+  return queryLastMessage ? (Object.values(queryLastMessage)[0] as ChatDataNew) : null;
 };
+
+// const getChatRoomLastMessage = async (
+//   chatRoomUid: string,
+//   chatRoomType: 'oneToOne' | 'group',
+// ): Promise<ChatDataNew | null> => {
+//   const chatRef =
+//     chatRoomType === 'oneToOne'
+//       ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
+//       : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
+
+//   const queryLastMessage = await (await get(query(chatRef, limitToLast(1)))).val();
+//   return queryLastMessage ? Object.values(queryLastMessage)[0] : null;
+// };
 
 /**
  * 일대일 채팅방 접속 시 생성 유무를 체크하여 분기되는 함수입니다.
