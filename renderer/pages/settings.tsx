@@ -118,15 +118,16 @@ const Settings = () => {
   const groupLayoutRef2 = useRef<HTMLInputElement>();
 
   useEffect(() => {
-    //설정 화면에 체크되어있을 항목들을 설정합니다.
-    if (localStorage.getItem('oneToOneChatLayout') === 'oneToOne') {
+    const oneToOneSetting = localStorage.getItem('oneToOneChatLayout');
+    const groupSetting = localStorage.getItem('groupChatLayout');
+    if (oneToOneSetting === 'oneToOne') {
       ref.current.checked = true;
-    } else if (localStorage.getItem('oneToOneChatLayout') === 'group') {
+    } else if (oneToOneSetting === 'group') {
       groupRef.current.checked = true;
     }
-    if (localStorage.getItem('groupChatLayout') === 'oneToOne') {
+    if (groupSetting === 'oneToOne') {
       groupLayoutRef.current.checked = true;
-    } else if (localStorage.getItem('groupChatLayout') === 'group') {
+    } else if (groupSetting === 'group') {
       groupLayoutRef2.current.checked = true;
     }
   }, []);
