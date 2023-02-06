@@ -133,21 +133,13 @@ const Settings = () => {
   }, []);
 
   const oneToOneSettings = (e: React.ChangeEvent<HTMLInputElement> | string) => {
-    if (typeof e === 'string') {
-      localStorage.setItem('oneToOneChatLayout', `${e}`);
-    } else {
-      const value = e.target.value as 'oneToOne' | 'group';
-      localStorage.setItem('oneToOneChatLayout', `${value}`);
-    }
+    const value = typeof e === 'string' ? e : e.target.value;
+    localStorage.setItem('oneToOneChatLayout', `${value}`);
   };
 
   const groupSettings = (e: React.ChangeEvent<HTMLInputElement> | string) => {
-    if (typeof e === 'string') {
-      localStorage.setItem('groupChatLayout', `${e}`);
-    } else {
-      const value = e.target.value as 'oneToOne' | 'group';
-      localStorage.setItem('groupChatLayout', `${value}`);
-    }
+    const value = typeof e === 'string' ? e : e.target.value;
+    localStorage.setItem('groupChatLayout', `${value}`);
   };
 
   return (
