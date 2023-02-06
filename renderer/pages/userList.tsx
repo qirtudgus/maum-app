@@ -113,7 +113,7 @@ const UserListComponent = () => {
   return (
     <Wrap>
       <PageTitle>유저 목록</PageTitle>
-      {userList.map((item, index) => {
+      {userList.map((item) => {
         return (
           item.uid === authService.currentUser?.uid && (
             <MyselfLi key={item.uid}>
@@ -133,7 +133,7 @@ const UserListComponent = () => {
           )
         );
       })}
-      {userList.map((item, index) => {
+      {userList.map((item) => {
         return (
           item.uid !== authService.currentUser?.uid && (
             <ChatRoomInfoWithUserList
