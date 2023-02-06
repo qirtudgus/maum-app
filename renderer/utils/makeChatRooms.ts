@@ -267,19 +267,6 @@ export const getChatRoomLastMessage = async (
   return queryLastMessage ? (Object.values(queryLastMessage)[0] as ChatDataNew) : null;
 };
 
-// const getChatRoomLastMessage = async (
-//   chatRoomUid: string,
-//   chatRoomType: 'oneToOne' | 'group',
-// ): Promise<ChatDataNew | null> => {
-//   const chatRef =
-//     chatRoomType === 'oneToOne'
-//       ? ref(realtimeDbService, `oneToOneChatRooms/${chatRoomUid}/chat`)
-//       : ref(realtimeDbService, `groupChatRooms/${chatRoomUid}/chat`);
-
-//   const queryLastMessage = await (await get(query(chatRef, limitToLast(1)))).val();
-//   return queryLastMessage ? Object.values(queryLastMessage)[0] : null;
-// };
-
 /**
  * 일대일 채팅방 접속 시 생성 유무를 체크하여 분기되는 함수입니다.
  * 1. 접속하려는 유저와 채팅방이 이미 존재할 시
