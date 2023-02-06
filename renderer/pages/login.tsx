@@ -72,7 +72,7 @@ const Login = () => {
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [isPasswordText, setIsPasswordText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const 방금가입한메일 = router.query.email as string;
+  const signedUpEamil = router.query.email as string;
 
   const signInWithEmail = async (email: string, password: string) => {
     try {
@@ -83,30 +83,16 @@ const Login = () => {
   };
 
   useEffect(() => {
-    //로컬스토리지 mail 체크 후 input에 저장
-    //저장은 해놨고, 방금 가입을 했으면 방금 가입한 메일을 인풋에
-    //저장만 해놨으면 인풋에
-    //저장 안해놨고 가입했으면 가입을 인풋에
     const isMailSave = window.localStorage.getItem('mail');
     const emailInput = emailRef.current.firstChild as HTMLInputElement;
     const passwordInput = passwordRef.current.firstChild as HTMLInputElement;
-    if (isMailSave && 방금가입한메일) {
-      emailInput.value = 방금가입한메일;
-      emailSaveRef.current.checked = true;
-      emailInput.focus();
+
+    let email = signedUpEamil || isMailSave || '';
+    emailInput.value = email;
+    emailSaveRef.current.checked = !!isMailSave;
+    emailInput.focus();
+    if (email) {
       passwordInput.focus();
-      // emailInput.placeholder = '';
-    } else if (isMailSave && !방금가입한메일) {
-      emailInput.value = isMailSave;
-      emailSaveRef.current.checked = true;
-      emailInput.focus();
-      passwordInput.focus();
-    } else if (!isMailSave && 방금가입한메일) {
-      emailInput.value = 방금가입한메일;
-      emailInput.focus();
-      passwordInput.focus();
-    } else {
-      emailInput.focus();
     }
   }, []);
 
