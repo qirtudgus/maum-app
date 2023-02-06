@@ -193,7 +193,7 @@ const Login = () => {
           <BasicInput
             ref={emailRef}
             placeholderValue='이메일'
-            defaultValue={방금가입한메일}
+            defaultValue={signedUpEamil}
             isError={isLoginError}
             statusText={isLoginText}
           ></BasicInput>
