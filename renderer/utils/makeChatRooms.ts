@@ -241,13 +241,19 @@ export const getMyOneToOneChatRoomChatList = async (chatRoomUid: string): Promis
  */
 export const getNotReadMessageCount = (chatList: ChatDataNew[], uid: string) => {
   if (!chatList) return 0;
-  let chatListLength = chatList.length;
-  let 안읽은메시지인덱스 = chatList.findIndex((i) => {
-    return i!.readUsers[uid] === false;
-  });
-  let 안읽은메시지갯수 = chatListLength - 안읽은메시지인덱스;
-  return 안읽은메시지인덱스 === -1 ? 0 : 안읽은메시지갯수;
+  const chatListLength = chatList.length;
+  const unreadMessageIndex = chatList.findIndex((i) => !i.readUsers[uid]);
+  return unreadMessageIndex === -1 ? 0 : chatListLength - unreadMessageIndex;
 };
+// export const getNotReadMessageCount = (chatList: ChatDataNew[], uid: string) => {
+//   if (!chatList) return 0;
+//   let chatListLength = chatList.length;
+//   let 안읽은메시지인덱스 = chatList.findIndex((i) => {
+//     return i!.readUsers[uid] === false;
+//   });
+//   let 안읽은메시지갯수 = chatListLength - 안읽은메시지인덱스;
+//   return 안읽은메시지인덱스 === -1 ? 0 : 안읽은메시지갯수;
+// };
 
 /**
  * 채팅의 uid와 종류를 넘겨주면 메시지가 있을때 마지막 메시지를, 없으면 null을 반환합니다.
@@ -276,6 +282,16 @@ export const getChatRoomLastMessage = async (
   return resultLastMessage;
 };
 
+/**
+ * 일대일 채팅방 접속 시 생성 유무를 체크하여 분기되는 함수입니다.
+ * 1. 접속하려는 유저와 채팅방이 이미 존재할 시
+ * 2. 접속하려는 유저와 채팅방이 없을 시
+ * @param myUid
+ * @param myDisplayName
+ * @param opponentUid
+ * @param opponentDisplayName
+ * @returns
+ */
 export const enterOneToOneChatRoom = async (
   myUid: string,
   myDisplayName: string,
